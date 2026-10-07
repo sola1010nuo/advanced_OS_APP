@@ -37,10 +37,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.petcollection.R
 import com.example.petcollection.data.Species
+import com.example.petcollection.data.MockBreedRepository
+import com.example.petcollection.ui.collection.CollectionEncounterHost
 import com.example.petcollection.ui.collection.CollectionScreen
 import com.example.petcollection.ui.collection.rememberCollectionUnlockState
 import com.example.petcollection.ui.home.HomePreviewData
 import com.example.petcollection.ui.home.HomeScreen
+import com.example.petcollection.ui.home.PhotoRecognitionState
 import com.example.petcollection.ui.theme.PetCollectionTheme
 import java.util.Locale
 
@@ -59,8 +62,10 @@ fun PetCollectionApp() {
     var appearance by rememberSaveable { mutableStateOf(Appearance.SYSTEM.name) }
     var destination by rememberSaveable { mutableStateOf(Destination.HOME.name) }
     var collectionSpecies by rememberSaveable { mutableStateOf(Species.CAT.name) }
-    // Shared input for future recognition; choosing a photo only updates Home.
+    // Each picker selection starts one automatic recognition, including selecting the same URI again.
     var selectedPhotoUri by rememberSaveable { mutableStateOf<String?>(null) }
+    var photoRequest by rememberSaveable { mutableIntStateOf(0) }
+    val recognitionState = remember { PhotoRecognitionState() }
     val baseContext = LocalContext.current
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -70,6 +75,7 @@ fun PetCollectionApp() {
                 // Some providers grant read access for the current session only.
             }
             selectedPhotoUri = uri.toString()
+            photoRequest++
         }
     }
     val systemConfiguration = LocalConfiguration.current
@@ -80,6 +86,11 @@ fun PetCollectionApp() {
     }
     val localizedContext = remember(baseContext, configuration) {
         baseContext.createConfigurationContext(configuration)
+    }
+    val catalog = remember(localizedContext) { MockBreedRepository(localizedContext.resources).getBreeds() }
+    val breeds = catalog.map(collectionUnlockState::applyTo)
+    LaunchedEffect(selectedPhotoUri, photoRequest) {
+        selectedPhotoUri?.let { recognitionState.recognize(baseContext.applicationContext, Uri.parse(it), catalog, collectionUnlockState) }
     }
     val dark = when (Appearance.valueOf(appearance)) {
         Appearance.SYSTEM -> isSystemInDarkTheme()
@@ -97,6 +108,8 @@ fun PetCollectionApp() {
     }
     CompositionLocalProvider(LocalContext provides localizedContext, LocalConfiguration provides configuration) {
         PetCollectionTheme(darkTheme = dark) {
+            // Collection already mounts this same host. Mount it here for Home and other destinations.
+            if (destination != Destination.COLLECTION.name) CollectionEncounterHost(collectionUnlockState, breeds)
             Scaffold(
                 bottomBar = {
                     NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
@@ -120,6 +133,14 @@ fun PetCollectionApp() {
                         onOpenCollection = { species ->
                             collectionSpecies = species.name
                             destination = Destination.COLLECTION.name
+                        },
+                        recognitionState = recognitionState,
+                        recognizedBreedName = breeds.firstOrNull { it.id == recognitionState.breedId }?.name,
+                        onRetryRecognition = { photoRequest++ },
+                        categories = HomePreviewData.categories.map { category ->
+                            val species = if (category.id == "cat") Species.CAT else Species.DOG
+                            val matching = breeds.filter { it.species == species }
+                            category.copy(total = matching.size, collected = matching.count { it.isDiscovered })
                         }
                     )
                     Destination.COLLECTION -> CollectionScreen(contentModifier,

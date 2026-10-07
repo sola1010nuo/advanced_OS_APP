@@ -1,65 +1,58 @@
 package com.example.petcollection.ui.home
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.petcollection.R
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
+/** The photo develops inside a Material 3 Polaroid frame; results use catalog names. */
 @Composable
-fun SelectedPhotoPreview(uri: Uri) {
-    val resolver = LocalContext.current.contentResolver
-    var loading by remember(uri) { mutableStateOf(true) }
-    val bitmap by produceState<Bitmap?>(null, uri, resolver) {
-        value = withContext(Dispatchers.IO) {
-            runCatching {
-                if (Build.VERSION.SDK_INT >= 28) {
-                    ImageDecoder.decodeBitmap(ImageDecoder.createSource(resolver, uri)) { decoder, info, _ ->
-                        val scale = (1024f / maxOf(info.size.width, info.size.height)).coerceAtMost(1f)
-                        decoder.setTargetSize(
-                            (info.size.width * scale).toInt().coerceAtLeast(1),
-                            (info.size.height * scale).toInt().coerceAtLeast(1)
-                        )
-                    }
-                } else {
-                    val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                    resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
-                    options.inJustDecodeBounds = false
-                    options.inSampleSize = 1
-                    while (maxOf(options.outWidth, options.outHeight) / options.inSampleSize > 1024) {
-                        options.inSampleSize *= 2
-                    }
-                    resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
+fun SelectedPhotoPreview(state: PhotoRecognitionState, breedName: String?, onRetry: () -> Unit) {
+    val photo = state.bitmap
+    val alpha = if (state.processing) {
+        val transition = rememberInfiniteTransition(label = "developing")
+        val pulse by transition.animateFloat(0.3f, 0.8f,
+            infiniteRepeatable(tween(900), RepeatMode.Reverse), label = "photo reveal")
+        pulse
+    } else 1f
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(6.dp).graphicsLayer { rotationZ = -1f },
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Box(Modifier.fillMaxWidth().aspectRatio(1f).background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center) {
+                if (photo != null) {
+                    Image(photo.asImageBitmap(), contentDescription = stringResource(R.string.selected_photo),
+                        modifier = Modifier.fillMaxSize().graphicsLayer { this.alpha = alpha },
+                        contentScale = ContentScale.Fit)
                 }
-            }.getOrNull()
-        }
-        loading = false
-    }
-    OutlinedCard(shape = RoundedCornerShape(24.dp)) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(stringResource(R.string.selected_photo), style = MaterialTheme.typography.titleMedium)
-            val photo = bitmap
-            if (photo != null) {
-                Image(photo.asImageBitmap(), contentDescription = stringResource(R.string.selected_photo),
-                    modifier = Modifier.fillMaxWidth().height(240.dp), contentScale = ContentScale.Fit)
-            } else if (loading) {
-                CircularProgressIndicator()
-            } else {
-                Text(stringResource(R.string.photo_preview_error), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (state.processing) CircularProgressIndicator()
+            }
+            Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (state.processing) {
+                    Text(stringResource(R.string.photo_developing), style = MaterialTheme.typography.titleMedium)
+                } else if (state.failed) {
+                    Text(stringResource(R.string.inference_error), color = MaterialTheme.colorScheme.error)
+                    TextButton(onClick = onRetry) { Text(stringResource(R.string.inference_retry)) }
+                } else if (breedName != null) {
+                    Text(breedName, style = MaterialTheme.typography.titleLarge)
+                    state.confidence?.let { Text(stringResource(R.string.inference_confidence, it * 100f)) }
+                }
             }
         }
     }
