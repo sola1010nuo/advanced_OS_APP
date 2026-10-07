@@ -1,0 +1,18 @@
+<resources>
+    <string name="unlock_title">登登！解鎖新圖鑑！</string>
+    <string name="unlock_added">已加入你的圖鑑</string>
+    <string name="unlock_record">紀錄這次相遇</string>
+    <string name="unlock_later">稍後再說</string>
+    <string name="encounter_title">紀錄這次相遇</string>
+    <string name="encounter_name">名字（選填）</string>
+    <string name="encounter_date">相遇日期</string>
+    <string name="encounter_time">相遇時間</string>
+    <string name="encounter_location">地點（選填）</string>
+    <string name="encounter_note">備註（選填）</string>
+    <string name="encounter_date_hint">YYYY-MM-DD（年-月-日）</string>
+    <string name="encounter_time_hint">HH:mm（24 小時制）</string>
+    <string name="encounter_date_error">請輸入有效日期：YYYY-MM-DD</string>
+    <string name="encounter_time_error">請輸入有效時間：HH:mm（00:00–23:59）</string>
+    <string name="encounter_save">儲存紀錄</string>
+    <string name="encounter_cancel">取消</string>
+</resources>

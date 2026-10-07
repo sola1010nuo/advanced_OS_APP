@@ -1,4 +1,4 @@
-﻿package com.example.petcollection.ui.collection
+package com.example.petcollection.ui.collection
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +17,11 @@ import com.example.petcollection.data.Breed
 import com.example.petcollection.data.Species
 
 @Composable
-fun BreedDetailScreen(breed: Breed, onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun BreedDetailScreen(
+    breed: Breed,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)) {
         item {

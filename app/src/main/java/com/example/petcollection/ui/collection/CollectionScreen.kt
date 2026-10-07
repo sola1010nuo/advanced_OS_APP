@@ -1,4 +1,4 @@
-﻿package com.example.petcollection.ui.collection
+package com.example.petcollection.ui.collection
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
@@ -25,11 +25,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 
 /** Small local grid/detail route; the existing app owns the bottom navigation. */
 @Composable
-fun CollectionScreen(modifier: Modifier = Modifier, repository: BreedRepository? = null) {
-    val resources = LocalContext.current.resources
+fun CollectionScreen(
+    modifier: Modifier = Modifier,
+    repository: BreedRepository? = null,
+    unlockState: CollectionUnlockState = rememberCollectionUnlockState()
+) {
+    val context = LocalContext.current
+    val resources = context.resources
     val configuration = LocalConfiguration.current
     val source = repository ?: remember(resources, configuration) { MockBreedRepository(resources) }
-    val breeds = remember(source) { source.getBreeds() }
+    val catalog = remember(source) { source.getBreeds() }
+    val breeds = catalog.map(unlockState::applyTo)
+    CollectionEncounterHost(unlockState, breeds)
     var selectedSpecies by rememberSaveable { mutableStateOf(Species.CAT.name) }
     var selectedBreedId by rememberSaveable { mutableStateOf<String?>(null) }
     val catGridState = rememberLazyGridState()
