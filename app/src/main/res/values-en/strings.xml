@@ -1,0 +1,43 @@
+﻿<resources>
+    <string name="app_name">PetCollection</string>
+    <string name="home">Home</string>
+    <string name="collection">Collection</string>
+    <string name="footprints">Footprints</string>
+    <string name="settings">Settings</string>
+    <string name="home_eyebrow">YOUR LITTLE WORLD OF PETS</string>
+    <string name="home_subtitle">Meet them. Collect them. Remember them.</string>
+    <string name="my_collection">My Collection</string>
+    <string name="your_collections">Your collections</string>
+    <string name="cat_collection">Cat Collection</string>
+    <string name="dog_collection">Dog Collection</string>
+    <string name="collection_count">%1$d / %2$d</string>
+    <string name="category_count">Breeds: %1$d / %2$d</string>
+    <string name="breeds_discovered">breeds discovered</string>
+    <string name="collection_hint">Every encounter is a new little memory.</string>
+    <string name="add_photo">＋ Add Pet Photo</string>
+    <string name="achievements">Achievements</string>
+    <string name="achievement_hint">Little milestones along the way</string>
+    <string name="first_discovery">First Discovery</string>
+    <string name="beginner_collector">Beginner Collector</string>
+    <string name="pet_explorer">Pet Explorer</string>
+    <string name="experienced_collector">Experienced Collector</string>
+    <string name="master_collector">Master Collector</string>
+    <string name="complete_collection">Complete Collection</string>
+    <string name="locked">Locked</string>
+    <plurals name="breed_threshold"><item quantity="one">%d breed</item><item quantity="other">%d breeds</item></plurals>
+    <string name="recent_discoveries">Recent Discoveries</string>
+    <string name="no_discoveries">No discoveries yet</string>
+    <string name="discoveries_hint">Your pet collection starts with your first encounter.</string>
+    <string name="recent_footprints">Recent Footprints</string>
+    <string name="no_footprints">No footprints yet</string>
+    <string name="footprints_hint">Remember where you met your furry friends.</string>
+    <string name="footprints_future">One day you can revisit encounter photos, breeds, times and places, with optional names and notes.</string>
+    <string name="collection_future">Your cat and dog collections will grow from your very first encounter.</string>
+    <string name="language">Language</string>
+    <string name="appearance">Appearance</string>
+    <string name="follow_system">Follow system</string>
+    <string name="light_mode">Light mode</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="settings_hint">Try your preferred language and appearance. These choices reset when you reopen the app.</string>
+</resources>
+

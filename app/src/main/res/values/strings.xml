@@ -1,3 +1,44 @@
-<resources>
+﻿<resources>
     <string name="app_name">PetCollection</string>
+    <string name="home">首頁</string>
+    <string name="collection">圖鑑</string>
+    <string name="footprints">足跡</string>
+    <string name="settings">設定</string>
+    <string name="home_eyebrow">屬於你的毛孩小世界</string>
+    <string name="home_subtitle">遇見牠們，收藏相遇，留下回憶。</string>
+    <string name="my_collection">我的收藏</string>
+    <string name="your_collections">我的圖鑑</string>
+    <string name="cat_collection">貓咪圖鑑</string>
+    <string name="dog_collection">狗狗圖鑑</string>
+    <string name="collection_count">%1$d / %2$d</string>
+    <string name="category_count">%1$d / %2$d 個品種</string>
+    <string name="breeds_discovered">已發現的品種</string>
+    <string name="collection_hint">每一次相遇，都是一段小小的回憶。</string>
+    <string name="add_photo">＋ 新增寵物照片</string>
+    <string name="achievements">我的徽章</string>
+    <string name="achievement_hint">收藏旅途中的小小里程碑</string>
+    <string name="first_discovery">初次發現</string>
+    <string name="beginner_collector">新手收藏家</string>
+    <string name="pet_explorer">毛孩探索家</string>
+    <string name="experienced_collector">資深收藏家</string>
+    <string name="master_collector">收藏大師</string>
+    <string name="complete_collection">完整收藏</string>
+    <string name="locked">尚未解鎖</string>
+    <plurals name="breed_threshold"><item quantity="other">%d 個品種</item></plurals>
+    <string name="recent_discoveries">最近發現</string>
+    <string name="no_discoveries">還沒有新的發現</string>
+    <string name="discoveries_hint">與毛孩的第一次相遇，就是收藏的開始。</string>
+    <string name="recent_footprints">最近足跡</string>
+    <string name="no_footprints">還沒有留下足跡</string>
+    <string name="footprints_hint">記錄你與毛孩相遇的地方</string>
+    <string name="footprints_future">未來可以在這裡回顧相遇的照片、品種、時間與地點，也能留下名字和筆記。</string>
+    <string name="collection_future">你的貓咪與狗狗圖鑑，將從第一次相遇慢慢豐富起來。</string>
+    <string name="language">語言</string>
+    <string name="language_zh" translatable="false">繁體中文</string>
+    <string name="language_en" translatable="false">English</string>
+    <string name="appearance">外觀</string>
+    <string name="follow_system">跟隨系統</string>
+    <string name="light_mode">淺色模式</string>
+    <string name="dark_mode">深色模式</string>
+    <string name="settings_hint">先試試喜歡的語言與外觀；重新開啟後會回到預設設定。</string>
 </resources>
