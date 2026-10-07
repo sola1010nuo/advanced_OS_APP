@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import com.example.petcollection.R
 import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.data.Species
-import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.ui.collection.CollectionEncounterHost
 import com.example.petcollection.ui.collection.CollectionScreen
 import com.example.petcollection.ui.collection.rememberCollectionUnlockState
@@ -149,12 +148,7 @@ fun PetCollectionApp() {
                         },
                         recognitionState = recognitionState,
                         recognizedBreedName = breeds.firstOrNull { it.id == recognitionState.breedId }?.name,
-                        onRetryRecognition = { photoRequest++ },
-                        categories = HomePreviewData.categories.map { category ->
-                            val species = if (category.id == "cat") Species.CAT else Species.DOG
-                            val matching = breeds.filter { it.species == species }
-                            category.copy(total = matching.size, collected = matching.count { it.isDiscovered })
-                        }
+                        onRetryRecognition = { photoRequest++ }
                     )
                     Destination.COLLECTION -> CollectionScreen(contentModifier,
                         unlockState = collectionUnlockState, initialSpecies = Species.valueOf(collectionSpecies))

@@ -41,8 +41,7 @@ fun HomeScreen(
     onOpenCollection: (Species) -> Unit = {},
     recognitionState: PhotoRecognitionState = remember { PhotoRecognitionState() },
     recognizedBreedName: String? = null,
-    onRetryRecognition: () -> Unit = {},
-    categories: List<CollectionCategory> = HomePreviewData.categories
+    onRetryRecognition: () -> Unit = {}
 ) {
     val photoPreview = remember { BringIntoViewRequester() }
     LaunchedEffect(selectedPhotoUri, recognitionState.processing) {
