@@ -1,4 +1,4 @@
-﻿<resources>
+<resources>
     <string name="app_name">PetCollection</string>
     <string name="home">Home</string>
     <string name="collection">Collection</string>
@@ -58,6 +58,8 @@
     <string name="encyclopedia_encounters">Encounters: %1$d</string>
     <string name="encyclopedia_photos">Collected photos</string>
     <string name="encyclopedia_no_photos">No collected photos yet</string>
+    <string name="selected_photo">Selected photo</string>
+    <string name="photo_preview_error">Unable to load this photo. Please select another image.</string>
 </resources>
 
 
