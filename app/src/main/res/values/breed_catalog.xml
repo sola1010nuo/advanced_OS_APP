@@ -1,7 +1,7 @@
 ﻿<resources>
     <string name="breed_abyssinian_name">阿比西尼亞貓</string>
 
-    <string name="breed_abyssinian_origin">衣索比亞／早期培育於英國</string>
+    <string name="breed_abyssinian_origin">埃及的印度洋海岸</string>
 
     <string name="breed_abyssinian_personality">好奇、活潑</string>
 
@@ -13,7 +13,7 @@
 
     <string name="breed_american_shorthair_origin">美國</string>
 
-    <string name="breed_american_shorthair_personality">隨和、愛玩</string>
+    <string name="breed_american_shorthair_personality">活潑、溫柔</string>
 
     <string name="breed_american_shorthair_size">中至大型</string>
 
