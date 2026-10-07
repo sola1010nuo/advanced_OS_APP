@@ -1,4 +1,4 @@
-﻿package com.example.petcollection.ui
+package com.example.petcollection.ui
 
 import android.app.Activity
 import android.content.res.Configuration
@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.petcollection.R
 import com.example.petcollection.ui.collection.CollectionScreen
+import com.example.petcollection.ui.collection.rememberCollectionUnlockState
 import com.example.petcollection.ui.home.HomePreviewData
 import com.example.petcollection.ui.home.HomeScreen
 import com.example.petcollection.ui.theme.PetCollectionTheme
@@ -46,6 +47,7 @@ private enum class Appearance(@param:StringRes val label: Int) {
 
 @Composable
 fun PetCollectionApp() {
+    val collectionUnlockState = rememberCollectionUnlockState()
     // UI prototype only: retained across rotation, reset on a fresh app launch.
     var language by rememberSaveable { mutableStateOf("zh-Hant") }
     var appearance by rememberSaveable { mutableStateOf(Appearance.SYSTEM.name) }
@@ -93,7 +95,7 @@ fun PetCollectionApp() {
                 val contentModifier = Modifier.padding(padding).consumeWindowInsets(padding)
                 when (Destination.valueOf(destination)) {
                     Destination.HOME -> HomeScreen(contentModifier)
-                    Destination.COLLECTION -> CollectionScreen(contentModifier)
+                    Destination.COLLECTION -> CollectionScreen(contentModifier, unlockState = collectionUnlockState)
                     Destination.FOOTPRINTS -> FootprintsScreen(contentModifier)
                     Destination.SETTINGS -> SettingsScreen(
                         language, { language = it }, Appearance.valueOf(appearance), { appearance = it.name }, contentModifier
@@ -214,7 +216,3 @@ private fun DestinationIcon(destination: Destination, modifier: Modifier = Modif
 @Preview(showBackground = true, widthDp = 393, heightDp = 852)
 @Composable
 private fun AppPreview() { PetCollectionApp() }
-
-
-
-

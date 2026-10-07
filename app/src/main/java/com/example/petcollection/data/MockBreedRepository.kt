@@ -1,4 +1,4 @@
-﻿package com.example.petcollection.data
+package com.example.petcollection.data
 
 import android.content.res.Resources
 import androidx.annotation.StringRes
@@ -7,9 +7,6 @@ import com.example.petcollection.R
 /** Replace this implementation with a database repository when persistence is added. */
 class MockBreedRepository(private val resources: Resources) : BreedRepository {
     override fun getBreeds(): List<Breed> = entries.map { entry ->
-        val discovered = entry.id in discoveredIds
-        // Null URIs deliberately represent sample slots, never actual collected photos.
-        val photos = if (discovered) List(2) { BreedPhoto("${entry.id}_sample_$it") } else emptyList()
         val name = resources.getString(entry.name)
         val coat = resources.getString(entry.coat)
         val personality = resources.getString(entry.personality)
@@ -17,9 +14,7 @@ class MockBreedRepository(private val resources: Resources) : BreedRepository {
             id = entry.id, name = name, species = entry.species,
             description = resources.getString(R.string.breed_description_template, name, coat, personality),
             origin = resources.getString(entry.origin), personality = personality,
-            size = resources.getString(entry.size), coat = coat,
-            isDiscovered = discovered, encounterCount = photos.size,
-            coverPhoto = photos.firstOrNull(), collectedPhotos = photos
+            size = resources.getString(entry.size), coat = coat
         )
     }
 
@@ -31,12 +26,7 @@ class MockBreedRepository(private val resources: Resources) : BreedRepository {
     )
 
     companion object {
-        private val discoveredIds = setOf(
-            "british_shorthair", "maine_coon", "ragdoll", "siamese",
-            "golden_retriever", "corgi", "shiba_inu", "pomeranian"
-        )
         fun total(species: Species): Int = entries.count { it.species == species }
-        fun discovered(species: Species): Int = entries.count { it.species == species && it.id in discoveredIds }
 
         private val entries = listOf(
             Entry("abyssinian", Species.CAT, R.string.breed_abyssinian_name, R.string.breed_abyssinian_origin, R.string.breed_abyssinian_personality, R.string.breed_abyssinian_size, R.string.breed_abyssinian_coat),

@@ -1,0 +1,18 @@
+<resources>
+    <string name="unlock_title">New Breed Unlocked!</string>
+    <string name="unlock_added">Added to your collection</string>
+    <string name="unlock_record">Record This Encounter</string>
+    <string name="unlock_later">Maybe Later</string>
+    <string name="encounter_title">Record This Encounter</string>
+    <string name="encounter_name">Pet name (optional)</string>
+    <string name="encounter_date">Encounter date</string>
+    <string name="encounter_time">Encounter time</string>
+    <string name="encounter_location">Location (optional)</string>
+    <string name="encounter_note">Note (optional)</string>
+    <string name="encounter_date_hint">YYYY-MM-DD</string>
+    <string name="encounter_time_hint">HH:mm (24-hour)</string>
+    <string name="encounter_date_error">Enter a valid date: YYYY-MM-DD</string>
+    <string name="encounter_time_error">Enter a valid time: HH:mm (00:00–23:59)</string>
+    <string name="encounter_save">Save Encounter</string>
+    <string name="encounter_cancel">Cancel</string>
+</resources>
