@@ -1,0 +1,562 @@
+﻿<resources>
+    <string name="breed_abyssinian_name">Abyssinian</string>
+
+    <string name="breed_abyssinian_origin">Ethiopia / early development in Britain</string>
+
+    <string name="breed_abyssinian_personality">curious and active</string>
+
+    <string name="breed_abyssinian_size">Medium</string>
+
+    <string name="breed_abyssinian_coat">short ticked coat</string>
+
+    <string name="breed_american_shorthair_name">American Shorthair</string>
+
+    <string name="breed_american_shorthair_origin">United States</string>
+
+    <string name="breed_american_shorthair_personality">easygoing and playful</string>
+
+    <string name="breed_american_shorthair_size">Medium to large</string>
+
+    <string name="breed_american_shorthair_coat">dense short coat</string>
+
+    <string name="breed_bengal_name">Bengal</string>
+
+    <string name="breed_bengal_origin">United States</string>
+
+    <string name="breed_bengal_personality">energetic and curious</string>
+
+    <string name="breed_bengal_size">Medium to large</string>
+
+    <string name="breed_bengal_coat">spotted or marbled short coat</string>
+
+    <string name="breed_birman_name">Birman</string>
+
+    <string name="breed_birman_origin">Early development in France</string>
+
+    <string name="breed_birman_personality">gentle and sociable</string>
+
+    <string name="breed_birman_size">Medium to large</string>
+
+    <string name="breed_birman_coat">silky pointed coat and white paws</string>
+
+    <string name="breed_bombay_name">Bombay</string>
+
+    <string name="breed_bombay_origin">United States</string>
+
+    <string name="breed_bombay_personality">affectionate and playful</string>
+
+    <string name="breed_bombay_size">Medium</string>
+
+    <string name="breed_bombay_coat">sleek black short coat</string>
+
+    <string name="breed_british_shorthair_name">British Shorthair</string>
+
+    <string name="breed_british_shorthair_origin">Britain</string>
+
+    <string name="breed_british_shorthair_personality">calm and easygoing</string>
+
+    <string name="breed_british_shorthair_size">Medium to large</string>
+
+    <string name="breed_british_shorthair_coat">plush short coat and rounded face</string>
+
+    <string name="breed_cornish_rex_name">Cornish Rex</string>
+
+    <string name="breed_cornish_rex_origin">Britain</string>
+
+    <string name="breed_cornish_rex_personality">active and sociable</string>
+
+    <string name="breed_cornish_rex_size">Small to medium</string>
+
+    <string name="breed_cornish_rex_coat">soft wavy coat and slender body</string>
+
+    <string name="breed_devon_rex_name">Devon Rex</string>
+
+    <string name="breed_devon_rex_origin">Britain</string>
+
+    <string name="breed_devon_rex_personality">playful and affectionate</string>
+
+    <string name="breed_devon_rex_size">Small to medium</string>
+
+    <string name="breed_devon_rex_coat">short curly coat and large ears</string>
+
+    <string name="breed_egyptian_mau_name">Egyptian Mau</string>
+
+    <string name="breed_egyptian_mau_origin">Egypt / development in the United States</string>
+
+    <string name="breed_egyptian_mau_personality">alert and active</string>
+
+    <string name="breed_egyptian_mau_size">Medium</string>
+
+    <string name="breed_egyptian_mau_coat">naturally spotted short coat</string>
+
+    <string name="breed_exotic_shorthair_name">Exotic Shorthair</string>
+
+    <string name="breed_exotic_shorthair_origin">United States</string>
+
+    <string name="breed_exotic_shorthair_personality">gentle and calm</string>
+
+    <string name="breed_exotic_shorthair_size">Medium</string>
+
+    <string name="breed_exotic_shorthair_coat">dense short coat and rounded face</string>
+
+    <string name="breed_maine_coon_name">Maine Coon</string>
+
+    <string name="breed_maine_coon_origin">United States</string>
+
+    <string name="breed_maine_coon_personality">friendly and gentle</string>
+
+    <string name="breed_maine_coon_size">Large</string>
+
+    <string name="breed_maine_coon_coat">long shaggy coat and bushy tail</string>
+
+    <string name="breed_manx_name">Manx</string>
+
+    <string name="breed_manx_origin">Isle of Man</string>
+
+    <string name="breed_manx_personality">playful and affectionate</string>
+
+    <string name="breed_manx_size">Medium</string>
+
+    <string name="breed_manx_coat">dense coat with variable tail length</string>
+
+    <string name="breed_munchkin_name">Munchkin</string>
+
+    <string name="breed_munchkin_origin">United States</string>
+
+    <string name="breed_munchkin_personality">curious and playful</string>
+
+    <string name="breed_munchkin_size">Small to medium</string>
+
+    <string name="breed_munchkin_coat">short legs with short or long coat</string>
+
+    <string name="breed_norwegian_forest_cat_name">Norwegian Forest Cat</string>
+
+    <string name="breed_norwegian_forest_cat_origin">Norway</string>
+
+    <string name="breed_norwegian_forest_cat_personality">gentle and independent</string>
+
+    <string name="breed_norwegian_forest_cat_size">Large</string>
+
+    <string name="breed_norwegian_forest_cat_coat">thick long coat and tufted ears</string>
+
+    <string name="breed_oriental_shorthair_name">Oriental Shorthair</string>
+
+    <string name="breed_oriental_shorthair_origin">Britain</string>
+
+    <string name="breed_oriental_shorthair_personality">social and vocal</string>
+
+    <string name="breed_oriental_shorthair_size">Medium</string>
+
+    <string name="breed_oriental_shorthair_coat">sleek short coat and slender body</string>
+
+    <string name="breed_persian_name">Persian</string>
+
+    <string name="breed_persian_origin">Persia / development in Europe</string>
+
+    <string name="breed_persian_personality">quiet and gentle</string>
+
+    <string name="breed_persian_size">Medium to large</string>
+
+    <string name="breed_persian_coat">long flowing coat and rounded face</string>
+
+    <string name="breed_ragdoll_name">Ragdoll</string>
+
+    <string name="breed_ragdoll_origin">United States</string>
+
+    <string name="breed_ragdoll_personality">gentle and affectionate</string>
+
+    <string name="breed_ragdoll_size">Large</string>
+
+    <string name="breed_ragdoll_coat">soft semi-long coat and blue eyes</string>
+
+    <string name="breed_russian_blue_name">Russian Blue</string>
+
+    <string name="breed_russian_blue_origin">Russia</string>
+
+    <string name="breed_russian_blue_personality">reserved and gentle</string>
+
+    <string name="breed_russian_blue_size">Medium</string>
+
+    <string name="breed_russian_blue_coat">dense blue-grey short coat</string>
+
+    <string name="breed_scottish_fold_name">Scottish Fold</string>
+
+    <string name="breed_scottish_fold_origin">Scotland</string>
+
+    <string name="breed_scottish_fold_personality">gentle and sociable</string>
+
+    <string name="breed_scottish_fold_size">Medium</string>
+
+    <string name="breed_scottish_fold_coat">rounded features and folded or straight ears</string>
+
+    <string name="breed_siamese_name">Siamese</string>
+
+    <string name="breed_siamese_origin">Thailand</string>
+
+    <string name="breed_siamese_personality">social and vocal</string>
+
+    <string name="breed_siamese_size">Medium</string>
+
+    <string name="breed_siamese_coat">pointed short coat and blue eyes</string>
+
+    <string name="breed_sphynx_name">Sphynx</string>
+
+    <string name="breed_sphynx_origin">Canada</string>
+
+    <string name="breed_sphynx_personality">outgoing and affectionate</string>
+
+    <string name="breed_sphynx_size">Medium</string>
+
+    <string name="breed_sphynx_coat">nearly hairless skin and large ears</string>
+
+    <string name="breed_turkish_angora_name">Turkish Angora</string>
+
+    <string name="breed_turkish_angora_origin">Turkey</string>
+
+    <string name="breed_turkish_angora_personality">active and curious</string>
+
+    <string name="breed_turkish_angora_size">Medium</string>
+
+    <string name="breed_turkish_angora_coat">silky semi-long coat</string>
+
+    <string name="breed_american_bulldog_name">American Bulldog</string>
+
+    <string name="breed_american_bulldog_origin">United States</string>
+
+    <string name="breed_american_bulldog_personality">confident and loyal</string>
+
+    <string name="breed_american_bulldog_size">Large</string>
+
+    <string name="breed_american_bulldog_coat">short coat and muscular build</string>
+
+    <string name="breed_american_pit_bull_terrier_name">American Pit Bull Terrier</string>
+
+    <string name="breed_american_pit_bull_terrier_origin">United States</string>
+
+    <string name="breed_american_pit_bull_terrier_personality">energetic and affectionate</string>
+
+    <string name="breed_american_pit_bull_terrier_size">Medium</string>
+
+    <string name="breed_american_pit_bull_terrier_coat">short smooth coat and athletic build</string>
+
+    <string name="breed_basset_hound_name">Basset Hound</string>
+
+    <string name="breed_basset_hound_origin">France / Belgium</string>
+
+    <string name="breed_basset_hound_personality">easygoing and persistent</string>
+
+    <string name="breed_basset_hound_size">Medium</string>
+
+    <string name="breed_basset_hound_coat">short coat, long ears and short legs</string>
+
+    <string name="breed_beagle_name">Beagle</string>
+
+    <string name="breed_beagle_origin">Britain</string>
+
+    <string name="breed_beagle_personality">curious and sociable</string>
+
+    <string name="breed_beagle_size">Small to medium</string>
+
+    <string name="breed_beagle_coat">short coat and floppy ears</string>
+
+    <string name="breed_border_collie_name">Border Collie</string>
+
+    <string name="breed_border_collie_origin">Britain</string>
+
+    <string name="breed_border_collie_personality">alert and energetic</string>
+
+    <string name="breed_border_collie_size">Medium</string>
+
+    <string name="breed_border_collie_coat">smooth or rough double coat</string>
+
+    <string name="breed_boxer_name">Boxer</string>
+
+    <string name="breed_boxer_origin">Germany</string>
+
+    <string name="breed_boxer_personality">playful and loyal</string>
+
+    <string name="breed_boxer_size">Medium to large</string>
+
+    <string name="breed_boxer_coat">short coat and square muzzle</string>
+
+    <string name="breed_chihuahua_name">Chihuahua</string>
+
+    <string name="breed_chihuahua_origin">Mexico</string>
+
+    <string name="breed_chihuahua_personality">alert and lively</string>
+
+    <string name="breed_chihuahua_size">Toy</string>
+
+    <string name="breed_chihuahua_coat">short or long coat and large ears</string>
+
+    <string name="breed_corgi_name">Corgi</string>
+
+    <string name="breed_corgi_origin">Wales</string>
+
+    <string name="breed_corgi_personality">lively and alert</string>
+
+    <string name="breed_corgi_size">Small to medium</string>
+
+    <string name="breed_corgi_coat">double coat, short legs and long body</string>
+
+    <string name="breed_english_cocker_spaniel_name">English Cocker Spaniel</string>
+
+    <string name="breed_english_cocker_spaniel_origin">Britain</string>
+
+    <string name="breed_english_cocker_spaniel_personality">cheerful and affectionate</string>
+
+    <string name="breed_english_cocker_spaniel_size">Medium</string>
+
+    <string name="breed_english_cocker_spaniel_coat">silky coat and feathered ears</string>
+
+    <string name="breed_english_setter_name">English Setter</string>
+
+    <string name="breed_english_setter_origin">Britain</string>
+
+    <string name="breed_english_setter_personality">gentle and energetic</string>
+
+    <string name="breed_english_setter_size">Medium to large</string>
+
+    <string name="breed_english_setter_coat">feathered coat with speckled markings</string>
+
+    <string name="breed_french_bulldog_name">French Bulldog</string>
+
+    <string name="breed_french_bulldog_origin">France</string>
+
+    <string name="breed_french_bulldog_personality">playful and affectionate</string>
+
+    <string name="breed_french_bulldog_size">Small</string>
+
+    <string name="breed_french_bulldog_coat">short coat and upright bat-like ears</string>
+
+    <string name="breed_german_shorthaired_pointer_name">German Shorthaired Pointer</string>
+
+    <string name="breed_german_shorthaired_pointer_origin">Germany</string>
+
+    <string name="breed_german_shorthaired_pointer_personality">active and eager</string>
+
+    <string name="breed_german_shorthaired_pointer_size">Medium to large</string>
+
+    <string name="breed_german_shorthaired_pointer_coat">short coat, often with ticking</string>
+
+    <string name="breed_golden_retriever_name">Golden Retriever</string>
+
+    <string name="breed_golden_retriever_origin">Scotland</string>
+
+    <string name="breed_golden_retriever_personality">friendly and eager</string>
+
+    <string name="breed_golden_retriever_size">Large</string>
+
+    <string name="breed_golden_retriever_coat">golden feathered double coat</string>
+
+    <string name="breed_great_pyrenees_name">Great Pyrenees</string>
+
+    <string name="breed_great_pyrenees_origin">France / Spain</string>
+
+    <string name="breed_great_pyrenees_personality">calm and watchful</string>
+
+    <string name="breed_great_pyrenees_size">Large to giant</string>
+
+    <string name="breed_great_pyrenees_coat">thick mostly white double coat</string>
+
+    <string name="breed_havanese_name">Havanese</string>
+
+    <string name="breed_havanese_origin">Cuba</string>
+
+    <string name="breed_havanese_personality">cheerful and sociable</string>
+
+    <string name="breed_havanese_size">Small</string>
+
+    <string name="breed_havanese_coat">long silky coat</string>
+
+    <string name="breed_japanese_chin_name">Japanese Chin</string>
+
+    <string name="breed_japanese_chin_origin">Japan</string>
+
+    <string name="breed_japanese_chin_personality">gentle and alert</string>
+
+    <string name="breed_japanese_chin_size">Toy</string>
+
+    <string name="breed_japanese_chin_coat">silky coat and feathered tail</string>
+
+    <string name="breed_keeshond_name">Keeshond</string>
+
+    <string name="breed_keeshond_origin">Netherlands</string>
+
+    <string name="breed_keeshond_personality">friendly and alert</string>
+
+    <string name="breed_keeshond_size">Medium</string>
+
+    <string name="breed_keeshond_coat">thick grey-black double coat</string>
+
+    <string name="breed_labrador_retriever_name">Labrador Retriever</string>
+
+    <string name="breed_labrador_retriever_origin">Newfoundland / development in Britain</string>
+
+    <string name="breed_labrador_retriever_personality">friendly and active</string>
+
+    <string name="breed_labrador_retriever_size">Large</string>
+
+    <string name="breed_labrador_retriever_coat">short dense coat and broad tail</string>
+
+    <string name="breed_leonberger_name">Leonberger</string>
+
+    <string name="breed_leonberger_origin">Germany</string>
+
+    <string name="breed_leonberger_personality">gentle and calm</string>
+
+    <string name="breed_leonberger_size">Giant</string>
+
+    <string name="breed_leonberger_coat">long double coat with a mane</string>
+
+    <string name="breed_maltese_name">Maltese</string>
+
+    <string name="breed_maltese_origin">Mediterranean region</string>
+
+    <string name="breed_maltese_personality">affectionate and lively</string>
+
+    <string name="breed_maltese_size">Toy</string>
+
+    <string name="breed_maltese_coat">long silky white coat</string>
+
+    <string name="breed_miniature_pinscher_name">Miniature Pinscher</string>
+
+    <string name="breed_miniature_pinscher_origin">Germany</string>
+
+    <string name="breed_miniature_pinscher_personality">lively and confident</string>
+
+    <string name="breed_miniature_pinscher_size">Small</string>
+
+    <string name="breed_miniature_pinscher_coat">short sleek coat</string>
+
+    <string name="breed_newfoundland_name">Newfoundland</string>
+
+    <string name="breed_newfoundland_origin">Canada</string>
+
+    <string name="breed_newfoundland_personality">gentle and patient</string>
+
+    <string name="breed_newfoundland_size">Giant</string>
+
+    <string name="breed_newfoundland_coat">thick water-resistant double coat</string>
+
+    <string name="breed_pomeranian_name">Pomeranian</string>
+
+    <string name="breed_pomeranian_origin">Pomerania region</string>
+
+    <string name="breed_pomeranian_personality">lively and alert</string>
+
+    <string name="breed_pomeranian_size">Toy</string>
+
+    <string name="breed_pomeranian_coat">fluffy double coat and plumed tail</string>
+
+    <string name="breed_poodle_name">Poodle</string>
+
+    <string name="breed_poodle_origin">Germany / development in France</string>
+
+    <string name="breed_poodle_personality">active and attentive</string>
+
+    <string name="breed_poodle_size">Toy to standard</string>
+
+    <string name="breed_poodle_coat">dense curly coat</string>
+
+    <string name="breed_pug_name">Pug</string>
+
+    <string name="breed_pug_origin">China</string>
+
+    <string name="breed_pug_personality">affectionate and playful</string>
+
+    <string name="breed_pug_size">Small</string>
+
+    <string name="breed_pug_coat">short coat, wrinkled face and curled tail</string>
+
+    <string name="breed_saint_bernard_name">Saint Bernard</string>
+
+    <string name="breed_saint_bernard_origin">Switzerland</string>
+
+    <string name="breed_saint_bernard_personality">gentle and patient</string>
+
+    <string name="breed_saint_bernard_size">Giant</string>
+
+    <string name="breed_saint_bernard_coat">short or long coat and broad head</string>
+
+    <string name="breed_samoyed_name">Samoyed</string>
+
+    <string name="breed_samoyed_origin">Siberia</string>
+
+    <string name="breed_samoyed_personality">friendly and active</string>
+
+    <string name="breed_samoyed_size">Medium to large</string>
+
+    <string name="breed_samoyed_coat">thick white double coat</string>
+
+    <string name="breed_schnauzer_name">Schnauzer</string>
+
+    <string name="breed_schnauzer_origin">Germany</string>
+
+    <string name="breed_schnauzer_personality">alert and spirited</string>
+
+    <string name="breed_schnauzer_size">Miniature to giant</string>
+
+    <string name="breed_schnauzer_coat">wiry coat, beard and eyebrows</string>
+
+    <string name="breed_scottish_terrier_name">Scottish Terrier</string>
+
+    <string name="breed_scottish_terrier_origin">Scotland</string>
+
+    <string name="breed_scottish_terrier_personality">independent and alert</string>
+
+    <string name="breed_scottish_terrier_size">Small</string>
+
+    <string name="breed_scottish_terrier_coat">wiry coat and short legs</string>
+
+    <string name="breed_shetland_sheepdog_name">Shetland Sheepdog</string>
+
+    <string name="breed_shetland_sheepdog_origin">Scotland</string>
+
+    <string name="breed_shetland_sheepdog_personality">attentive and lively</string>
+
+    <string name="breed_shetland_sheepdog_size">Small to medium</string>
+
+    <string name="breed_shetland_sheepdog_coat">long double coat and mane</string>
+
+    <string name="breed_shiba_inu_name">Shiba Inu</string>
+
+    <string name="breed_shiba_inu_origin">Japan</string>
+
+    <string name="breed_shiba_inu_personality">independent and alert</string>
+
+    <string name="breed_shiba_inu_size">Small to medium</string>
+
+    <string name="breed_shiba_inu_coat">dense double coat and curled tail</string>
+
+    <string name="breed_staffordshire_bull_terrier_name">Staffordshire Bull Terrier</string>
+
+    <string name="breed_staffordshire_bull_terrier_origin">Britain</string>
+
+    <string name="breed_staffordshire_bull_terrier_personality">affectionate and energetic</string>
+
+    <string name="breed_staffordshire_bull_terrier_size">Medium</string>
+
+    <string name="breed_staffordshire_bull_terrier_coat">short coat and muscular build</string>
+
+    <string name="breed_soft_coated_wheaten_terrier_name">Soft Coated Wheaten Terrier</string>
+
+    <string name="breed_soft_coated_wheaten_terrier_origin">Ireland</string>
+
+    <string name="breed_soft_coated_wheaten_terrier_personality">cheerful and lively</string>
+
+    <string name="breed_soft_coated_wheaten_terrier_size">Medium</string>
+
+    <string name="breed_soft_coated_wheaten_terrier_coat">soft wavy wheaten coat</string>
+
+    <string name="breed_yorkshire_terrier_name">Yorkshire Terrier</string>
+
+    <string name="breed_yorkshire_terrier_origin">Britain</string>
+
+    <string name="breed_yorkshire_terrier_personality">lively and confident</string>
+
+    <string name="breed_yorkshire_terrier_size">Toy</string>
+
+    <string name="breed_yorkshire_terrier_coat">long silky blue-and-tan coat</string>
+</resources>
+

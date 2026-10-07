@@ -1,0 +1,562 @@
+﻿<resources>
+    <string name="breed_abyssinian_name">阿比西尼亞貓</string>
+
+    <string name="breed_abyssinian_origin">埃及的印度洋海岸</string>
+
+    <string name="breed_abyssinian_personality">好奇、活潑</string>
+
+    <string name="breed_abyssinian_size">中型</string>
+
+    <string name="breed_abyssinian_coat">短毛與細緻斑色</string>
+
+    <string name="breed_american_shorthair_name">美國短毛貓</string>
+
+    <string name="breed_american_shorthair_origin">美國</string>
+
+    <string name="breed_american_shorthair_personality">活潑、溫柔</string>
+
+    <string name="breed_american_shorthair_size">中至大型</string>
+
+    <string name="breed_american_shorthair_coat">濃密短毛</string>
+
+    <string name="breed_bengal_name">孟加拉貓</string>
+
+    <string name="breed_bengal_origin">美國</string>
+
+    <string name="breed_bengal_personality">精力充沛、好奇</string>
+
+    <string name="breed_bengal_size">中至大型</string>
+
+    <string name="breed_bengal_coat">豹斑或大理石紋短毛</string>
+
+    <string name="breed_birman_name">伯曼貓</string>
+
+    <string name="breed_birman_origin">早期培育於法國</string>
+
+    <string name="breed_birman_personality">溫和、親人</string>
+
+    <string name="breed_birman_size">中至大型</string>
+
+    <string name="breed_birman_coat">絲滑重點色毛髮與白色腳掌</string>
+
+    <string name="breed_bombay_name">孟買貓</string>
+
+    <string name="breed_bombay_origin">美國</string>
+
+    <string name="breed_bombay_personality">親人、愛玩</string>
+
+    <string name="breed_bombay_size">中型</string>
+
+    <string name="breed_bombay_coat">光滑黑色短毛</string>
+
+    <string name="breed_british_shorthair_name">英國短毛貓</string>
+
+    <string name="breed_british_shorthair_origin">英國</string>
+
+    <string name="breed_british_shorthair_personality">沉穩、隨和</string>
+
+    <string name="breed_british_shorthair_size">中至大型</string>
+
+    <string name="breed_british_shorthair_coat">厚實短毛與圓臉</string>
+
+    <string name="breed_cornish_rex_name">柯尼斯捲毛貓</string>
+
+    <string name="breed_cornish_rex_origin">英國</string>
+
+    <string name="breed_cornish_rex_personality">活潑、親人</string>
+
+    <string name="breed_cornish_rex_size">小至中型</string>
+
+    <string name="breed_cornish_rex_coat">柔軟波浪毛與纖細身形</string>
+
+    <string name="breed_devon_rex_name">德文捲毛貓</string>
+
+    <string name="breed_devon_rex_origin">英國</string>
+
+    <string name="breed_devon_rex_personality">愛玩、親人</string>
+
+    <string name="breed_devon_rex_size">小至中型</string>
+
+    <string name="breed_devon_rex_coat">短捲毛與大耳朵</string>
+
+    <string name="breed_egyptian_mau_name">埃及貓</string>
+
+    <string name="breed_egyptian_mau_origin">埃及／培育於美國</string>
+
+    <string name="breed_egyptian_mau_personality">警覺、活潑</string>
+
+    <string name="breed_egyptian_mau_size">中型</string>
+
+    <string name="breed_egyptian_mau_coat">天然斑點短毛</string>
+
+    <string name="breed_exotic_shorthair_name">異國短毛貓</string>
+
+    <string name="breed_exotic_shorthair_origin">美國</string>
+
+    <string name="breed_exotic_shorthair_personality">溫和、沉穩</string>
+
+    <string name="breed_exotic_shorthair_size">中型</string>
+
+    <string name="breed_exotic_shorthair_coat">濃密短毛與圓臉</string>
+
+    <string name="breed_maine_coon_name">緬因貓</string>
+
+    <string name="breed_maine_coon_origin">美國</string>
+
+    <string name="breed_maine_coon_personality">友善、溫和</string>
+
+    <string name="breed_maine_coon_size">大型</string>
+
+    <string name="breed_maine_coon_coat">長而蓬鬆的毛髮與濃密尾巴</string>
+
+    <string name="breed_manx_name">曼島貓</string>
+
+    <string name="breed_manx_origin">曼島</string>
+
+    <string name="breed_manx_personality">愛玩、親人</string>
+
+    <string name="breed_manx_size">中型</string>
+
+    <string name="breed_manx_coat">濃密毛髮，尾巴長度有差異</string>
+
+    <string name="breed_munchkin_name">曼赤肯貓</string>
+
+    <string name="breed_munchkin_origin">美國</string>
+
+    <string name="breed_munchkin_personality">好奇、愛玩</string>
+
+    <string name="breed_munchkin_size">小至中型</string>
+
+    <string name="breed_munchkin_coat">短腿，毛髮可短可長</string>
+
+    <string name="breed_norwegian_forest_cat_name">挪威森林貓</string>
+
+    <string name="breed_norwegian_forest_cat_origin">挪威</string>
+
+    <string name="breed_norwegian_forest_cat_personality">溫和、獨立</string>
+
+    <string name="breed_norwegian_forest_cat_size">大型</string>
+
+    <string name="breed_norwegian_forest_cat_coat">厚實長毛與耳尖毛簇</string>
+
+    <string name="breed_oriental_shorthair_name">東方短毛貓</string>
+
+    <string name="breed_oriental_shorthair_origin">英國</string>
+
+    <string name="breed_oriental_shorthair_personality">喜歡互動、常發聲</string>
+
+    <string name="breed_oriental_shorthair_size">中型</string>
+
+    <string name="breed_oriental_shorthair_coat">光滑短毛與修長身形</string>
+
+    <string name="breed_persian_name">波斯貓</string>
+
+    <string name="breed_persian_origin">波斯／培育於歐洲</string>
+
+    <string name="breed_persian_personality">安靜、溫和</string>
+
+    <string name="breed_persian_size">中至大型</string>
+
+    <string name="breed_persian_coat">濃密長毛與圓臉</string>
+
+    <string name="breed_ragdoll_name">布偶貓</string>
+
+    <string name="breed_ragdoll_origin">美國</string>
+
+    <string name="breed_ragdoll_personality">溫和、親人</string>
+
+    <string name="breed_ragdoll_size">大型</string>
+
+    <string name="breed_ragdoll_coat">柔軟半長毛與藍眼睛</string>
+
+    <string name="breed_russian_blue_name">俄羅斯藍貓</string>
+
+    <string name="breed_russian_blue_origin">俄羅斯</string>
+
+    <string name="breed_russian_blue_personality">慢熟、溫和</string>
+
+    <string name="breed_russian_blue_size">中型</string>
+
+    <string name="breed_russian_blue_coat">濃密藍灰色短毛</string>
+
+    <string name="breed_scottish_fold_name">蘇格蘭摺耳貓</string>
+
+    <string name="breed_scottish_fold_origin">蘇格蘭</string>
+
+    <string name="breed_scottish_fold_personality">溫和、親人</string>
+
+    <string name="breed_scottish_fold_size">中型</string>
+
+    <string name="breed_scottish_fold_coat">圓潤外觀，可有摺耳或立耳</string>
+
+    <string name="breed_siamese_name">暹羅貓</string>
+
+    <string name="breed_siamese_origin">泰國</string>
+
+    <string name="breed_siamese_personality">喜歡互動、常發聲</string>
+
+    <string name="breed_siamese_size">中型</string>
+
+    <string name="breed_siamese_coat">重點色短毛與藍眼睛</string>
+
+    <string name="breed_sphynx_name">斯芬克斯貓</string>
+
+    <string name="breed_sphynx_origin">加拿大</string>
+
+    <string name="breed_sphynx_personality">外向、親人</string>
+
+    <string name="breed_sphynx_size">中型</string>
+
+    <string name="breed_sphynx_coat">近乎無毛的皮膚與大耳朵</string>
+
+    <string name="breed_turkish_angora_name">土耳其安哥拉貓</string>
+
+    <string name="breed_turkish_angora_origin">土耳其</string>
+
+    <string name="breed_turkish_angora_personality">活潑、好奇</string>
+
+    <string name="breed_turkish_angora_size">中型</string>
+
+    <string name="breed_turkish_angora_coat">絲滑半長毛</string>
+
+    <string name="breed_american_bulldog_name">美國鬥牛犬</string>
+
+    <string name="breed_american_bulldog_origin">美國</string>
+
+    <string name="breed_american_bulldog_personality">自信、忠誠</string>
+
+    <string name="breed_american_bulldog_size">大型</string>
+
+    <string name="breed_american_bulldog_coat">短毛與強健身形</string>
+
+    <string name="breed_american_pit_bull_terrier_name">美國比特鬥牛㹴</string>
+
+    <string name="breed_american_pit_bull_terrier_origin">美國</string>
+
+    <string name="breed_american_pit_bull_terrier_personality">精力充沛、親人</string>
+
+    <string name="breed_american_pit_bull_terrier_size">中型</string>
+
+    <string name="breed_american_pit_bull_terrier_coat">光滑短毛與結實身形</string>
+
+    <string name="breed_basset_hound_name">巴吉度獵犬</string>
+
+    <string name="breed_basset_hound_origin">法國／比利時</string>
+
+    <string name="breed_basset_hound_personality">隨和、有毅力</string>
+
+    <string name="breed_basset_hound_size">中型</string>
+
+    <string name="breed_basset_hound_coat">短毛、長耳朵與短腿</string>
+
+    <string name="breed_beagle_name">米格魯</string>
+
+    <string name="breed_beagle_origin">英國</string>
+
+    <string name="breed_beagle_personality">好奇、友善</string>
+
+    <string name="breed_beagle_size">小至中型</string>
+
+    <string name="breed_beagle_coat">短毛與垂耳</string>
+
+    <string name="breed_border_collie_name">邊境牧羊犬</string>
+
+    <string name="breed_border_collie_origin">英國</string>
+
+    <string name="breed_border_collie_personality">警覺、精力充沛</string>
+
+    <string name="breed_border_collie_size">中型</string>
+
+    <string name="breed_border_collie_coat">短或中長的雙層毛</string>
+
+    <string name="breed_boxer_name">拳師犬</string>
+
+    <string name="breed_boxer_origin">德國</string>
+
+    <string name="breed_boxer_personality">愛玩、忠誠</string>
+
+    <string name="breed_boxer_size">中至大型</string>
+
+    <string name="breed_boxer_coat">短毛與方形口吻</string>
+
+    <string name="breed_chihuahua_name">吉娃娃</string>
+
+    <string name="breed_chihuahua_origin">墨西哥</string>
+
+    <string name="breed_chihuahua_personality">警覺、活潑</string>
+
+    <string name="breed_chihuahua_size">玩具型</string>
+
+    <string name="breed_chihuahua_coat">短或長毛與大耳朵</string>
+
+    <string name="breed_corgi_name">柯基犬</string>
+
+    <string name="breed_corgi_origin">威爾斯</string>
+
+    <string name="breed_corgi_personality">活潑、警覺</string>
+
+    <string name="breed_corgi_size">小至中型</string>
+
+    <string name="breed_corgi_coat">雙層毛、短腿與長身形</string>
+
+    <string name="breed_english_cocker_spaniel_name">英國可卡犬</string>
+
+    <string name="breed_english_cocker_spaniel_origin">英國</string>
+
+    <string name="breed_english_cocker_spaniel_personality">開朗、親人</string>
+
+    <string name="breed_english_cocker_spaniel_size">中型</string>
+
+    <string name="breed_english_cocker_spaniel_coat">絲滑毛髮與長耳飾毛</string>
+
+    <string name="breed_english_setter_name">英國雪達犬</string>
+
+    <string name="breed_english_setter_origin">英國</string>
+
+    <string name="breed_english_setter_personality">溫和、精力充沛</string>
+
+    <string name="breed_english_setter_size">中至大型</string>
+
+    <string name="breed_english_setter_coat">飾毛與細小斑點</string>
+
+    <string name="breed_french_bulldog_name">法國鬥牛犬</string>
+
+    <string name="breed_french_bulldog_origin">法國</string>
+
+    <string name="breed_french_bulldog_personality">愛玩、親人</string>
+
+    <string name="breed_french_bulldog_size">小型</string>
+
+    <string name="breed_french_bulldog_coat">短毛與蝙蝠狀立耳</string>
+
+    <string name="breed_german_shorthaired_pointer_name">德國短毛指示犬</string>
+
+    <string name="breed_german_shorthaired_pointer_origin">德國</string>
+
+    <string name="breed_german_shorthaired_pointer_personality">活潑、積極</string>
+
+    <string name="breed_german_shorthaired_pointer_size">中至大型</string>
+
+    <string name="breed_german_shorthaired_pointer_coat">短毛，常有細小斑點</string>
+
+    <string name="breed_golden_retriever_name">黃金獵犬</string>
+
+    <string name="breed_golden_retriever_origin">蘇格蘭</string>
+
+    <string name="breed_golden_retriever_personality">友善、積極</string>
+
+    <string name="breed_golden_retriever_size">大型</string>
+
+    <string name="breed_golden_retriever_coat">金色雙層毛與飾毛</string>
+
+    <string name="breed_great_pyrenees_name">大白熊犬</string>
+
+    <string name="breed_great_pyrenees_origin">法國／西班牙</string>
+
+    <string name="breed_great_pyrenees_personality">沉穩、警覺</string>
+
+    <string name="breed_great_pyrenees_size">大型至巨型</string>
+
+    <string name="breed_great_pyrenees_coat">厚實、以白色為主的雙層毛</string>
+
+    <string name="breed_havanese_name">哈瓦那犬</string>
+
+    <string name="breed_havanese_origin">古巴</string>
+
+    <string name="breed_havanese_personality">開朗、親人</string>
+
+    <string name="breed_havanese_size">小型</string>
+
+    <string name="breed_havanese_coat">長而絲滑的毛髮</string>
+
+    <string name="breed_japanese_chin_name">日本狆</string>
+
+    <string name="breed_japanese_chin_origin">日本</string>
+
+    <string name="breed_japanese_chin_personality">溫和、警覺</string>
+
+    <string name="breed_japanese_chin_size">玩具型</string>
+
+    <string name="breed_japanese_chin_coat">絲滑毛髮與飾毛尾巴</string>
+
+    <string name="breed_keeshond_name">荷蘭毛獅犬</string>
+
+    <string name="breed_keeshond_origin">荷蘭</string>
+
+    <string name="breed_keeshond_personality">友善、警覺</string>
+
+    <string name="breed_keeshond_size">中型</string>
+
+    <string name="breed_keeshond_coat">厚實灰黑色雙層毛</string>
+
+    <string name="breed_labrador_retriever_name">拉布拉多犬</string>
+
+    <string name="breed_labrador_retriever_origin">紐芬蘭／培育於英國</string>
+
+    <string name="breed_labrador_retriever_personality">友善、活潑</string>
+
+    <string name="breed_labrador_retriever_size">大型</string>
+
+    <string name="breed_labrador_retriever_coat">濃密短毛與寬厚尾巴</string>
+
+    <string name="breed_leonberger_name">蘭伯格犬</string>
+
+    <string name="breed_leonberger_origin">德國</string>
+
+    <string name="breed_leonberger_personality">溫和、沉穩</string>
+
+    <string name="breed_leonberger_size">巨型</string>
+
+    <string name="breed_leonberger_coat">長雙層毛與鬃毛</string>
+
+    <string name="breed_maltese_name">馬爾濟斯</string>
+
+    <string name="breed_maltese_origin">地中海地區</string>
+
+    <string name="breed_maltese_personality">親人、活潑</string>
+
+    <string name="breed_maltese_size">玩具型</string>
+
+    <string name="breed_maltese_coat">長而絲滑的白色毛髮</string>
+
+    <string name="breed_miniature_pinscher_name">迷你杜賓犬</string>
+
+    <string name="breed_miniature_pinscher_origin">德國</string>
+
+    <string name="breed_miniature_pinscher_personality">活潑、自信</string>
+
+    <string name="breed_miniature_pinscher_size">小型</string>
+
+    <string name="breed_miniature_pinscher_coat">光滑短毛</string>
+
+    <string name="breed_newfoundland_name">紐芬蘭犬</string>
+
+    <string name="breed_newfoundland_origin">加拿大</string>
+
+    <string name="breed_newfoundland_personality">溫和、有耐心</string>
+
+    <string name="breed_newfoundland_size">巨型</string>
+
+    <string name="breed_newfoundland_coat">厚實防水雙層毛</string>
+
+    <string name="breed_pomeranian_name">博美犬</string>
+
+    <string name="breed_pomeranian_origin">波美拉尼亞地區</string>
+
+    <string name="breed_pomeranian_personality">活潑、警覺</string>
+
+    <string name="breed_pomeranian_size">玩具型</string>
+
+    <string name="breed_pomeranian_coat">蓬鬆雙層毛與羽狀尾巴</string>
+
+    <string name="breed_poodle_name">貴賓犬</string>
+
+    <string name="breed_poodle_origin">德國／培育於法國</string>
+
+    <string name="breed_poodle_personality">活潑、專注</string>
+
+    <string name="breed_poodle_size">玩具型至標準型</string>
+
+    <string name="breed_poodle_coat">濃密捲毛</string>
+
+    <string name="breed_pug_name">巴哥犬</string>
+
+    <string name="breed_pug_origin">中國</string>
+
+    <string name="breed_pug_personality">親人、愛玩</string>
+
+    <string name="breed_pug_size">小型</string>
+
+    <string name="breed_pug_coat">短毛、皺褶臉與捲尾</string>
+
+    <string name="breed_saint_bernard_name">聖伯納犬</string>
+
+    <string name="breed_saint_bernard_origin">瑞士</string>
+
+    <string name="breed_saint_bernard_personality">溫和、有耐心</string>
+
+    <string name="breed_saint_bernard_size">巨型</string>
+
+    <string name="breed_saint_bernard_coat">短或長毛與寬大頭部</string>
+
+    <string name="breed_samoyed_name">薩摩耶犬</string>
+
+    <string name="breed_samoyed_origin">西伯利亞</string>
+
+    <string name="breed_samoyed_personality">友善、活潑</string>
+
+    <string name="breed_samoyed_size">中至大型</string>
+
+    <string name="breed_samoyed_coat">厚實白色雙層毛</string>
+
+    <string name="breed_schnauzer_name">雪納瑞</string>
+
+    <string name="breed_schnauzer_origin">德國</string>
+
+    <string name="breed_schnauzer_personality">警覺、有活力</string>
+
+    <string name="breed_schnauzer_size">迷你型至巨型</string>
+
+    <string name="breed_schnauzer_coat">粗硬毛髮、鬍鬚與濃眉</string>
+
+    <string name="breed_scottish_terrier_name">蘇格蘭㹴</string>
+
+    <string name="breed_scottish_terrier_origin">蘇格蘭</string>
+
+    <string name="breed_scottish_terrier_personality">獨立、警覺</string>
+
+    <string name="breed_scottish_terrier_size">小型</string>
+
+    <string name="breed_scottish_terrier_coat">粗硬毛髮與短腿</string>
+
+    <string name="breed_shetland_sheepdog_name">喜樂蒂牧羊犬</string>
+
+    <string name="breed_shetland_sheepdog_origin">蘇格蘭</string>
+
+    <string name="breed_shetland_sheepdog_personality">專注、活潑</string>
+
+    <string name="breed_shetland_sheepdog_size">小至中型</string>
+
+    <string name="breed_shetland_sheepdog_coat">長雙層毛與鬃毛</string>
+
+    <string name="breed_shiba_inu_name">柴犬</string>
+
+    <string name="breed_shiba_inu_origin">日本</string>
+
+    <string name="breed_shiba_inu_personality">獨立、警覺</string>
+
+    <string name="breed_shiba_inu_size">小至中型</string>
+
+    <string name="breed_shiba_inu_coat">濃密雙層毛與捲尾</string>
+
+    <string name="breed_staffordshire_bull_terrier_name">斯塔福郡鬥牛㹴</string>
+
+    <string name="breed_staffordshire_bull_terrier_origin">英國</string>
+
+    <string name="breed_staffordshire_bull_terrier_personality">親人、精力充沛</string>
+
+    <string name="breed_staffordshire_bull_terrier_size">中型</string>
+
+    <string name="breed_staffordshire_bull_terrier_coat">短毛與強健身形</string>
+
+    <string name="breed_soft_coated_wheaten_terrier_name">愛爾蘭軟毛麥色㹴</string>
+
+    <string name="breed_soft_coated_wheaten_terrier_origin">愛爾蘭</string>
+
+    <string name="breed_soft_coated_wheaten_terrier_personality">開朗、活潑</string>
+
+    <string name="breed_soft_coated_wheaten_terrier_size">中型</string>
+
+    <string name="breed_soft_coated_wheaten_terrier_coat">柔軟波浪狀麥色毛髮</string>
+
+    <string name="breed_yorkshire_terrier_name">約克夏㹴</string>
+
+    <string name="breed_yorkshire_terrier_origin">英國</string>
+
+    <string name="breed_yorkshire_terrier_personality">活潑、自信</string>
+
+    <string name="breed_yorkshire_terrier_size">玩具型</string>
+
+    <string name="breed_yorkshire_terrier_coat">長而絲滑的藍灰與棕色毛髮</string>
+</resources>
+

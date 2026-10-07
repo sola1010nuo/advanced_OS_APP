@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.petcollection.R
-import com.example.petcollection.ui.home.CollectionCategoryCard
+import com.example.petcollection.ui.collection.CollectionScreen
 import com.example.petcollection.ui.home.HomePreviewData
 import com.example.petcollection.ui.home.HomeScreen
 import com.example.petcollection.ui.theme.PetCollectionTheme
@@ -113,13 +113,6 @@ private fun Page(title: Int, modifier: Modifier, content: @Composable ColumnScop
     }
 }
 
-@Composable
-private fun CollectionScreen(modifier: Modifier) {
-    Page(R.string.collection, modifier) {
-        Text(stringResource(R.string.collection_future), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        HomePreviewData.categories.forEach { CollectionCategoryCard(it) }
-    }
-}
 
 @Composable
 private fun FootprintsScreen(modifier: Modifier) {
@@ -221,6 +214,7 @@ private fun DestinationIcon(destination: Destination, modifier: Modifier = Modif
 @Preview(showBackground = true, widthDp = 393, heightDp = 852)
 @Composable
 private fun AppPreview() { PetCollectionApp() }
+
 
 
 

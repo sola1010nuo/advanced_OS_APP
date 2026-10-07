@@ -41,4 +41,24 @@
     <string name="light_mode">淺色模式</string>
     <string name="dark_mode">深色模式</string>
     <string name="settings_hint">先試試喜歡的語言與外觀；重新開啟後會回到預設設定。</string>
+    <string name="encyclopedia_progress">%1$d / %2$d 已發現</string>
+    <string name="encyclopedia_cats">貓咪</string>
+    <string name="encyclopedia_dogs">狗狗</string>
+    <string name="encyclopedia_cat">貓</string>
+    <string name="encyclopedia_dog">狗</string>
+    <string name="encyclopedia_back">‹ 返回</string>
+    <string name="encyclopedia_discovered">✓ 已發現</string>
+    <string name="encyclopedia_undiscovered">尚未發現</string>
+    <string name="encyclopedia_locked">尚未解鎖</string>
+    <string name="encyclopedia_photo_placeholder">照片預留位置</string>
+    <string name="encyclopedia_characteristics">基本特徵</string>
+    <string name="encyclopedia_origin">起源</string>
+    <string name="encyclopedia_personality">常見個性</string>
+    <string name="encyclopedia_size">體型</string>
+    <string name="encyclopedia_coat">毛髮與外觀</string>
+    <string name="encyclopedia_lifespan">常見壽命</string>
+    <string name="encyclopedia_encounters">相遇次數：%1$d</string>
+    <string name="encyclopedia_photos">收藏照片</string>
+    <string name="encyclopedia_no_photos">尚無收藏照片</string>
 </resources>
+
