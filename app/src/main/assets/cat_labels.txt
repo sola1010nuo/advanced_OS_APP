@@ -1,0 +1,22 @@
+Abyssinian
+American_Shorthair
+Bengal
+Birman
+Bombay
+British_Shorthair
+Cornish_rex
+Devon_rex
+Egyptian_Mau
+Exotic Shorthair
+Maine_Coon
+Manx
+Munchkin
+Norwegian_Forest
+Oriental_Shorthair
+Persian
+Ragdoll
+Russian_Blue
+Scottish_Fold
+Siamese
+Sphynx
+Turkish_Angora
