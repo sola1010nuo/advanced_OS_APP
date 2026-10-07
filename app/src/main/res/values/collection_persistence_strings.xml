@@ -1,0 +1,19 @@
+<resources>
+    <string name="other_cats">其他貓咪</string>
+    <string name="other_dogs">其他狗狗</string>
+    <string name="unregistered">未登記</string>
+    <string name="other_cats_description">收藏 22 個可收集品種以外的貓咪相遇紀錄，此相簿不計入圖鑑進度。</string>
+    <string name="other_dogs_description">收藏 34 個可收集品種以外的狗狗相遇紀錄，此相簿不計入圖鑑進度。</string>
+    <string name="unregistered_description">暫存等待登記的照片，此相簿不計入貓咪或狗狗圖鑑進度。</string>
+    <string name="collection_add_encounter">新增相遇照片</string>
+    <string name="collection_album_empty">還沒有相遇紀錄，新增照片開始收藏吧。</string>
+    <string name="collection_storage_error">無法讀取或儲存這筆紀錄，請再試一次。</string>
+    <string name="collection_done">完成</string>
+    <string name="encounter_back_album">返回相簿</string>
+    <string name="encounter_edit">編輯</string>
+    <string name="encounter_delete">刪除</string>
+    <string name="encounter_delete_question">確定要刪除這筆紀錄嗎？</string>
+    <string name="encounter_delete_message">此操作會從收藏中移除紀錄，但保留裝置相簿中的原始照片。</string>
+    <string name="encounter_set_cover">設為封面照片</string>
+    <string name="encounter_current_cover">目前的封面照片</string>
+</resources>
