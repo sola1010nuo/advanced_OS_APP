@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import android.net.Uri
 import com.example.petcollection.data.Species
 import androidx.compose.ui.Alignment
@@ -52,7 +53,7 @@ fun HomeScreen(
             shape = RoundedCornerShape(18.dp), contentPadding = PaddingValues(16.dp)) {
             Text(stringResource(R.string.add_photo), style = MaterialTheme.typography.titleMedium)
         }
-        selectedPhotoUri?.let { SelectedPhotoPreview(it) }
+        selectedPhotoUri?.let { uri -> key(uri) { SelectedPhotoPreview(uri) } }
         AchievementSection(HomePreviewData.achievements, HomePreviewData.total)
         RecentDiscoveriesSection()
         RecentFootprintsSection()

@@ -59,7 +59,7 @@ fun PetCollectionApp() {
     var appearance by rememberSaveable { mutableStateOf(Appearance.SYSTEM.name) }
     var destination by rememberSaveable { mutableStateOf(Destination.HOME.name) }
     var collectionSpecies by rememberSaveable { mutableStateOf(Species.CAT.name) }
-    // Shared input for future recognition; choosing a photo only updates Home.
+    // Shared photo input. Home runs inference only after an explicit Cat/Dog choice.
     var selectedPhotoUri by rememberSaveable { mutableStateOf<String?>(null) }
     val baseContext = LocalContext.current
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->

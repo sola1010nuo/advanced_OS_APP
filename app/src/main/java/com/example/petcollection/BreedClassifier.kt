@@ -34,12 +34,12 @@ class BreedClassifier(
     private val labels: List<String>
 
     init {
-        interpreter = Interpreter(loadModelFile(modelFileName))
-
         labels = context.assets
             .open(labelFileName)
             .bufferedReader()
-            .readLines()
+            .use { it.readLines() }
+
+        interpreter = Interpreter(loadModelFile(modelFileName))
     }
 
     fun classify(bitmap: Bitmap): Result {
@@ -93,18 +93,17 @@ class BreedClassifier(
 
     private fun loadModelFile(fileName: String): ByteBuffer {
 
-        val fileDescriptor =
-            context.assets.openFd(fileName)
+        context.assets.openFd(fileName).use { fileDescriptor ->
+            FileInputStream(fileDescriptor.fileDescriptor).use { inputStream ->
 
-        FileInputStream(fileDescriptor.fileDescriptor).use { inputStream ->
+                val fileChannel = inputStream.channel
 
-            val fileChannel = inputStream.channel
-
-            return fileChannel.map(
-                FileChannel.MapMode.READ_ONLY,
-                fileDescriptor.startOffset,
-                fileDescriptor.declaredLength
-            )
+                return fileChannel.map(
+                    FileChannel.MapMode.READ_ONLY,
+                    fileDescriptor.startOffset,
+                    fileDescriptor.declaredLength
+                )
+            }
         }
     }
 

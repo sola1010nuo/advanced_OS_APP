@@ -60,6 +60,11 @@
     <string name="encyclopedia_no_photos">No collected photos yet</string>
     <string name="selected_photo">Selected photo</string>
     <string name="photo_preview_error">Unable to load this photo. Please select another image.</string>
+    <string name="choose_animal_type">Is this a cat or a dog?</string>
+    <string name="inference_running">Identifying breed…</string>
+    <string name="inference_confidence">Confidence: %1$.1f%%</string>
+    <string name="inference_error">Unable to identify the breed. Please try again.</string>
+    <string name="inference_retry">Choose again</string>
 </resources>
 
 
