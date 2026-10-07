@@ -1,0 +1,28 @@
+﻿<resources>
+    <string name="collection_discovered_count">%1$d / %2$d Discovered</string>
+    <string name="filter_cats">Cats</string>
+    <string name="filter_dogs">Dogs</string>
+    <string name="species_cat">Cat</string>
+    <string name="species_dog">Dog</string>
+    <string name="breed_discovered">Discovered</string>
+    <string name="breed_undiscovered">Not discovered yet</string>
+    <string name="breed_locked_hint">You can learn about this breed before your first encounter.</string>
+    <string name="breed_cover">Cover photo</string>
+    <string name="breed_photo_placeholder">Photo placeholder</string>
+    <string name="breed_cover_placeholder">No cover photo yet</string>
+    <string name="breed_photo_description">Photo of %1$s</string>
+    <string name="breed_about">About this breed</string>
+    <string name="breed_characteristics">Basic characteristics</string>
+    <string name="breed_origin">Origin</string>
+    <string name="breed_personality">Typical personality</string>
+    <string name="breed_size">Size</string>
+    <string name="breed_coat">Coat and appearance</string>
+    <string name="breed_lifespan">Typical lifespan</string>
+    <string name="breed_photos">My encounter photos</string>
+    <string name="breed_no_photos">No collected photos yet</string>
+    <string name="breed_back">Back to Collection</string>
+    <string name="breed_preview_notes">Breed notes are prototype summaries. Personality and appearance vary between individuals.</string>
+    <string name="breed_description_template">%1$s is known for its %2$s. Typical personality: %3$s.</string>
+    <plurals name="breed_encounters"><item quantity="one">%d encounter</item><item quantity="other">%d encounters</item></plurals>
+    <plurals name="breed_photo_count"><item quantity="one">%d collected photo</item><item quantity="other">%d collected photos</item></plurals>
+</resources>

@@ -39,5 +39,25 @@
     <string name="light_mode">Light mode</string>
     <string name="dark_mode">Dark mode</string>
     <string name="settings_hint">Try your preferred language and appearance. These choices reset when you reopen the app.</string>
+    <string name="encyclopedia_progress">%1$d / %2$d Discovered</string>
+    <string name="encyclopedia_cats">Cats</string>
+    <string name="encyclopedia_dogs">Dogs</string>
+    <string name="encyclopedia_cat">Cat</string>
+    <string name="encyclopedia_dog">Dog</string>
+    <string name="encyclopedia_back">‹ Back</string>
+    <string name="encyclopedia_discovered">✓ Discovered</string>
+    <string name="encyclopedia_undiscovered">Not discovered yet</string>
+    <string name="encyclopedia_locked">Locked</string>
+    <string name="encyclopedia_photo_placeholder">Photo placeholder</string>
+    <string name="encyclopedia_characteristics">Basic characteristics</string>
+    <string name="encyclopedia_origin">Origin</string>
+    <string name="encyclopedia_personality">Typical personality</string>
+    <string name="encyclopedia_size">Size</string>
+    <string name="encyclopedia_coat">Coat / appearance</string>
+    <string name="encyclopedia_lifespan">Typical lifespan</string>
+    <string name="encyclopedia_encounters">Encounters: %1$d</string>
+    <string name="encyclopedia_photos">Collected photos</string>
+    <string name="encyclopedia_no_photos">No collected photos yet</string>
 </resources>
+
 
