@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import android.net.Uri
+import com.example.petcollection.data.Species
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -26,7 +28,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, categories: List<CollectionCategory> = HomePreviewData.categories) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    categories: List<CollectionCategory> = HomePreviewData.categories,
+    selectedPhotoUri: Uri? = null,
+    onAddPhoto: () -> Unit = {},
+    onOpenCollection: (Species) -> Unit = {}
+) {
     Column(
         modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 28.dp),
         verticalArrangement = Arrangement.spacedBy(28.dp)
@@ -35,12 +43,17 @@ fun HomeScreen(modifier: Modifier = Modifier, categories: List<CollectionCategor
         CollectionProgressCard(categories.sumOf { it.collected }, categories.sumOf { it.total })
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionTitle(stringResource(R.string.your_collections))
-            categories.forEach { CollectionCategoryCard(it) }
+            categories.forEach { category ->
+                CollectionCategoryCard(category, onClick = {
+                    onOpenCollection(if (category.id == "cat") Species.CAT else Species.DOG)
+                })
+            }
         }
-        Button(onClick = {}, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+        Button(onClick = onAddPhoto, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
             shape = RoundedCornerShape(18.dp), contentPadding = PaddingValues(16.dp)) {
             Text(stringResource(R.string.add_photo), style = MaterialTheme.typography.titleMedium)
         }
+        selectedPhotoUri?.let { SelectedPhotoPreview(it) }
         AchievementSection(HomePreviewData.achievements, HomePreviewData.total)
         RecentDiscoveriesSection()
         RecentFootprintsSection()
@@ -73,10 +86,10 @@ fun CollectionProgressCard(collected: Int, total: Int) {
 }
 
 @Composable
-fun CollectionCategoryCard(category: CollectionCategory) {
+fun CollectionCategoryCard(category: CollectionCategory, onClick: () -> Unit = {}) {
     val isCat = category.id == "cat"
     val tint = if (isCat) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.tertiaryContainer
-    Card(onClick = {}, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
+    Card(onClick = onClick, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
         Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             PetIllustration(isCat, Modifier.size(64.dp).background(tint, RoundedCornerShape(18.dp)).padding(10.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {

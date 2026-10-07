@@ -2,6 +2,11 @@ package com.example.petcollection.ui
 
 import android.app.Activity
 import androidx.activity.compose.LocalActivityResultRegistryOwner
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import android.content.res.Configuration
 import android.os.LocaleList
 import androidx.annotation.StringRes
@@ -55,6 +60,9 @@ fun PetCollectionApp() {
     var language by rememberSaveable { mutableStateOf("zh-Hant") }
     var appearance by rememberSaveable { mutableStateOf(Appearance.SYSTEM.name) }
     var destination by rememberSaveable { mutableStateOf(Destination.HOME.name) }
+    var collectionSpecies by rememberSaveable { mutableStateOf(Species.CAT.name) }
+    // Shared input for future recognition; choosing a photo only updates Home.
+    var selectedPhotoUri by rememberSaveable { mutableStateOf<String?>(null) }
     val baseContext = LocalContext.current
     val collectionData by collectionUnlockState.collection.collectAsState()
     val normalIdsBySpecies = remember(baseContext) {
@@ -62,6 +70,16 @@ fun PetCollectionApp() {
             .mapValues { (_, breeds) -> breeds.map { it.id }.toSet() }
     }
     val activityResultOwner = LocalActivityResultRegistryOwner.current
+    val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            try {
+                baseContext.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } catch (_: SecurityException) {
+                // Some providers grant read access for the current session only.
+            }
+            selectedPhotoUri = uri.toString()
+        }
+    }
     val systemConfiguration = LocalConfiguration.current
     val configuration = remember(systemConfiguration, language) {
         Configuration(systemConfiguration).apply {
@@ -104,11 +122,21 @@ fun PetCollectionApp() {
             ) { padding ->
                 val contentModifier = Modifier.padding(padding).consumeWindowInsets(padding)
                 when (Destination.valueOf(destination)) {
-                    Destination.HOME -> HomeScreen(contentModifier, categories = HomePreviewData.categories.map { category ->
-                        val species = if (category.id == "cat") Species.CAT else Species.DOG
-                        category.copy(collected = collectionData.discoveredCount(normalIdsBySpecies[species].orEmpty()))
-                    })
-                    Destination.COLLECTION -> CollectionScreen(contentModifier, unlockState = collectionUnlockState)
+                    Destination.HOME -> HomeScreen(
+                        modifier = contentModifier,
+                        categories = HomePreviewData.categories.map { category ->
+                            val species = if (category.id == "cat") Species.CAT else Species.DOG
+                            category.copy(collected = collectionData.discoveredCount(normalIdsBySpecies[species].orEmpty()))
+                        },
+                        selectedPhotoUri = selectedPhotoUri?.let(Uri::parse),
+                        onAddPhoto = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                        onOpenCollection = { species ->
+                            collectionSpecies = species.name
+                            destination = Destination.COLLECTION.name
+                        }
+                    )
+                    Destination.COLLECTION -> CollectionScreen(contentModifier,
+                        unlockState = collectionUnlockState, initialSpecies = Species.valueOf(collectionSpecies))
                     Destination.FOOTPRINTS -> FootprintsScreen(contentModifier)
                     Destination.SETTINGS -> SettingsScreen(
                         language, { language = it }, Appearance.valueOf(appearance), { appearance = it.name }, contentModifier

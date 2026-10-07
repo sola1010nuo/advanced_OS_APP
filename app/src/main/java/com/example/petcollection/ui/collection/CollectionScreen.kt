@@ -32,7 +32,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 fun CollectionScreen(
     modifier: Modifier = Modifier,
     repository: BreedRepository? = null,
-    unlockState: CollectionUnlockState = rememberCollectionUnlockState()
+    unlockState: CollectionUnlockState = rememberCollectionUnlockState(),
+    initialSpecies: Species = Species.CAT
 ) {
     val context = LocalContext.current
     val resources = context.resources
@@ -42,7 +43,7 @@ fun CollectionScreen(
     val data by unlockState.collection.collectAsState()
     val breeds = catalog.map { unlockState.applyTo(it, data) }
     CollectionEncounterHost(unlockState, breeds)
-    var selectedSpecies by rememberSaveable { mutableStateOf(Species.CAT.name) }
+    var selectedSpecies by rememberSaveable(initialSpecies) { mutableStateOf(initialSpecies.name) }
     var selectedBreedId by rememberSaveable { mutableStateOf<String?>(null) }
     var selectedEncounterId by rememberSaveable { mutableStateOf<String?>(null) }
     var pickerTargetId by rememberSaveable { mutableStateOf<String?>(null) }
