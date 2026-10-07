@@ -71,6 +71,8 @@ internal fun BreedImageArea(
         if (!locked && image != null) {
             Image(image, contentDescription = stringResource(R.string.breed_photo_description, breed.name),
                 modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+        } else if (breed.species == null) {
+            Text(stringResource(R.string.breed_photo_placeholder), color = colors.onSurfaceVariant)
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)) {

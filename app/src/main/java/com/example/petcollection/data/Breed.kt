@@ -7,7 +7,7 @@ enum class Species { CAT, DOG }
 data class Breed(
     val id: String,
     val name: String,
-    val species: Species,
+    val species: Species?,
     val description: String,
     val origin: String,
     val personality: String,
@@ -17,11 +17,13 @@ data class Breed(
     val isDiscovered: Boolean = false,
     val encounterCount: Int = 0,
     val coverPhoto: BreedPhoto? = null,
-    val collectedPhotos: List<BreedPhoto> = emptyList()
+    val collectedPhotos: List<BreedPhoto> = emptyList(),
+    val isCollectible: Boolean = true
 )
 
 /** Replace this implementation with a database-backed repository later. */
 interface BreedRepository {
     fun getBreeds(): List<Breed>
-    fun getBreed(id: String): Breed? = getBreeds().find { it.id == id }
+    fun getCollectionEntries(): List<Breed> = getBreeds()
+    fun getBreed(id: String): Breed? = getCollectionEntries().find { it.id == id }
 }

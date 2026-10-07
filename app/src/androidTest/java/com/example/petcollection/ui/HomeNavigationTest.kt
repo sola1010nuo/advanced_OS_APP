@@ -24,7 +24,7 @@ class HomeNavigationTest {
             fun click(id: Int) = compose.onNode(hasText(resources.getString(id)) and hasClickAction()).performClick()
             fun assertGrid(species: Species) {
                 val filter = if (species == Species.CAT) R.string.filter_cats else R.string.filter_dogs
-                compose.onNodeWithText(resources.getString(filter)).assertIsOn()
+                compose.onNodeWithText(resources.getString(filter)).assertIsSelected()
                 compose.onNode(hasText(resources.getString(R.string.collection)) and hasClickAction()).assertIsSelected()
                 val breeds = MockBreedRepository(resources).getBreeds().filter { it.species == species }
                 compose.onNodeWithText(breeds.first().name).assertIsDisplayed()

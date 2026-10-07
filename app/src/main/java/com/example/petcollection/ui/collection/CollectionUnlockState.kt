@@ -1,60 +1,113 @@
-﻿package com.example.petcollection.ui.collection
+package com.example.petcollection.ui.collection
 
 import androidx.compose.runtime.*
-import com.example.petcollection.data.Breed
-import com.example.petcollection.data.BreedPhoto
-import com.example.petcollection.data.EncounterRecord
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.petcollection.data.*
 import java.time.LocalDateTime
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-/** In-memory UI session only. Hoist this state when connecting recognition or persistence.
- * Unlocking is independent from saving/cancelling an individual encounter.
- */
-class CollectionUnlockState {
-    private val unlockedIds = mutableStateListOf<String>()
-    private val records = mutableStateListOf<EncounterRecord>()
-    val encounters: List<EncounterRecord> get() = records.toList()
+/** Room is the collection source of truth; only the active unsaved form is kept in UI state. */
+class CollectionUnlockState(private val repository: EncounterRepository) : ViewModel() {
+    var operationError by mutableStateOf(false)
+        private set
+    var isWorking by mutableStateOf(false)
+        private set
+    val collection = repository.collection.catch {
+        operationError = true
+        emit(CollectionData())
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, CollectionData())
+    val encounters: List<EncounterRecord> get() = collection.value.encounters
     var pendingEncounter by mutableStateOf<EncounterRecord?>(null)
         private set
     var showUnlockCelebration by mutableStateOf(false)
         private set
+    private var editingExisting = false
 
-    fun applyTo(breed: Breed): Breed {
-        val saved = records.filter { it.breedId == breed.id }
-        val photos = saved.mapNotNull { record -> record.photoUri?.let { BreedPhoto(record.id, it) } }
-        return breed.copy(
-            isDiscovered = breed.isDiscovered || breed.id in unlockedIds,
-            encounterCount = breed.encounterCount + saved.size,
-            collectedPhotos = breed.collectedPhotos + photos,
-            coverPhoto = breed.coverPhoto ?: photos.firstOrNull()
-        )
-    }
+    fun applyTo(breed: Breed, data: CollectionData = collection.value): Breed = data.applyTo(breed)
 
-    /** Future recognition entry point. Already-unlocked breeds go straight to editing.
-     * Returns false while another encounter is being edited, without dropping that draft.
-     */
+    /** Future callers supply a canonical entry; a draft never unlocks a breed before INSERT. */
     fun onBreedRecognized(breed: Breed, photoUri: String?, photoTime: LocalDateTime? = null): Boolean {
-        if (pendingEncounter != null) return false
-        val isNew = !applyTo(breed).isDiscovered
-        if (isNew) unlockedIds.add(breed.id)
+        if (pendingEncounter != null || isWorking || !collection.value.loaded) return false
+        require(breed.id in MockBreedRepository.collectionIds)
         pendingEncounter = EncounterRecord(breedId = breed.id, photoUri = photoUri,
             encounteredAt = photoTime ?: LocalDateTime.now())
-        showUnlockCelebration = isNew
+        editingExisting = false
+        showUnlockCelebration = false
+        operationError = false
         return true
     }
 
+    fun startEdit(record: EncounterRecord) {
+        if (pendingEncounter != null || isWorking) return
+        pendingEncounter = record
+        editingExisting = true
+        showUnlockCelebration = false
+        operationError = false
+    }
     fun editEncounter() { showUnlockCelebration = false }
     fun dismissEncounter() {
+        if (isWorking) return
         pendingEncounter = null
         showUnlockCelebration = false
+        operationError = false
     }
+    fun clearError() { operationError = false }
 
-    fun saveEncounter(record: EncounterRecord) {
+    fun saveEncounter(record: EncounterRecord, onSaved: (EncounterRecord) -> Unit = {}) {
         val draft = pendingEncounter ?: return
-        require(record.id == draft.id && record.breedId == draft.breedId) { "Encounter does not match the active draft" }
-        records.add(record)
-        dismissEncounter()
+        if (isWorking) return
+        require(record.id == draft.id && record.breedId == draft.breedId)
+        val updating = editingExisting
+        perform {
+            if (updating) {
+                repository.update(record)
+                pendingEncounter = null
+                onSaved(record)
+            } else {
+                val (stored, first) = repository.create(record)
+                onSaved(stored)
+                if (first && record.breedId in MockBreedRepository.normalBreedIds) {
+                    pendingEncounter = stored
+                    editingExisting = true
+                    showUnlockCelebration = true
+                } else pendingEncounter = null
+            }
+        }
+    }
+    fun selectCover(breedId: String, encounterId: String) = perform { repository.selectCover(breedId, encounterId) }
+    fun deleteEncounter(id: String, onDeleted: () -> Unit) = perform {
+        repository.delete(id)
+        onDeleted()
+    }
+    private fun perform(action: suspend () -> Unit) {
+        if (isWorking) return
+        isWorking = true
+        operationError = false
+        viewModelScope.launch {
+            try { action() }
+            catch (cancelled: CancellationException) { throw cancelled }
+            catch (_: Exception) { operationError = true }
+            finally { isWorking = false }
+        }
     }
 }
 
 @Composable
-fun rememberCollectionUnlockState(): CollectionUnlockState = remember { CollectionUnlockState() }
+fun rememberCollectionUnlockState(): CollectionUnlockState {
+    val context = LocalContext.current.applicationContext
+    val factory = remember(context) {
+        object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T = CollectionUnlockState(
+                EncounterRepository(CollectionDatabase.getInstance(context).encounters(), context)
+            ) as T
+        }
+    }
+    return viewModel(factory = factory)
+}

@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    categories: List<CollectionCategory> = HomePreviewData.categories,
     selectedPhotoUri: Uri? = null,
     onAddPhoto: () -> Unit = {},
     onOpenCollection: (Species) -> Unit = {},

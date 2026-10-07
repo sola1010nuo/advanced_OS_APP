@@ -1,6 +1,7 @@
 package com.example.petcollection.ui
 
 import android.app.Activity
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.petcollection.R
+import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.data.Species
 import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.ui.collection.CollectionEncounterHost
@@ -67,6 +69,12 @@ fun PetCollectionApp() {
     var photoRequest by rememberSaveable { mutableIntStateOf(0) }
     val recognitionState = remember { PhotoRecognitionState() }
     val baseContext = LocalContext.current
+    val collectionData by collectionUnlockState.collection.collectAsState()
+    val normalIdsBySpecies = remember(baseContext) {
+        MockBreedRepository(baseContext.resources).getBreeds().groupBy { it.species }
+            .mapValues { (_, breeds) -> breeds.map { it.id }.toSet() }
+    }
+    val activityResultOwner = LocalActivityResultRegistryOwner.current
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
             try {
@@ -106,7 +114,8 @@ fun PetCollectionApp() {
             }
         }
     }
-    CompositionLocalProvider(LocalContext provides localizedContext, LocalConfiguration provides configuration) {
+    CompositionLocalProvider(LocalContext provides localizedContext, LocalConfiguration provides configuration,
+        *listOfNotNull(activityResultOwner?.let { LocalActivityResultRegistryOwner provides it }).toTypedArray()) {
         PetCollectionTheme(darkTheme = dark) {
             // Collection already mounts this same host. Mount it here for Home and other destinations.
             if (destination != Destination.COLLECTION.name) CollectionEncounterHost(collectionUnlockState, breeds)
@@ -128,6 +137,10 @@ fun PetCollectionApp() {
                 when (Destination.valueOf(destination)) {
                     Destination.HOME -> HomeScreen(
                         modifier = contentModifier,
+                        categories = HomePreviewData.categories.map { category ->
+                            val species = if (category.id == "cat") Species.CAT else Species.DOG
+                            category.copy(collected = collectionData.discoveredCount(normalIdsBySpecies[species].orEmpty()))
+                        },
                         selectedPhotoUri = selectedPhotoUri?.let(Uri::parse),
                         onAddPhoto = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                         onOpenCollection = { species ->
