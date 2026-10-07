@@ -6,11 +6,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
 import android.net.Uri
 import com.example.petcollection.data.Species
 import androidx.compose.ui.Alignment
@@ -33,17 +37,28 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     selectedPhotoUri: Uri? = null,
     onAddPhoto: () -> Unit = {},
-    onOpenCollection: (Species) -> Unit = {}
+    onOpenCollection: (Species) -> Unit = {},
+    recognitionState: PhotoRecognitionState = remember { PhotoRecognitionState() },
+    recognizedBreedName: String? = null,
+    onRetryRecognition: () -> Unit = {},
+    categories: List<CollectionCategory> = HomePreviewData.categories
 ) {
+    val photoPreview = remember { BringIntoViewRequester() }
+    LaunchedEffect(selectedPhotoUri, recognitionState.processing) {
+        if (selectedPhotoUri != null) {
+            withFrameNanos { }
+            photoPreview.bringIntoView()
+        }
+    }
     Column(
         modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 28.dp),
         verticalArrangement = Arrangement.spacedBy(28.dp)
     ) {
         HomeHeader()
-        CollectionProgressCard(HomePreviewData.collected, HomePreviewData.total)
+        CollectionProgressCard(categories.sumOf { it.collected }, categories.sumOf { it.total })
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionTitle(stringResource(R.string.your_collections))
-            HomePreviewData.categories.forEach { category ->
+            categories.forEach { category ->
                 CollectionCategoryCard(category, onClick = {
                     onOpenCollection(if (category.id == "cat") Species.CAT else Species.DOG)
                 })
@@ -53,7 +68,11 @@ fun HomeScreen(
             shape = RoundedCornerShape(18.dp), contentPadding = PaddingValues(16.dp)) {
             Text(stringResource(R.string.add_photo), style = MaterialTheme.typography.titleMedium)
         }
-        selectedPhotoUri?.let { uri -> key(uri) { SelectedPhotoPreview(uri) } }
+        if (selectedPhotoUri != null) {
+            Box(Modifier.bringIntoViewRequester(photoPreview)) {
+                SelectedPhotoPreview(recognitionState, recognizedBreedName, onRetryRecognition)
+            }
+        }
         AchievementSection(HomePreviewData.achievements, HomePreviewData.total)
         RecentDiscoveriesSection()
         RecentFootprintsSection()

@@ -12,6 +12,44 @@ class BreedClassifier(
     private val context: Context,
     private val animalType: AnimalType
 ) {
+    companion object {
+        fun detectAnimal(context: Context, bitmap: Bitmap): AnimalType {
+            val labels = context.assets.open("cat_dog_labels.txt").bufferedReader().use { it.readLines() }
+            val bytes = context.assets.open("cat_dog_model.tflite").use { it.readBytes() }
+            val model = ByteBuffer.allocateDirect(bytes.size).order(ByteOrder.nativeOrder())
+            model.put(bytes).rewind()
+            Interpreter(model).use { detector ->
+                require(detector.getInputTensor(0).shape().contentEquals(intArrayOf(1, 224, 224, 3)))
+                require(detector.getOutputTensor(0).shape().contentEquals(intArrayOf(1, labels.size)))
+                val output = Array(1) { FloatArray(labels.size) }
+                detector.run(rgbInput(bitmap), output)
+                val best = output[0].indices.maxBy { output[0][it] }
+                return when (labels[best].trim().lowercase(java.util.Locale.ROOT)) {
+                    "cat" -> AnimalType.CAT
+                    "dog" -> AnimalType.DOG
+                    else -> error("Unexpected animal label")
+                }
+            }
+        }
+
+        /** Preserve the exported model contract: 224x224 RGB floats in the 0–255 range. */
+        private fun rgbInput(bitmap: Bitmap): ByteBuffer {
+            val resized = Bitmap.createScaledBitmap(bitmap, 224, 224, true)
+            try {
+                val buffer = ByteBuffer.allocateDirect(224 * 224 * 3 * 4).order(ByteOrder.nativeOrder())
+                for (y in 0 until 224) for (x in 0 until 224) {
+                    val pixel = resized.getPixel(x, y)
+                    buffer.putFloat(((pixel shr 16) and 0xFF).toFloat())
+                    buffer.putFloat(((pixel shr 8) and 0xFF).toFloat())
+                    buffer.putFloat((pixel and 0xFF).toFloat())
+                }
+                buffer.rewind()
+                return buffer
+            } finally {
+                if (resized !== bitmap) resized.recycle()
+            }
+        }
+    }
 
     enum class AnimalType {
         CAT, DOG
@@ -43,32 +81,7 @@ class BreedClassifier(
     }
 
     fun classify(bitmap: Bitmap): Result {
-
-        // 模型訓練時使用 224 x 224
-        val resizedBitmap =
-            Bitmap.createScaledBitmap(bitmap, 224, 224, true)
-
-        val inputBuffer =
-            ByteBuffer.allocateDirect(1 * 224 * 224 * 3 * 4)
-                .order(ByteOrder.nativeOrder())
-
-        // 將圖片轉成模型輸入
-        for (y in 0 until 224) {
-            for (x in 0 until 224) {
-
-                val pixel = resizedBitmap.getPixel(x, y)
-
-                val r = ((pixel shr 16) and 0xFF).toFloat()
-                val g = ((pixel shr 8) and 0xFF).toFloat()
-                val b = (pixel and 0xFF).toFloat()
-
-                inputBuffer.putFloat(r)
-                inputBuffer.putFloat(g)
-                inputBuffer.putFloat(b)
-            }
-        }
-
-        inputBuffer.rewind()
+        val inputBuffer = rgbInput(bitmap)
 
         val output =
             Array(1) { FloatArray(labels.size) }

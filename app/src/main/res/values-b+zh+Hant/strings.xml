@@ -60,11 +60,11 @@
     <string name="encyclopedia_no_photos">尚無收藏照片</string>
     <string name="selected_photo">已選取的照片</string>
     <string name="photo_preview_error">無法載入這張照片，請選擇其他圖片。</string>
-    <string name="choose_animal_type">照片中是貓還是狗？</string>
     <string name="inference_running">正在辨識品種…</string>
     <string name="inference_confidence">信心度：%1$.1f%%</string>
     <string name="inference_error">無法辨識品種，請再試一次。</string>
-    <string name="inference_retry">重新選擇</string>
+    <string name="inference_retry">再試一次</string>
+    <string name="photo_developing">正在沖洗照片…</string>
 </resources>
 
 
