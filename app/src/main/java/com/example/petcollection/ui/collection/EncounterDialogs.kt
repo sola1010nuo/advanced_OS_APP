@@ -33,7 +33,8 @@ fun BreedUnlockDialog(
     photo: BreedPhoto?,
     onRecordEncounter: () -> Unit,
     onDismiss: () -> Unit,
-    englishName: String? = null
+    englishName: String? = null,
+    confirmLabel: Int = R.string.unlock_record
 ) {
     LocalizedEncounterAlertDialog(
         onDismissRequest = onDismiss,
@@ -51,7 +52,7 @@ fun BreedUnlockDialog(
                 Text(stringResource(R.string.unlock_added), color = MaterialTheme.colorScheme.primary)
             }
         },
-        confirmButton = { Button(onClick = onRecordEncounter) { Text(stringResource(R.string.unlock_record)) } },
+        confirmButton = { Button(onClick = onRecordEncounter) { Text(stringResource(confirmLabel)) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.unlock_later)) } }
     )
 }
@@ -62,7 +63,9 @@ fun EncounterEditorDialog(
     breed: Breed,
     initialEncounter: EncounterRecord,
     onSave: (EncounterRecord) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    saving: Boolean = false,
+    hasError: Boolean = false
 ) {
     var name by rememberSaveable(initialEncounter.id) { mutableStateOf(initialEncounter.petName.orEmpty()) }
     var date by rememberSaveable(initialEncounter.id) { mutableStateOf(initialEncounter.encounteredAt.toLocalDate().toString()) }
@@ -76,6 +79,7 @@ fun EncounterEditorDialog(
         title = { Text(stringResource(R.string.encounter_title)) },
         text = {
             Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (hasError) Text(stringResource(R.string.collection_storage_error), color = MaterialTheme.colorScheme.error)
                 Card(shape = RoundedCornerShape(20.dp)) {
                     BreedImageArea(breed, BreedPhoto(initialEncounter.id, initialEncounter.photoUri),
                         locked = false, modifier = Modifier.fillMaxWidth().height(160.dp))
@@ -98,7 +102,7 @@ fun EncounterEditorDialog(
             }
         },
         confirmButton = {
-            Button(enabled = parsedDate != null && parsedTime != null, onClick = {
+            Button(enabled = !saving && parsedDate != null && parsedTime != null, onClick = {
                 if (parsedDate != null && parsedTime != null) {
                     onSave(initialEncounter.copy(
                         petName = name.trim().ifEmpty { null }, encounteredAt = parsedDate.atTime(parsedTime),
@@ -115,7 +119,7 @@ fun EncounterEditorDialog(
  * app-selected resources, including nested photo placeholders and accessibility text.
  */
 @Composable
-private fun LocalizedEncounterAlertDialog(
+internal fun LocalizedEncounterAlertDialog(
     onDismissRequest: () -> Unit,
     title: @Composable () -> Unit,
     text: @Composable () -> Unit,

@@ -4,8 +4,18 @@ import android.content.res.Resources
 import androidx.annotation.StringRes
 import com.example.petcollection.R
 
-/** Replace this implementation with a database repository when persistence is added. */
+/** Resource-backed breed catalog; encounter and cover state live in Room. */
 class MockBreedRepository(private val resources: Resources) : BreedRepository {
+    override fun getCollectionEntries(): List<Breed> = getBreeds() + listOf(
+        category("other_cat", Species.CAT, R.string.other_cats, R.string.other_cats_description),
+        category("other_dog", Species.DOG, R.string.other_dogs, R.string.other_dogs_description),
+        category("unregistered", null, R.string.unregistered, R.string.unregistered_description)
+    )
+
+    private fun category(id: String, species: Species?, name: Int, description: Int) = Breed(
+        id, resources.getString(name), species, resources.getString(description), "", "", "", "",
+        isCollectible = false
+    )
     override fun getBreeds(): List<Breed> = entries.map { entry ->
         val name = resources.getString(entry.name)
         val coat = resources.getString(entry.coat)
@@ -26,6 +36,8 @@ class MockBreedRepository(private val resources: Resources) : BreedRepository {
     )
 
     companion object {
+        val normalBreedIds: Set<String> get() = entries.map { it.id }.toSet()
+        val collectionIds: Set<String> get() = normalBreedIds + setOf("other_cat", "other_dog", "unregistered")
         fun total(species: Species): Int = entries.count { it.species == species }
 
         private val entries = listOf(

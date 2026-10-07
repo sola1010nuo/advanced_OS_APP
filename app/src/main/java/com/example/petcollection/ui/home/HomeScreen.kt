@@ -26,16 +26,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(modifier: Modifier = Modifier, categories: List<CollectionCategory> = HomePreviewData.categories) {
     Column(
         modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 28.dp),
         verticalArrangement = Arrangement.spacedBy(28.dp)
     ) {
         HomeHeader()
-        CollectionProgressCard(HomePreviewData.collected, HomePreviewData.total)
+        CollectionProgressCard(categories.sumOf { it.collected }, categories.sumOf { it.total })
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionTitle(stringResource(R.string.your_collections))
-            HomePreviewData.categories.forEach { CollectionCategoryCard(it) }
+            categories.forEach { CollectionCategoryCard(it) }
         }
         Button(onClick = {}, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
             shape = RoundedCornerShape(18.dp), contentPadding = PaddingValues(16.dp)) {

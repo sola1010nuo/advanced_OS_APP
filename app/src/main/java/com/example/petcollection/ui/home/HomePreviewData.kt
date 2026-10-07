@@ -2,18 +2,20 @@
 
 import androidx.annotation.StringRes
 import com.example.petcollection.R
+import com.example.petcollection.data.MockBreedRepository
+import com.example.petcollection.data.Species
 
 // Temporary UI-only data. Add collectible categories here as the design evolves.
 data class CollectionCategory(val id: String, @param:StringRes val nameRes: Int, val total: Int, val collected: Int = 0)
 data class AchievementPreview(@param:StringRes val nameRes: Int, val breedThreshold: Int? = null)
 
 object HomePreviewData {
-    val categories = listOf(
-        CollectionCategory("cat", R.string.cat_collection, 22),
-        CollectionCategory("dog", R.string.dog_collection, 27)
+    val categories: List<CollectionCategory> = listOf(
+        CollectionCategory("cat", R.string.cat_collection, MockBreedRepository.total(Species.CAT)),
+        CollectionCategory("dog", R.string.dog_collection, MockBreedRepository.total(Species.DOG))
     )
-    val total get() = categories.sumOf { it.total }
-    val collected get() = categories.sumOf { it.collected }
+    val total: Int get() = categories.sumOf { it.total }
+    val collected: Int get() = categories.sumOf { it.collected }
     val achievements = listOf(
         AchievementPreview(R.string.first_discovery, 1),
         AchievementPreview(R.string.beginner_collector, 5),

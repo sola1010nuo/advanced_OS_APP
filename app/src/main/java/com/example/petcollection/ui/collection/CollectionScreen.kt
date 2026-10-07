@@ -1,6 +1,9 @@
 package com.example.petcollection.ui.collection
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -14,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.petcollection.R
@@ -34,20 +38,62 @@ fun CollectionScreen(
     val resources = context.resources
     val configuration = LocalConfiguration.current
     val source = repository ?: remember(resources, configuration) { MockBreedRepository(resources) }
-    val catalog = remember(source) { source.getBreeds() }
-    val breeds = catalog.map(unlockState::applyTo)
+    val catalog = remember(source) { source.getCollectionEntries() }
+    val data by unlockState.collection.collectAsState()
+    val breeds = catalog.map { unlockState.applyTo(it, data) }
     CollectionEncounterHost(unlockState, breeds)
     var selectedSpecies by rememberSaveable { mutableStateOf(Species.CAT.name) }
     var selectedBreedId by rememberSaveable { mutableStateOf<String?>(null) }
+    var selectedEncounterId by rememberSaveable { mutableStateOf<String?>(null) }
+    var pickerTargetId by rememberSaveable { mutableStateOf<String?>(null) }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) breeds.firstOrNull { it.id == pickerTargetId }?.let {
+            unlockState.onBreedRecognized(it, uri.toString())
+        }
+        pickerTargetId = null
+    }
     val catGridState = rememberLazyGridState()
     val dogGridState = rememberLazyGridState()
     val selectedBreed = breeds.firstOrNull { it.id == selectedBreedId }
-    BackHandler(enabled = selectedBreed != null) { selectedBreedId = null }
-    if (selectedBreed != null) {
-        BreedDetailScreen(selectedBreed, onBack = { selectedBreedId = null }, modifier = modifier)
+    val selectedEncounter = data.encounters.firstOrNull { it.id == selectedEncounterId && it.breedId == selectedBreedId }
+    BackHandler(enabled = selectedBreed != null && unlockState.pendingEncounter == null) {
+        if (selectedEncounterId != null) selectedEncounterId = null else selectedBreedId = null
+    }
+    LaunchedEffect(data, selectedEncounterId) {
+        if (data.loaded && selectedEncounterId != null && selectedEncounter == null) selectedEncounterId = null
+    }
+    if (!data.loaded) {
+        Column(modifier.padding(24.dp)) {
+            if (unlockState.operationError) Text(stringResource(R.string.collection_storage_error))
+            else CircularProgressIndicator()
+        }
+        return
+    }
+    if (unlockState.operationError && unlockState.pendingEncounter == null) {
+        LocalizedEncounterAlertDialog(onDismissRequest = unlockState::clearError,
+            title = { Text(stringResource(R.string.collection_storage_error)) }, text = {},
+            confirmButton = { TextButton(onClick = unlockState::clearError) { Text(stringResource(R.string.collection_done)) } },
+            dismissButton = {})
+    }
+    if (selectedBreed != null && selectedEncounter != null) {
+        EncounterDetailScreen(selectedBreed, selectedEncounter,
+            onBack = { selectedEncounterId = null },
+            onEdit = { unlockState.startEdit(selectedEncounter) },
+            onDelete = { unlockState.deleteEncounter(selectedEncounter.id) { selectedEncounterId = null } },
+            onSetCover = { unlockState.selectCover(selectedBreed.id, selectedEncounter.id) },
+            busy = unlockState.isWorking, modifier = modifier)
+    } else if (selectedBreed != null) {
+        BreedDetailScreen(selectedBreed, onBack = { selectedBreedId = null }, modifier = modifier,
+            encounters = data.forBreed(selectedBreed.id), onOpenEncounter = { selectedEncounterId = it },
+            onAddEncounter = {
+                if (!unlockState.isWorking) {
+                    pickerTargetId = selectedBreed.id
+                    picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }
+            })
     } else {
         val species = Species.valueOf(selectedSpecies)
-        val discovered = breeds.count { it.isDiscovered }
+        val discovered = breeds.count { it.isCollectible && it.species == species && it.isDiscovered }
         LazyVerticalGrid(
             columns = GridCells.Fixed(2), modifier = modifier.fillMaxSize(),
             state = if (species == Species.CAT) catGridState else dogGridState,
@@ -59,7 +105,7 @@ fun CollectionScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text(stringResource(R.string.collection), style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold)
-                    CollectionSummary(discovered, breeds.size)
+                    CollectionSummary(discovered, MockBreedRepository.total(species))
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Species.entries.forEach { filter ->
                             FilterChip(
@@ -69,9 +115,17 @@ fun CollectionScreen(
                             )
                         }
                     }
+                    breeds.firstOrNull { it.id == "unregistered" }?.let { category ->
+                        OutlinedCard(onClick = { selectedBreedId = category.id }, modifier = Modifier.fillMaxWidth()) {
+                            Column(Modifier.padding(16.dp)) {
+                                Text(category.name, style = MaterialTheme.typography.titleMedium)
+                                Text(pluralStringResource(R.plurals.breed_encounters, category.encounterCount, category.encounterCount))
+                            }
+                        }
+                    }
                 }
             }
-            items(breeds.filter { it.species == species }, key = { it.id }) { breed ->
+            items(breeds.filter { it.species == species }.sortedBy { !it.isCollectible }, key = { it.id }) { breed ->
                 BreedCard(breed, onClick = { selectedBreedId = breed.id })
             }
         }
@@ -98,13 +152,14 @@ private fun BreedCard(breed: Breed, onClick: () -> Unit) {
     Card(onClick = onClick, shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
         BreedImageArea(
-            breed = breed, photo = if (breed.isDiscovered) breed.coverPhoto else null,
-            locked = !breed.isDiscovered, modifier = Modifier.fillMaxWidth().aspectRatio(1.15f)
+            breed = breed, photo = breed.coverPhoto,
+            locked = breed.isCollectible && !breed.isDiscovered, modifier = Modifier.fillMaxWidth().aspectRatio(1.15f)
         )
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(breed.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.heightIn(min = 40.dp))
-            Text(stringResource(if (breed.isDiscovered) R.string.breed_discovered else R.string.breed_undiscovered),
+            Text(if (breed.isCollectible) stringResource(if (breed.isDiscovered) R.string.breed_discovered else R.string.breed_undiscovered)
+                else pluralStringResource(R.plurals.breed_encounters, breed.encounterCount, breed.encounterCount),
                 style = MaterialTheme.typography.labelMedium,
                 color = if (breed.isDiscovered) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
         }

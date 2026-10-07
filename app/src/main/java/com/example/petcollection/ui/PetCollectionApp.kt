@@ -1,6 +1,7 @@
 package com.example.petcollection.ui
 
 import android.app.Activity
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import android.content.res.Configuration
 import android.os.LocaleList
 import androidx.annotation.StringRes
@@ -31,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.petcollection.R
+import com.example.petcollection.data.MockBreedRepository
+import com.example.petcollection.data.Species
 import com.example.petcollection.ui.collection.CollectionScreen
 import com.example.petcollection.ui.collection.rememberCollectionUnlockState
 import com.example.petcollection.ui.home.HomePreviewData
@@ -53,6 +56,12 @@ fun PetCollectionApp() {
     var appearance by rememberSaveable { mutableStateOf(Appearance.SYSTEM.name) }
     var destination by rememberSaveable { mutableStateOf(Destination.HOME.name) }
     val baseContext = LocalContext.current
+    val collectionData by collectionUnlockState.collection.collectAsState()
+    val normalIdsBySpecies = remember(baseContext) {
+        MockBreedRepository(baseContext.resources).getBreeds().groupBy { it.species }
+            .mapValues { (_, breeds) -> breeds.map { it.id }.toSet() }
+    }
+    val activityResultOwner = LocalActivityResultRegistryOwner.current
     val systemConfiguration = LocalConfiguration.current
     val configuration = remember(systemConfiguration, language) {
         Configuration(systemConfiguration).apply {
@@ -76,7 +85,8 @@ fun PetCollectionApp() {
             }
         }
     }
-    CompositionLocalProvider(LocalContext provides localizedContext, LocalConfiguration provides configuration) {
+    CompositionLocalProvider(LocalContext provides localizedContext, LocalConfiguration provides configuration,
+        *listOfNotNull(activityResultOwner?.let { LocalActivityResultRegistryOwner provides it }).toTypedArray()) {
         PetCollectionTheme(darkTheme = dark) {
             Scaffold(
                 bottomBar = {
@@ -94,7 +104,10 @@ fun PetCollectionApp() {
             ) { padding ->
                 val contentModifier = Modifier.padding(padding).consumeWindowInsets(padding)
                 when (Destination.valueOf(destination)) {
-                    Destination.HOME -> HomeScreen(contentModifier)
+                    Destination.HOME -> HomeScreen(contentModifier, categories = HomePreviewData.categories.map { category ->
+                        val species = if (category.id == "cat") Species.CAT else Species.DOG
+                        category.copy(collected = collectionData.discoveredCount(normalIdsBySpecies[species].orEmpty()))
+                    })
                     Destination.COLLECTION -> CollectionScreen(contentModifier, unlockState = collectionUnlockState)
                     Destination.FOOTPRINTS -> FootprintsScreen(contentModifier)
                     Destination.SETTINGS -> SettingsScreen(
