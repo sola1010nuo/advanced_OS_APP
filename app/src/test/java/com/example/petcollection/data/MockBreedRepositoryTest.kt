@@ -1,6 +1,6 @@
 ﻿package com.example.petcollection.data
 
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Test
 
 class MockBreedRepositoryTest {
@@ -10,9 +10,11 @@ class MockBreedRepositoryTest {
         assertEquals(56, Species.entries.sumOf { MockBreedRepository.total(it) })
     }
 
-    @Test fun mockDiscoveryCountsMatchInitialCollection() {
-        assertEquals(4, MockBreedRepository.discovered(Species.CAT))
-        assertEquals(4, MockBreedRepository.discovered(Species.DOG))
-        assertEquals(8, Species.entries.sumOf { MockBreedRepository.discovered(it) })
+    @Test fun breedDefaultsAreLockedWithoutEncounterData() {
+        val breed = Breed("test", "Test", Species.CAT, "Description", "Origin", "Personality", "Size", "Coat")
+        assertFalse(breed.isDiscovered)
+        assertEquals(0, breed.encounterCount)
+        assertNull(breed.coverPhoto)
+        assertTrue(breed.collectedPhotos.isEmpty())
     }
 }

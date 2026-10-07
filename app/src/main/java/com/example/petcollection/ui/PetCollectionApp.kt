@@ -1,6 +1,11 @@
-﻿package com.example.petcollection.ui
+package com.example.petcollection.ui
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import android.content.res.Configuration
 import android.os.LocaleList
 import androidx.annotation.StringRes
@@ -31,7 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.petcollection.R
+import com.example.petcollection.data.Species
 import com.example.petcollection.ui.collection.CollectionScreen
+import com.example.petcollection.ui.collection.rememberCollectionUnlockState
 import com.example.petcollection.ui.home.HomePreviewData
 import com.example.petcollection.ui.home.HomeScreen
 import com.example.petcollection.ui.theme.PetCollectionTheme
@@ -46,11 +53,25 @@ private enum class Appearance(@param:StringRes val label: Int) {
 
 @Composable
 fun PetCollectionApp() {
+    val collectionUnlockState = rememberCollectionUnlockState()
     // UI prototype only: retained across rotation, reset on a fresh app launch.
     var language by rememberSaveable { mutableStateOf("zh-Hant") }
     var appearance by rememberSaveable { mutableStateOf(Appearance.SYSTEM.name) }
     var destination by rememberSaveable { mutableStateOf(Destination.HOME.name) }
+    var collectionSpecies by rememberSaveable { mutableStateOf(Species.CAT.name) }
+    // Shared input for future recognition; choosing a photo only updates Home.
+    var selectedPhotoUri by rememberSaveable { mutableStateOf<String?>(null) }
     val baseContext = LocalContext.current
+    val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            try {
+                baseContext.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } catch (_: SecurityException) {
+                // Some providers grant read access for the current session only.
+            }
+            selectedPhotoUri = uri.toString()
+        }
+    }
     val systemConfiguration = LocalConfiguration.current
     val configuration = remember(systemConfiguration, language) {
         Configuration(systemConfiguration).apply {
@@ -92,8 +113,17 @@ fun PetCollectionApp() {
             ) { padding ->
                 val contentModifier = Modifier.padding(padding).consumeWindowInsets(padding)
                 when (Destination.valueOf(destination)) {
-                    Destination.HOME -> HomeScreen(contentModifier)
-                    Destination.COLLECTION -> CollectionScreen(contentModifier)
+                    Destination.HOME -> HomeScreen(
+                        modifier = contentModifier,
+                        selectedPhotoUri = selectedPhotoUri?.let(Uri::parse),
+                        onAddPhoto = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                        onOpenCollection = { species ->
+                            collectionSpecies = species.name
+                            destination = Destination.COLLECTION.name
+                        }
+                    )
+                    Destination.COLLECTION -> CollectionScreen(contentModifier,
+                        unlockState = collectionUnlockState, initialSpecies = Species.valueOf(collectionSpecies))
                     Destination.FOOTPRINTS -> FootprintsScreen(contentModifier)
                     Destination.SETTINGS -> SettingsScreen(
                         language, { language = it }, Appearance.valueOf(appearance), { appearance = it.name }, contentModifier
@@ -214,7 +244,3 @@ private fun DestinationIcon(destination: Destination, modifier: Modifier = Modif
 @Preview(showBackground = true, widthDp = 393, heightDp = 852)
 @Composable
 private fun AppPreview() { PetCollectionApp() }
-
-
-
-
