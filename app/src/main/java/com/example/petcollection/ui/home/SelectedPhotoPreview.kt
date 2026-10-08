@@ -51,7 +51,6 @@ fun SelectedPhotoPreview(state: PhotoRecognitionState, breedName: String?, onRet
                     TextButton(onClick = onRetry) { Text(stringResource(R.string.inference_retry)) }
                 } else if (breedName != null) {
                     Text(breedName, style = MaterialTheme.typography.titleLarge)
-                    state.confidence?.let { Text(stringResource(R.string.inference_confidence, it * 100f)) }
                 }
             }
         }

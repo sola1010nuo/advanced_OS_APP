@@ -5,6 +5,7 @@ import android.graphics.Color
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertTrue
 import org.junit.Assert.*
@@ -75,20 +76,45 @@ class BreedClassifierInferenceTest {
             assertFalse(recognition.processing)
             assertNotNull(recognition.bitmap)
             val breed = catalog.first { it.id == recognition.breedId }
-            assertTrue(state.applyTo(breed).isDiscovered)
-            assertTrue(state.showUnlockCelebration)
+            assertFalse(state.applyTo(breed).isDiscovered)
+            assertTrue(state.showRecognitionResult)
+            assertTrue(state.isFirstDiscovery)
             assertEquals(uri.toString(), state.pendingEncounter!!.photoUri)
-            state.editEncounter()
-            state.saveEncounter(state.pendingEncounter!!.copy(petName = "Test pet"))
-            recognition.recognize(context, uri, catalog, state)
-            assertFalse(recognition.failed)
-            assertFalse(state.showUnlockCelebration)
-            assertNotNull(state.pendingEncounter)
-            state.saveEncounter(state.pendingEncounter!!)
+            withContext(Dispatchers.Main) {
+                state.editEncounter()
+                state.saveEncounter(state.pendingEncounter!!.copy(petName = "Test pet"))
+            }
+            state.collection.first { it.encounters.size == 1 }
+            withContext(Dispatchers.Main) {
+                kotlinx.coroutines.withTimeout(10000) {
+                    while (state.isWorking) kotlinx.coroutines.delay(10)
+                }
+                assertNull(state.pendingEncounter)
+                recognition.recognize(context, uri, catalog, state)
+                assertFalse(recognition.failed)
+                assertTrue(state.showRecognitionResult)
+                assertFalse(state.isFirstDiscovery)
+                state.editEncounter()
+                state.saveEncounter(state.pendingEncounter!!)
+            }
+            state.collection.first { it.encounters.size == 2 }
             assertEquals(2, state.applyTo(breed).encounterCount)
             assertEquals(2, state.applyTo(breed).collectedPhotos.size)
-            assertTrue(state.encounters.all { it.photoUri == uri.toString() && it.breedId == breed.id })
+            val originalBytes = file.readBytes()
+            state.encounters.forEach { record ->
+                assertEquals(breed.id, record.breedId)
+                val savedBytes = requireNotNull(context.contentResolver.openInputStream(Uri.parse(record.photoUri)))
+                    .use { it.readBytes() }
+                assertArrayEquals(originalBytes, savedBytes)
+            }
             assertEquals(1, catalog.count { state.applyTo(it).isDiscovered })
+            val repository = com.example.petcollection.data.EncounterRepository(database.encounters(), context)
+            val store = androidx.lifecycle.ViewModelStore()
+            withContext(Dispatchers.Main) {
+                store.put("collection", state)
+                store.clear()
+            }
+            database.encounters().observeAll().first().forEach { repository.delete(it.id) }
         } finally {
             database.close()
             file.delete()
