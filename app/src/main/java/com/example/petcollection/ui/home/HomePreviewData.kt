@@ -5,8 +5,9 @@ import com.example.petcollection.R
 import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.data.Species
 
-// Temporary UI-only data. Add collectible categories here as the design evolves.
-data class CollectionCategory(val id: String, @param:StringRes val nameRes: Int, val total: Int, val collected: Int = 0)
+// Screen input; production values come from CollectionData, not preview fixtures.
+data class CollectionCategory(val id: String, @param:StringRes val nameRes: Int, val total: Int,
+    val collected: Int = 0, val encounterCount: Int = 0)
 data class AchievementPreview(@param:StringRes val nameRes: Int, val breedThreshold: Int? = null)
 
 object HomePreviewData {

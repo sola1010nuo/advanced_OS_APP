@@ -62,10 +62,13 @@ class BreedClassifierInferenceTest {
         val file = java.io.File(context.cacheDir, "recognition-test.png")
         file.outputStream().use { photo.compress(Bitmap.CompressFormat.PNG, 100, it) }
         photo.recycle()
+        val database = androidx.room.Room.inMemoryDatabaseBuilder(
+            context, com.example.petcollection.data.CollectionDatabase::class.java
+        ).build()
         try {
             val uri = Uri.fromFile(file)
             val catalog = MockBreedRepository(context.resources).getBreeds()
-            val state = CollectionUnlockState()
+            val state = CollectionUnlockState(com.example.petcollection.data.EncounterRepository(database.encounters(), context))
             val recognition = PhotoRecognitionState()
             recognition.recognize(context, uri, catalog, state)
             assertFalse(recognition.failed)
@@ -87,6 +90,7 @@ class BreedClassifierInferenceTest {
             assertTrue(state.encounters.all { it.photoUri == uri.toString() && it.breedId == breed.id })
             assertEquals(1, catalog.count { state.applyTo(it).isDiscovered })
         } finally {
+            database.close()
             file.delete()
         }
     }

@@ -42,7 +42,7 @@ import com.example.petcollection.data.Species
 import com.example.petcollection.ui.collection.CollectionEncounterHost
 import com.example.petcollection.ui.collection.CollectionScreen
 import com.example.petcollection.ui.collection.rememberCollectionUnlockState
-import com.example.petcollection.ui.home.HomePreviewData
+import com.example.petcollection.ui.home.CollectionCategory
 import com.example.petcollection.ui.home.HomeScreen
 import com.example.petcollection.ui.home.PhotoRecognitionState
 import com.example.petcollection.ui.theme.PetCollectionTheme
@@ -69,10 +69,6 @@ fun PetCollectionApp() {
     val recognitionState = remember { PhotoRecognitionState() }
     val baseContext = LocalContext.current
     val collectionData by collectionUnlockState.collection.collectAsState()
-    val normalIdsBySpecies = remember(baseContext) {
-        MockBreedRepository(baseContext.resources).getBreeds().groupBy { it.species }
-            .mapValues { (_, breeds) -> breeds.map { it.id }.toSet() }
-    }
     val activityResultOwner = LocalActivityResultRegistryOwner.current
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -94,8 +90,9 @@ fun PetCollectionApp() {
     val localizedContext = remember(baseContext, configuration) {
         baseContext.createConfigurationContext(configuration)
     }
-    val catalog = remember(localizedContext) { MockBreedRepository(localizedContext.resources).getBreeds() }
-    val breeds = catalog.map(collectionUnlockState::applyTo)
+    val entries = remember(localizedContext) { MockBreedRepository(localizedContext.resources).getCollectionEntries() }
+    val catalog = entries.filter { it.isCollectible }
+    val breeds = entries.map { collectionData.applyTo(it) }
     LaunchedEffect(selectedPhotoUri, photoRequest) {
         selectedPhotoUri?.let { recognitionState.recognize(baseContext.applicationContext, Uri.parse(it), catalog, collectionUnlockState) }
     }
@@ -136,10 +133,13 @@ fun PetCollectionApp() {
                 when (Destination.valueOf(destination)) {
                     Destination.HOME -> HomeScreen(
                         modifier = contentModifier,
-                        categories = HomePreviewData.categories.map { category ->
-                            val species = if (category.id == "cat") Species.CAT else Species.DOG
-                            category.copy(collected = collectionData.discoveredCount(normalIdsBySpecies[species].orEmpty()))
+                        categories = Species.entries.map { species ->
+                            val stats = collectionData.statistics(entries, species)
+                            CollectionCategory(if (species == Species.CAT) "cat" else "dog",
+                                if (species == Species.CAT) R.string.cat_collection else R.string.dog_collection,
+                                stats.totalBreeds, stats.discovered, stats.encounterCount)
                         },
+                        encounterCount = collectionData.statistics(entries).encounterCount,
                         selectedPhotoUri = selectedPhotoUri?.let(Uri::parse),
                         onAddPhoto = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                         onOpenCollection = { species ->

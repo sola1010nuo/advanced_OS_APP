@@ -13,7 +13,9 @@ class MockBreedRepository(private val resources: Resources) : BreedRepository {
     )
 
     private fun category(id: String, species: Species?, name: Int, description: Int) = Breed(
-        id, resources.getString(name), species, resources.getString(description), "", "", "", "",
+        id, resources.getString(name), species,
+        if (species != null) resources.getString(description, total(species)) else resources.getString(description),
+        "", "", "", "",
         isCollectible = false
     )
     override fun getBreeds(): List<Breed> = entries.map { entry ->

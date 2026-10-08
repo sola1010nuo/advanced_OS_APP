@@ -126,8 +126,19 @@ class CollectionCrudUiTest {
 
     @Test fun allSpecialAlbumsSupportCrudWithoutUnlockOrProgress() {
         mount()
+        compose.onNodeWithText(text(R.string.filter_cats)).assertIsSelected()
+        compose.onNodeWithText(text(R.string.filter_dogs)).assertExists()
+        compose.onNodeWithText(text(R.string.filter_other)).assertExists()
+        compose.onNodeWithText(text(R.string.unregistered)).assertDoesNotExist()
+        compose.onNodeWithText(text(R.string.filter_other)).performClick()
+        compose.onNodeWithText(text(R.string.filter_other)).assertIsSelected()
+        compose.onNodeWithText(text(R.string.unregistered)).assertIsDisplayed()
+        compose.onNodeWithText(text(R.string.other_cats)).assertDoesNotExist()
+        compose.onNodeWithText(text(R.string.other_dogs)).assertDoesNotExist()
+        compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 22)).assertDoesNotExist()
+        compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 34)).assertDoesNotExist()
         for ((id, filter) in listOf("other_cat" to R.string.filter_cats, "other_dog" to R.string.filter_dogs,
-            "unregistered" to null)) {
+            "unregistered" to R.string.filter_other)) {
             openAlbum(id, filter)
             add(id, "Special $id")
             openPhoto("Special $id")

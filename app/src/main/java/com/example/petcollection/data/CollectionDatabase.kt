@@ -46,8 +46,25 @@ abstract class EncounterDao {
     abstract suspend fun cover(breedId: String): BreedCover?
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun putCover(cover: BreedCover)
+    @Query("DELETE FROM breed_covers WHERE breedId = :breedId")
+    abstract suspend fun deleteCover(breedId: String)
     @Query("SELECT * FROM encounters WHERE breedId = :breedId AND photoUri IS NOT NULL ORDER BY createdAt, id LIMIT 1")
     abstract suspend fun firstPhoto(breedId: String): EncounterRecord?
+
+    @Transaction
+    open suspend fun updateAndRepairCovers(record: EncounterRecord) {
+        val old = requireNotNull(get(record.id))
+        check(update(record) == 1)
+        if (old.breedId != record.breedId) {
+            if (cover(old.breedId)?.encounterId == record.id) {
+                deleteCover(old.breedId)
+                firstPhoto(old.breedId)?.let { putCover(BreedCover(old.breedId, it.id)) }
+            }
+            if (record.photoUri != null && cover(record.breedId) == null) {
+                putCover(BreedCover(record.breedId, record.id))
+            }
+        }
+    }
 
     @Transaction
     open suspend fun create(record: EncounterRecord): Boolean {
