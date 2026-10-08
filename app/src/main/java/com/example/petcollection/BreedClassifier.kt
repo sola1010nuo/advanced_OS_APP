@@ -11,33 +11,14 @@ import java.nio.channels.FileChannel
 class BreedClassifier(
     private val context: Context,
     private val animalType: AnimalType
-) {
+) : java.io.Closeable {
     companion object {
-        fun detectAnimal(context: Context, bitmap: Bitmap): AnimalType {
-            val labels = context.assets.open("cat_dog_labels.txt").bufferedReader().use { it.readLines() }
-            val bytes = context.assets.open("cat_dog_model.tflite").use { it.readBytes() }
-            val model = ByteBuffer.allocateDirect(bytes.size).order(ByteOrder.nativeOrder())
-            model.put(bytes).rewind()
-            Interpreter(model).use { detector ->
-                require(detector.getInputTensor(0).shape().contentEquals(intArrayOf(1, 224, 224, 3)))
-                require(detector.getOutputTensor(0).shape().contentEquals(intArrayOf(1, labels.size)))
-                val output = Array(1) { FloatArray(labels.size) }
-                detector.run(rgbInput(bitmap), output)
-                val best = output[0].indices.maxBy { output[0][it] }
-                return when (labels[best].trim().lowercase(java.util.Locale.ROOT)) {
-                    "cat" -> AnimalType.CAT
-                    "dog" -> AnimalType.DOG
-                    else -> error("Unexpected animal label")
-                }
-            }
-        }
-
         /** Preserve the exported model contract: 224x224 RGB floats in the 0–255 range. */
-        private fun rgbInput(bitmap: Bitmap): ByteBuffer {
-            val resized = Bitmap.createScaledBitmap(bitmap, 224, 224, true)
+        internal fun rgbInput(bitmap: Bitmap, width: Int = 224, height: Int = 224): ByteBuffer {
+            val resized = Bitmap.createScaledBitmap(bitmap, width, height, true)
             try {
-                val buffer = ByteBuffer.allocateDirect(224 * 224 * 3 * 4).order(ByteOrder.nativeOrder())
-                for (y in 0 until 224) for (x in 0 until 224) {
+                val buffer = ByteBuffer.allocateDirect(width * height * 3 * 4).order(ByteOrder.nativeOrder())
+                for (y in 0 until height) for (x in 0 until width) {
                     val pixel = resized.getPixel(x, y)
                     buffer.putFloat(((pixel shr 16) and 0xFF).toFloat())
                     buffer.putFloat(((pixel shr 8) and 0xFF).toFloat())
@@ -120,7 +101,7 @@ class BreedClassifier(
         }
     }
 
-    fun close() {
+    override fun close() {
         interpreter.close()
     }
 }

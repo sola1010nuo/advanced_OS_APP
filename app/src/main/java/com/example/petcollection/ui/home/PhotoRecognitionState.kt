@@ -8,8 +8,9 @@ import android.net.Uri
 import android.os.Build
 import androidx.compose.runtime.*
 import com.example.petcollection.BreedClassifier
+import com.example.petcollection.AnimalClassifier
+import com.example.petcollection.data.RecognitionPolicy
 import com.example.petcollection.data.Breed
-import com.example.petcollection.data.ModelBreedMapping
 import com.example.petcollection.data.Species
 import com.example.petcollection.ui.collection.CollectionUnlockState
 import kotlinx.coroutines.CancellationException
@@ -41,22 +42,20 @@ class PhotoRecognitionState {
         try {
             val photo = withContext(Dispatchers.IO) { decodePhoto(context, uri) }
             bitmap = photo
-            val (species, prediction) = withContext(Dispatchers.Default) {
-                val type = BreedClassifier.detectAnimal(context, photo)
-                val classifier = BreedClassifier(context, type)
-                try {
-                    (if (type == BreedClassifier.AnimalType.CAT) Species.CAT else Species.DOG) to classifier.classify(photo)
-                } finally {
-                    classifier.close()
+            val classification = withContext(Dispatchers.Default) {
+                val animal = AnimalClassifier(context).use { it.classify(photo) }
+                RecognitionPolicy.route(animal, catalog) { species ->
+                    val type = if (species == Species.CAT) BreedClassifier.AnimalType.CAT else BreedClassifier.AnimalType.DOG
+                    BreedClassifier(context, type).use { classifier ->
+                        val result = classifier.classify(photo)
+                        result.breed to result.confidence
+                    }
                 }
             }
-            val breed = requireNotNull(ModelBreedMapping.resolve(prediction.breed, species, catalog)) {
-                "Model label has no catalog entry: ${prediction.breed}"
-            }
             unlockState.collection.first { it.loaded }
-            check(unlockState.onBreedRecognized(breed, uri.toString())) { "Another encounter is pending" }
-            breedId = breed.id
-            confidence = prediction.confidence
+            check(unlockState.onClassificationResult(classification.breedId, catalog, uri.toString())) { "Another encounter is pending" }
+            breedId = classification.breedId
+            confidence = classification.confidence
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (_: Exception) {

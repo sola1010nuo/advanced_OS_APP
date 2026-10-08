@@ -23,15 +23,20 @@ import org.junit.Test
 class BreedClassifierInferenceTest {
     @Test fun inspectAnimalModelContract() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val model = context.assets.open("cat_dog_model.tflite").use { it.readBytes() }
+        val model = context.assets.open(AnimalClassifier.MODEL_ASSET).use { it.readBytes() }
         val buffer = java.nio.ByteBuffer.allocateDirect(model.size).order(java.nio.ByteOrder.nativeOrder())
         buffer.put(model).rewind()
         org.tensorflow.lite.Interpreter(buffer).use { interpreter ->
             val input = interpreter.getInputTensor(0)
             val output = interpreter.getOutputTensor(0)
             android.util.Log.i("AnimalModelContract", "input=${input.shape().contentToString()} ${input.dataType()} output=${output.shape().contentToString()} ${output.dataType()}")
+            assertEquals(org.tensorflow.lite.DataType.FLOAT32, input.dataType())
+            assertEquals(org.tensorflow.lite.DataType.FLOAT32, output.dataType())
+            assertEquals(0f, input.quantizationParams().scale, 0f)
+            assertEquals(listOf("cat", "dog", "monkey"),
+                context.assets.open(AnimalClassifier.LABELS_ASSET).bufferedReader().use { it.readLines() })
             assertTrue(input.shape().contentEquals(intArrayOf(1, 224, 224, 3)))
-            assertTrue(output.shape().contentEquals(intArrayOf(1, 2)))
+            assertTrue(output.shape().contentEquals(intArrayOf(1, 3)))
         }
     }
     @Test fun everyModelLabelMapsToExistingLocalizedCatalog() {
@@ -68,7 +73,7 @@ class BreedClassifierInferenceTest {
         ).build()
         try {
             val uri = Uri.fromFile(file)
-            val catalog = MockBreedRepository(context.resources).getBreeds()
+            val catalog = MockBreedRepository(context.resources).getCollectionEntries()
             val state = CollectionUnlockState(com.example.petcollection.data.EncounterRepository(database.encounters(), context))
             val recognition = PhotoRecognitionState()
             recognition.recognize(context, uri, catalog, state)
@@ -78,7 +83,7 @@ class BreedClassifierInferenceTest {
             val breed = catalog.first { it.id == recognition.breedId }
             assertFalse(state.applyTo(breed).isDiscovered)
             assertTrue(state.showRecognitionResult)
-            assertTrue(state.isFirstDiscovery)
+            assertEquals(breed.isCollectible, state.isFirstDiscovery)
             assertEquals(uri.toString(), state.pendingEncounter!!.photoUri)
             withContext(Dispatchers.Main) {
                 state.editEncounter()
@@ -107,7 +112,7 @@ class BreedClassifierInferenceTest {
                     .use { it.readBytes() }
                 assertArrayEquals(originalBytes, savedBytes)
             }
-            assertEquals(1, catalog.count { state.applyTo(it).isDiscovered })
+            assertEquals(if (breed.isCollectible) 1 else 0, state.collection.value.statistics(catalog).discovered)
             val repository = com.example.petcollection.data.EncounterRepository(database.encounters(), context)
             val store = androidx.lifecycle.ViewModelStore()
             withContext(Dispatchers.Main) {
@@ -118,6 +123,25 @@ class BreedClassifierInferenceTest {
         } finally {
             database.close()
             file.delete()
+        }
+    }
+    @Test fun threeClassAnimalModelRunsOffMainThreadWithSharedRgbInput() = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val photo = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+        photo.eraseColor(Color.rgb(255, 128, 0))
+        try {
+            val rgb = BreedClassifier.rgbInput(photo, 1, 1)
+            assertEquals(255f, rgb.float, 0f)
+            assertEquals(128f, rgb.float, 0f)
+            assertEquals(0f, rgb.float, 0f)
+            val prediction = withContext(Dispatchers.Default) {
+                assertTrue(android.os.Looper.myLooper() != android.os.Looper.getMainLooper())
+                AnimalClassifier(context).use { it.classify(photo) }
+            }
+            assertTrue(prediction.confidence.isFinite() && prediction.confidence in 0f..1f)
+            assertTrue(prediction.category in com.example.petcollection.data.AnimalCategory.entries)
+        } finally {
+            photo.recycle()
         }
     }
     @Test fun bothModelsProduceLabelAndProbabilityOffMainThread() = runBlocking {
