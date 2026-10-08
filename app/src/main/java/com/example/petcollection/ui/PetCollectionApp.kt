@@ -148,7 +148,8 @@ fun PetCollectionApp() {
                         },
                         recognitionState = recognitionState,
                         recognizedBreedName = breeds.firstOrNull { it.id == recognitionState.breedId }?.name,
-                        onRetryRecognition = { photoRequest++ }
+                        onRetryRecognition = { photoRequest++ },
+                        collectionStatistics = collectionData.statistics(entries)
                     )
                     Destination.COLLECTION -> CollectionScreen(contentModifier,
                         unlockState = collectionUnlockState, initialSpecies = Species.valueOf(collectionSpecies))

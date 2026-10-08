@@ -46,6 +46,14 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         return true
     }
 
+    /** Future three-class classifier: pass canonical "monkey" here, with the selected URI.
+     * This only creates a preview draft; the editor remains the sole save entry point.
+     */
+    fun onClassificationResult(canonicalId: String, catalog: List<Breed>, photoUri: String): Boolean {
+        val breed = catalog.firstOrNull { it.id == canonicalId } ?: return false
+        return onBreedRecognized(breed, photoUri)
+    }
+
     fun startEdit(record: EncounterRecord) {
         if (pendingEncounter != null || isWorking) return
         pendingEncounter = record

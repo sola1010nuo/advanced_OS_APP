@@ -25,6 +25,15 @@ fun BreedDetailScreen(
         item {
             TextButton(onClick = onBack) { Text(stringResource(R.string.breed_back)) }
             Text(breed.name, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+            if (breed.isSecretMonkey) {
+                Text(stringResource(R.string.monkey_english_name), style = MaterialTheme.typography.titleMedium)
+                MonkeyLegendaryBadge()
+                Surface(shape = RoundedCornerShape(16.dp), color = monkeyContainerColor(), contentColor = monkeyContentColor()) {
+                    Text(stringResource(R.string.monkey_legend), modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                }
+                Text(stringResource(R.string.monkey_inspiration), style = MaterialTheme.typography.bodyMedium)
+            }
             breed.species?.let { species ->
                 Text(stringResource(if (species == Species.CAT) R.string.species_cat else R.string.species_dog),
                     style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
@@ -52,7 +61,9 @@ fun BreedDetailScreen(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (breed.isCollectible) DetailHeading(stringResource(R.string.breed_about))
                 Text(breed.description, style = MaterialTheme.typography.bodyLarge)
-                if (breed.isCollectible) Text(stringResource(R.string.breed_preview_notes),
+                if (breed.isSecretMonkey) Text(stringResource(R.string.monkey_model_note),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                else if (breed.isCollectible) Text(stringResource(R.string.breed_preview_notes),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }

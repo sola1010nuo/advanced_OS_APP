@@ -1,4 +1,4 @@
-﻿package com.example.petcollection.data
+package com.example.petcollection.data
 
 /** Photo references can later come from app storage or a Room encounter record. */
 data class BreedPhoto(val id: String, val uri: String? = null)
@@ -18,8 +18,13 @@ data class Breed(
     val encounterCount: Int = 0,
     val coverPhoto: BreedPhoto? = null,
     val collectedPhotos: List<BreedPhoto> = emptyList(),
-    val isCollectible: Boolean = true
-)
+    val isCollectible: Boolean = true,
+    val isHiddenUntilDiscovered: Boolean = false
+) {
+    /** Visibility is independent of membership in the collectible catalog. */
+    val isVisibleInCollection: Boolean get() = !isHiddenUntilDiscovered || isDiscovered
+    val isSecretMonkey: Boolean get() = id == MockBreedRepository.MONKEY_ID
+}
 
 /** Replace this implementation with a database-backed repository later. */
 interface BreedRepository {

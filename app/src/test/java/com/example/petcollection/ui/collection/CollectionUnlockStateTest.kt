@@ -7,6 +7,26 @@ import org.junit.Test
 class CollectionUnlockStateTest {
     private val breed = Breed("corgi", "Corgi", Species.DOG, "Description", "Origin", "Personality", "Size", "Coat")
 
+    @Test fun hiddenCollectibleUsesExistingDynamicStatisticsAndVisibilitySeparately() {
+        val monkey = breed.copy(id = MockBreedRepository.MONKEY_ID, species = null, isHiddenUntilDiscovered = true)
+        val catalog = listOf(breed, monkey, monkey.copy(id = "unregistered", isCollectible = false, isHiddenUntilDiscovered = false))
+        val empty = CollectionData(loaded = true)
+        assertFalse(empty.applyTo(monkey).isVisibleInCollection)
+        assertEquals(catalog.count { it.isCollectible }, empty.statistics(catalog).totalBreeds)
+        val first = EncounterRecord(monkey.id, "file:///first", id = "first")
+        val second = EncounterRecord(monkey.id, "file:///second", id = "second")
+        val saved = CollectionData(listOf(first, second), loaded = true)
+        assertTrue(saved.applyTo(monkey).isVisibleInCollection)
+        assertEquals(1, saved.statistics(catalog).discovered)
+        assertEquals(2, saved.statistics(catalog).encounterCount)
+        assertEquals(0, saved.statistics(catalog, Species.CAT).discovered)
+        assertEquals(0, saved.statistics(catalog, Species.DOG).discovered)
+        assertEquals(empty.statistics(catalog, Species.DOG).totalBreeds, saved.statistics(catalog, Species.DOG).totalBreeds)
+        assertEquals(empty.statistics(catalog).totalBreeds + 1,
+            empty.statistics(catalog + breed.copy(id = "future")).totalBreeds)
+        assertFalse(saved.copy(encounters = emptyList()).applyTo(monkey).isVisibleInCollection)
+        assertEquals(0, saved.copy(encounters = emptyList()).statistics(catalog).discovered)
+    }
     @Test fun discoveryAndCountsComeOnlyFromSavedEncounters() {
         val first = EncounterRecord("corgi", "file:///first", id = "first")
         val second = EncounterRecord("corgi", "file:///second", id = "second")

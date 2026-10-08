@@ -24,25 +24,29 @@ class MockBreedRepository(private val resources: Resources) : BreedRepository {
         val personality = resources.getString(entry.personality)
         Breed(
             id = entry.id, name = name, species = entry.species,
-            description = resources.getString(R.string.breed_description_template, name, coat, personality),
+            description = if (entry.id == MONKEY_ID) resources.getString(R.string.monkey_description)
+                else resources.getString(R.string.breed_description_template, name, coat, personality),
             origin = resources.getString(entry.origin), personality = personality,
-            size = resources.getString(entry.size), coat = coat
+            size = resources.getString(entry.size), coat = coat, isHiddenUntilDiscovered = entry.hidden
         )
     }
 
     private data class Entry(
-        val id: String, val species: Species,
+        val id: String, val species: Species?,
         @param:StringRes val name: Int, @param:StringRes val origin: Int,
         @param:StringRes val personality: Int, @param:StringRes val size: Int,
-        @param:StringRes val coat: Int
+        @param:StringRes val coat: Int, val hidden: Boolean = false
     )
 
     companion object {
+        const val MONKEY_ID = "monkey"
         val normalBreedIds: Set<String> get() = entries.map { it.id }.toSet()
         val collectionIds: Set<String> get() = normalBreedIds + setOf("other_cat", "other_dog", "unregistered")
         fun total(species: Species): Int = entries.count { it.species == species }
 
         private val entries = listOf(
+            Entry(MONKEY_ID, null, R.string.monkey_name, R.string.monkey_origin,
+                R.string.monkey_personality, R.string.monkey_size, R.string.monkey_coat, hidden = true),
             Entry("abyssinian", Species.CAT, R.string.breed_abyssinian_name, R.string.breed_abyssinian_origin, R.string.breed_abyssinian_personality, R.string.breed_abyssinian_size, R.string.breed_abyssinian_coat),
             Entry("american_shorthair", Species.CAT, R.string.breed_american_shorthair_name, R.string.breed_american_shorthair_origin, R.string.breed_american_shorthair_personality, R.string.breed_american_shorthair_size, R.string.breed_american_shorthair_coat),
             Entry("bengal", Species.CAT, R.string.breed_bengal_name, R.string.breed_bengal_origin, R.string.breed_bengal_personality, R.string.breed_bengal_size, R.string.breed_bengal_coat),

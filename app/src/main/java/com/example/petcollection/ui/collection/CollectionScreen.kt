@@ -62,7 +62,7 @@ fun CollectionScreen(
     val catGridState = rememberLazyGridState()
     val dogGridState = rememberLazyGridState()
     val otherGridState = rememberLazyGridState()
-    val selectedBreed = breeds.firstOrNull { it.id == selectedBreedId }
+    val selectedBreed = breeds.firstOrNull { it.id == selectedBreedId && it.isVisibleInCollection }
     val selectedEncounter = data.encounters.firstOrNull { it.id == selectedEncounterId && it.breedId == selectedBreedId }
     BackHandler(enabled = selectedBreed != null && unlockState.pendingEncounter == null) {
         if (selectedEncounterId != null) selectedEncounterId = null else selectedBreedId = null
@@ -128,18 +128,25 @@ fun CollectionScreen(
                             )
                         }
                     }
-                    breeds.firstOrNull { category == CollectionCategory.OTHER && it.id == "unregistered" }?.let { category ->
-                        OutlinedCard(onClick = { selectedBreedId = category.id }, modifier = Modifier.fillMaxWidth()) {
+
+                }
+            }
+            items(breeds.filter { it.isVisibleInCollection && it.species == species && (species != null || it.isCollectible) }
+                .sortedBy { !it.isCollectible }, key = { it.id }) { breed ->
+                BreedCard(breed, onClick = { selectedBreedId = breed.id })
+            }
+            // Preserve the existing Other album, after the first secret collectible card.
+            if (category == CollectionCategory.OTHER) {
+                breeds.firstOrNull { it.id == "unregistered" }?.let { album ->
+                    item(span = { GridItemSpan(maxLineSpan) }, key = album.id) {
+                        OutlinedCard(onClick = { selectedBreedId = album.id }, modifier = Modifier.fillMaxWidth()) {
                             Column(Modifier.padding(16.dp)) {
-                                Text(category.name, style = MaterialTheme.typography.titleMedium)
-                                Text(pluralStringResource(R.plurals.breed_encounters, category.encounterCount, category.encounterCount))
+                                Text(album.name, style = MaterialTheme.typography.titleMedium)
+                                Text(pluralStringResource(R.plurals.breed_encounters, album.encounterCount, album.encounterCount))
                             }
                         }
                     }
                 }
-            }
-            items(breeds.filter { species != null && it.species == species }.sortedBy { !it.isCollectible }, key = { it.id }) { breed ->
-                BreedCard(breed, onClick = { selectedBreedId = breed.id })
             }
         }
     }
@@ -164,12 +171,14 @@ private fun CollectionSummary(discovered: Int, total: Int, encounterCount: Int) 
 @Composable
 private fun BreedCard(breed: Breed, onClick: () -> Unit) {
     Card(onClick = onClick, shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
+        colors = if (breed.isSecretMonkey) monkeyCardColors()
+            else CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
         BreedImageArea(
             breed = breed, photo = breed.coverPhoto,
             locked = breed.isCollectible && !breed.isDiscovered, modifier = Modifier.fillMaxWidth().aspectRatio(1.15f)
         )
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (breed.isSecretMonkey) MonkeyLegendaryBadge()
             Text(breed.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.heightIn(min = 40.dp))
             Text(if (breed.isCollectible) stringResource(if (breed.isDiscovered) R.string.breed_discovered else R.string.breed_undiscovered)
