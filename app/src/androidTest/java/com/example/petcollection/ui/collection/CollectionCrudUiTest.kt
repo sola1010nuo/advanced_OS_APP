@@ -57,13 +57,19 @@ class CollectionCrudUiTest {
     }
     private fun add(id: String, name: String, normalFirst: Boolean = false) {
         compose.runOnIdle { assertTrue(state.onBreedRecognized(catalog.getBreed(id)!!, Uri.fromFile(fixture).toString())) }
+        val message = when (id) {
+            "other_cat" -> R.string.recognition_other_cat
+            "other_dog" -> R.string.recognition_other_dog
+            "unregistered" -> R.string.recognition_unregistered
+            else -> if (normalFirst) R.string.recognition_first else R.string.recognition_again
+        }
+        compose.onNodeWithText(text(message)).assertExists()
+        compose.onNodeWithText(text(R.string.encounter_title)).assertDoesNotExist()
+        click(R.string.recognition_continue)
         compose.onNode(hasText(text(R.string.encounter_name)) and hasSetTextAction()).performScrollTo().performTextReplacement(name)
         click(R.string.encounter_save)
         compose.waitUntil(10000) { !state.isWorking && state.encounters.any { it.petName == name } }
-        if (normalFirst) {
-            compose.onNodeWithText(text(R.string.unlock_title)).assertExists()
-            compose.onNodeWithText(text(R.string.collection_done)).performClick()
-        } else compose.onNodeWithText(text(R.string.unlock_title)).assertDoesNotExist()
+        compose.onNodeWithText(text(R.string.recognition_result)).assertDoesNotExist()
     }
     private fun openAlbum(id: String, filter: Int?) {
         compose.onNode(hasScrollAction()).performScrollToIndex(0)
@@ -152,6 +158,28 @@ class CollectionCrudUiTest {
         }
     }
 
+    @Test fun cancellingResultOrEditorNeverWritesOrUnlocks() {
+        mount()
+        val breed = catalog.getBreed("corgi")!!
+        for (continueToEditor in listOf(false, true)) {
+            compose.runOnIdle {
+                assertTrue(state.onBreedRecognized(breed, Uri.fromFile(fixture).toString()))
+                assertTrue(state.isFirstDiscovery)
+                // Saving cannot skip the result.
+                state.saveEncounter(state.pendingEncounter!!)
+                assertFalse(state.isWorking)
+            }
+            compose.onNodeWithText(text(R.string.recognition_first)).assertExists()
+            if (continueToEditor) click(R.string.recognition_continue)
+            click(R.string.encounter_cancel)
+            compose.runOnIdle {
+                assertNull(state.pendingEncounter)
+                assertFalse(state.applyTo(breed).isDiscovered)
+                assertEquals(0, state.collection.value.statistics(catalog.getCollectionEntries()).encounterCount)
+            }
+            assertEquals(0, runBlocking { db.encounters().count(breed.id) })
+        }
+    }
     @After fun close() = runBlocking {
         val store = androidx.lifecycle.ViewModelStore()
         store.put("collection", state)

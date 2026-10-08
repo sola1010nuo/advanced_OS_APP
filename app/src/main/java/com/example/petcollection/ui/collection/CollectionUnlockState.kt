@@ -25,7 +25,9 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
     val encounters: List<EncounterRecord> get() = collection.value.encounters
     var pendingEncounter by mutableStateOf<EncounterRecord?>(null)
         private set
-    var showUnlockCelebration by mutableStateOf(false)
+    var showRecognitionResult by mutableStateOf(false)
+        private set
+    var isFirstDiscovery by mutableStateOf(false)
         private set
     private var editingExisting = false
 
@@ -38,7 +40,8 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         pendingEncounter = EncounterRecord(breedId = breed.id, photoUri = photoUri,
             encounteredAt = photoTime ?: LocalDateTime.now())
         editingExisting = false
-        showUnlockCelebration = false
+        isFirstDiscovery = breed.id in MockBreedRepository.normalBreedIds && collection.value.forBreed(breed.id).isEmpty()
+        showRecognitionResult = true
         operationError = false
         return true
     }
@@ -47,21 +50,21 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         if (pendingEncounter != null || isWorking) return
         pendingEncounter = record
         editingExisting = true
-        showUnlockCelebration = false
+        showRecognitionResult = false
         operationError = false
     }
-    fun editEncounter() { showUnlockCelebration = false }
+    fun editEncounter() { showRecognitionResult = false }
     fun dismissEncounter() {
         if (isWorking) return
         pendingEncounter = null
-        showUnlockCelebration = false
+        showRecognitionResult = false
         operationError = false
     }
     fun clearError() { operationError = false }
 
     fun saveEncounter(record: EncounterRecord, onSaved: (EncounterRecord) -> Unit = {}) {
         val draft = pendingEncounter ?: return
-        if (isWorking) return
+        if (isWorking || showRecognitionResult) return
         require(record.id == draft.id && record.breedId in MockBreedRepository.collectionIds)
         if (!editingExisting) require(record.breedId == draft.breedId)
         val updating = editingExisting
@@ -71,13 +74,9 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
                 pendingEncounter = null
                 onSaved(record)
             } else {
-                val (stored, first) = repository.create(record)
+                val (stored, _) = repository.create(record)
+                pendingEncounter = null
                 onSaved(stored)
-                if (first && record.breedId in MockBreedRepository.normalBreedIds) {
-                    pendingEncounter = stored
-                    editingExisting = true
-                    showUnlockCelebration = true
-                } else pendingEncounter = null
             }
         }
     }

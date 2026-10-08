@@ -1,0 +1,9 @@
+<resources>
+    <string name="recognition_result">Recognition Result</string>
+    <string name="recognition_first">New Breed Unlocked!</string>
+    <string name="recognition_again">Meet Again!</string>
+    <string name="recognition_other_cat">Recognized as a cat, added to Other Cats</string>
+    <string name="recognition_other_dog">Recognized as a dog, added to Other Dogs</string>
+    <string name="recognition_unregistered">Unable to recognize yet, added to Other</string>
+    <string name="recognition_continue">Continue</string>
+</resources>

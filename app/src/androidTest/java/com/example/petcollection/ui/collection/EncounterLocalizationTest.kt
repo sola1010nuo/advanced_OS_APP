@@ -35,7 +35,7 @@ class EncounterLocalizationTest {
         database.close()
     }
 
-    @Test fun languageSwitchUpdatesEditorValidationAndSavedUnlockDialog() {
+    @Test fun languageSwitchUpdatesRecognitionThenEditorWithoutSavedUnlockDialog() {
         var language by mutableStateOf("zh-Hant")
         val breed = MockBreedRepository(zh).getBreed("abyssinian")!!
         compose.setContent {
@@ -51,9 +51,12 @@ class EncounterLocalizationTest {
         compose.waitUntil(10000) { state.collection.value.loaded }
         compose.onNodeWithText(breed.name).performClick()
         compose.runOnIdle { state.onBreedRecognized(breed, null) }
-        compose.onNodeWithText(zh.getString(R.string.encounter_title)).assertExists()
-        compose.onNodeWithText(zh.getString(R.string.unlock_title)).assertDoesNotExist()
+        compose.onNodeWithText(zh.getString(R.string.recognition_first)).assertExists()
+        compose.onNodeWithText(zh.getString(R.string.encounter_title)).assertDoesNotExist()
         compose.runOnIdle { language = "en" }
+        compose.onNodeWithText(en.getString(R.string.recognition_first)).assertExists()
+        compose.onNode(hasText(en.getString(R.string.breed_abyssinian_name)) and hasAnyAncestor(isDialog())).assertExists()
+        compose.onNodeWithText(en.getString(R.string.recognition_continue)).performClick()
         compose.onNodeWithText(en.getString(R.string.encounter_title)).assertExists()
         compose.onNodeWithText(en.getString(R.string.encounter_name)).performScrollTo().performTextReplacement("Snow")
         compose.onNodeWithText(en.getString(R.string.encounter_date)).performScrollTo().performTextReplacement("invalid")
@@ -68,15 +71,14 @@ class EncounterLocalizationTest {
         compose.onNodeWithText(zh.getString(R.string.encounter_date)).performScrollTo().performTextReplacement("2026-10-07")
         compose.onNodeWithText(zh.getString(R.string.encounter_time)).performScrollTo().performTextReplacement("15:30")
         compose.onNodeWithText(zh.getString(R.string.encounter_save)).performClick()
-        compose.waitUntil(10000) { state.showUnlockCelebration }
-        compose.onNodeWithText(zh.getString(R.string.unlock_title)).assertExists()
+        compose.waitUntil(10000) { !state.isWorking && state.encounters.size == 1 }
+        compose.onNodeWithText(zh.getString(R.string.recognition_result)).assertDoesNotExist()
         compose.runOnIdle { language = "en" }
-        compose.onNodeWithText(en.getString(R.string.unlock_title)).assertExists()
-        compose.onNodeWithText(en.getString(R.string.collection_done)).performClick()
-        compose.waitUntil(10000) { state.encounters.size == 1 }
         compose.runOnIdle { state.onBreedRecognized(breed, null) }
+        compose.onNodeWithText(en.getString(R.string.recognition_again)).assertExists()
+        compose.onNodeWithText(en.getString(R.string.encounter_title)).assertDoesNotExist()
+        compose.onNodeWithText(en.getString(R.string.recognition_continue)).performClick()
         compose.onNodeWithText(en.getString(R.string.encounter_title)).assertExists()
-        compose.onNodeWithText(en.getString(R.string.unlock_title)).assertDoesNotExist()
     }
 
     @Test fun actualAppLanguageSettingChangesBreedStatusLabel() {

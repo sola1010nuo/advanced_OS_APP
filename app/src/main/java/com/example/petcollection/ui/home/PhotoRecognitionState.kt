@@ -14,6 +14,7 @@ import com.example.petcollection.data.Species
 import com.example.petcollection.ui.collection.CollectionUnlockState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 /** App-scoped UI session; tab changes do not repeat recognition or create another draft. */
@@ -52,6 +53,7 @@ class PhotoRecognitionState {
             val breed = requireNotNull(ModelBreedMapping.resolve(prediction.breed, species, catalog)) {
                 "Model label has no catalog entry: ${prediction.breed}"
             }
+            unlockState.collection.first { it.loaded }
             check(unlockState.onBreedRecognized(breed, uri.toString())) { "Another encounter is pending" }
             breedId = breed.id
             confidence = prediction.confidence

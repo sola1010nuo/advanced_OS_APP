@@ -1,0 +1,9 @@
+<resources>
+    <string name="recognition_result">辨識結果</string>
+    <string name="recognition_first">新圖鑑解鎖！</string>
+    <string name="recognition_again">再次遇見！</string>
+    <string name="recognition_other_cat">已辨識為貓咪，收錄至其他貓咪</string>
+    <string name="recognition_other_dog">已辨識為狗狗，收錄至其他狗狗</string>
+    <string name="recognition_unregistered">尚無法辨識，收錄至其他</string>
+    <string name="recognition_continue">繼續</string>
+</resources>

@@ -26,37 +26,48 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-/** Reusable reward modal; callers decide when the breed is newly unlocked. */
+/** The selected photo and localized classification, without persisting the draft. */
 @Composable
-fun BreedUnlockDialog(
+fun RecognitionResultDialog(
     breed: Breed,
-    photo: BreedPhoto?,
-    onRecordEncounter: () -> Unit,
-    onDismiss: () -> Unit,
-    englishName: String? = null,
-    confirmLabel: Int = R.string.unlock_record
+    draft: EncounterRecord,
+    firstDiscovery: Boolean,
+    onContinue: () -> Unit,
+    onDismiss: () -> Unit
 ) {
+    val message = when (breed.id) {
+        "other_cat" -> R.string.recognition_other_cat
+        "other_dog" -> R.string.recognition_other_dog
+        "unregistered" -> R.string.recognition_unregistered
+        else -> if (firstDiscovery) R.string.recognition_first else R.string.recognition_again
+    }
     LocalizedEncounterAlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.unlock_title)) },
+        title = { Text(stringResource(R.string.recognition_result)) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Card(shape = RoundedCornerShape(20.dp)) {
-                    BreedImageArea(breed, photo, locked = false, modifier = Modifier.fillMaxWidth().height(180.dp))
+            Column(Modifier.verticalScroll(rememberScrollState()).padding(6.dp)) {
+                Card(
+                    shape = RoundedCornerShape(4.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                        BreedImageArea(breed, BreedPhoto(draft.id, draft.photoUri), locked = false,
+                            modifier = Modifier.fillMaxWidth().aspectRatio(1f))
+                        Column(Modifier.padding(horizontal = 8.dp, vertical = 20.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(stringResource(message), style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold)
+                            if (breed.isCollectible) Text(breed.name, style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
                 }
-                Text(breed.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                if (!englishName.isNullOrBlank() && englishName != breed.name) {
-                    Text(englishName, style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Text(stringResource(R.string.unlock_added), color = MaterialTheme.colorScheme.primary)
             }
         },
-        confirmButton = { Button(onClick = onRecordEncounter) { Text(stringResource(confirmLabel)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.unlock_later)) } }
+        confirmButton = { Button(onClick = onContinue) { Text(stringResource(R.string.recognition_continue)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.encounter_cancel)) } }
     )
 }
-
 /** Editable encounter draft. Save emits a record; it does not perform database writes. */
 @Composable
 fun EncounterEditorDialog(
