@@ -91,10 +91,9 @@ fun PetCollectionApp() {
         baseContext.createConfigurationContext(configuration)
     }
     val entries = remember(localizedContext) { MockBreedRepository(localizedContext.resources).getCollectionEntries() }
-    val catalog = entries.filter { it.isCollectible }
     val breeds = entries.map { collectionData.applyTo(it) }
     LaunchedEffect(selectedPhotoUri, photoRequest) {
-        selectedPhotoUri?.let { recognitionState.recognize(baseContext.applicationContext, Uri.parse(it), catalog, collectionUnlockState) }
+        selectedPhotoUri?.let { recognitionState.recognize(baseContext.applicationContext, Uri.parse(it), entries, collectionUnlockState) }
     }
     val dark = when (Appearance.valueOf(appearance)) {
         Appearance.SYSTEM -> isSystemInDarkTheme()
