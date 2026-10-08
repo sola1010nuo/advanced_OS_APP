@@ -29,4 +29,26 @@ class CollectionUnlockStateTest {
         assertEquals(22, MockBreedRepository.total(Species.CAT))
         assertEquals(34, MockBreedRepository.total(Species.DOG))
     }
+
+    @Test fun statisticsSeparateDistinctBreedsFromEncountersAndFollowReclassificationAndDeletion() {
+        val cat = breed.copy(id = "cat", species = Species.CAT)
+        val dog = breed.copy(id = "dog")
+        val catalog = listOf(cat, dog,
+            cat.copy(id = "other_cat", isCollectible = false),
+            dog.copy(id = "other_dog", isCollectible = false),
+            dog.copy(id = "unregistered", species = null, isCollectible = false))
+        val first = EncounterRecord("dog", null, id = "first")
+        val second = EncounterRecord("dog", "file:///second", id = "second")
+        val records = listOf(first, second, EncounterRecord("other_cat", null),
+            EncounterRecord("other_dog", null), EncounterRecord("unregistered", null))
+        val data = CollectionData(records, loaded = true)
+        assertEquals(CollectionStatistics(1, 1, 3), data.statistics(catalog, Species.DOG))
+        assertEquals(CollectionStatistics(0, 1, 1), data.statistics(catalog, Species.CAT))
+        assertEquals(CollectionStatistics(1, 2, 5), data.statistics(catalog))
+        val reclassified = data.copy(encounters = records.map { if (it.id == first.id) it.copy(breedId = "cat") else it })
+        assertEquals(CollectionStatistics(2, 2, 5), reclassified.statistics(catalog))
+        val deleted = reclassified.copy(encounters = reclassified.encounters.filter { it.id != second.id })
+        assertEquals(CollectionStatistics(0, 1, 1), deleted.statistics(catalog, Species.DOG))
+        assertEquals(CollectionStatistics(1, 2, 4), deleted.statistics(catalog))
+    }
 }

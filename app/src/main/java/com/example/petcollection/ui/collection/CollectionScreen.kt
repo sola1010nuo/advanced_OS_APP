@@ -27,6 +27,12 @@ import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.data.Species
 import androidx.compose.foundation.shape.RoundedCornerShape
 
+private enum class CollectionCategory(val species: Species?, val labelRes: Int) {
+    CAT(Species.CAT, R.string.filter_cats),
+    DOG(Species.DOG, R.string.filter_dogs),
+    OTHER(null, R.string.filter_other)
+}
+
 /** Small local grid/detail route; the existing app owns the bottom navigation. */
 @Composable
 fun CollectionScreen(
@@ -55,6 +61,7 @@ fun CollectionScreen(
     }
     val catGridState = rememberLazyGridState()
     val dogGridState = rememberLazyGridState()
+    val otherGridState = rememberLazyGridState()
     val selectedBreed = breeds.firstOrNull { it.id == selectedBreedId }
     val selectedEncounter = data.encounters.firstOrNull { it.id == selectedEncounterId && it.breedId == selectedBreedId }
     BackHandler(enabled = selectedBreed != null && unlockState.pendingEncounter == null) {
@@ -93,11 +100,16 @@ fun CollectionScreen(
                 }
             })
     } else {
-        val species = Species.valueOf(selectedSpecies)
-        val discovered = breeds.count { it.isCollectible && it.species == species && it.isDiscovered }
+        val category = CollectionCategory.valueOf(selectedSpecies)
+        val species = category.species
+        val statistics = data.statistics(catalog, species)
         LazyVerticalGrid(
             columns = GridCells.Fixed(2), modifier = modifier.fillMaxSize(),
-            state = if (species == Species.CAT) catGridState else dogGridState,
+            state = when (category) {
+                CollectionCategory.CAT -> catGridState
+                CollectionCategory.DOG -> dogGridState
+                CollectionCategory.OTHER -> otherGridState
+            },
             contentPadding = PaddingValues(24.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -106,17 +118,17 @@ fun CollectionScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text(stringResource(R.string.collection), style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold)
-                    CollectionSummary(discovered, MockBreedRepository.total(species))
+                    if (species != null) CollectionSummary(statistics.discovered, statistics.totalBreeds, statistics.encounterCount)
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Species.entries.forEach { filter ->
+                        CollectionCategory.entries.forEach { filter ->
                             FilterChip(
-                                selected = species == filter, onClick = { selectedSpecies = filter.name },
-                                label = { Text(stringResource(if (filter == Species.CAT) R.string.filter_cats else R.string.filter_dogs)) },
+                                selected = category == filter, onClick = { selectedSpecies = filter.name },
+                                label = { Text(stringResource(filter.labelRes)) },
                                 modifier = Modifier.weight(1f)
                             )
                         }
                     }
-                    breeds.firstOrNull { it.id == "unregistered" }?.let { category ->
+                    breeds.firstOrNull { category == CollectionCategory.OTHER && it.id == "unregistered" }?.let { category ->
                         OutlinedCard(onClick = { selectedBreedId = category.id }, modifier = Modifier.fillMaxWidth()) {
                             Column(Modifier.padding(16.dp)) {
                                 Text(category.name, style = MaterialTheme.typography.titleMedium)
@@ -126,7 +138,7 @@ fun CollectionScreen(
                     }
                 }
             }
-            items(breeds.filter { it.species == species }.sortedBy { !it.isCollectible }, key = { it.id }) { breed ->
+            items(breeds.filter { species != null && it.species == species }.sortedBy { !it.isCollectible }, key = { it.id }) { breed ->
                 BreedCard(breed, onClick = { selectedBreedId = breed.id })
             }
         }
@@ -134,11 +146,12 @@ fun CollectionScreen(
 }
 
 @Composable
-private fun CollectionSummary(discovered: Int, total: Int) {
+private fun CollectionSummary(discovered: Int, total: Int, encounterCount: Int) {
     Card(shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
         Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.collection_discovered_count, discovered, total),
                 style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            Text(pluralStringResource(R.plurals.breed_encounters, encounterCount, encounterCount))
             LinearProgressIndicator(
                 progress = { if (total == 0) 0f else discovered.toFloat() / total },
                 modifier = Modifier.fillMaxWidth().height(8.dp),

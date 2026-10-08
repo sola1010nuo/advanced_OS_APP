@@ -14,6 +14,33 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class CollectionPersistenceTest {
+    @Test fun reclassificationUpdatesRoomStatisticsAndRepairsCovers() = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val db = Room.inMemoryDatabaseBuilder(context, CollectionDatabase::class.java).build()
+        try {
+            val repository = EncounterRepository(db.encounters(), context)
+            val catalog = MockBreedRepository(context.resources).getCollectionEntries()
+            val first = EncounterRecord("corgi", "content://fixture/first", id = "first")
+            val second = EncounterRecord("corgi", "content://fixture/second", id = "second")
+            db.encounters().create(first)
+            db.encounters().create(second)
+            assertEquals(1, repository.collection.first().statistics(catalog, Species.DOG).discovered)
+            repository.update(first.copy(breedId = "unregistered"))
+            var snapshot = repository.collection.first { it.forBreed("unregistered").size == 1 }
+            assertEquals(1, snapshot.statistics(catalog, Species.DOG).discovered)
+            assertEquals(second.id, db.encounters().cover("corgi")!!.encounterId)
+            assertEquals(first.id, db.encounters().cover("unregistered")!!.encounterId)
+            repository.update(second.copy(breedId = "other_dog"))
+            snapshot = repository.collection.first { it.forBreed("corgi").isEmpty() }
+            assertEquals(0, snapshot.statistics(catalog, Species.DOG).discovered)
+            assertEquals(1, snapshot.statistics(catalog, Species.DOG).encounterCount)
+            assertEquals(2, snapshot.statistics(catalog).encounterCount)
+            assertNull(db.encounters().cover("corgi"))
+        } finally {
+            db.close()
+        }
+    }
+
     @Test fun scenariosAToLCrudCoversCategoriesAndDatabaseReopen() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val name = "collection-test-${UUID.randomUUID()}.db"

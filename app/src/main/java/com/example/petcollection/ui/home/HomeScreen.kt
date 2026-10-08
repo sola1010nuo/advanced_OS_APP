@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 fun HomeScreen(
     modifier: Modifier = Modifier,
     categories: List<CollectionCategory> = HomePreviewData.categories,
+    encounterCount: Int = 0,
     selectedPhotoUri: Uri? = null,
     onAddPhoto: () -> Unit = {},
     onOpenCollection: (Species) -> Unit = {},
@@ -55,7 +56,7 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(28.dp)
     ) {
         HomeHeader()
-        CollectionProgressCard(categories.sumOf { it.collected }, categories.sumOf { it.total })
+        CollectionProgressCard(categories.sumOf { it.collected }, categories.sumOf { it.total }, encounterCount)
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionTitle(stringResource(R.string.your_collections))
             categories.forEach { category ->
@@ -73,7 +74,7 @@ fun HomeScreen(
                 SelectedPhotoPreview(recognitionState, recognizedBreedName, onRetryRecognition)
             }
         }
-        AchievementSection(HomePreviewData.achievements, HomePreviewData.total)
+        AchievementSection(HomePreviewData.achievements, categories.sumOf { it.total })
         RecentDiscoveriesSection()
         RecentFootprintsSection()
     }
@@ -88,12 +89,14 @@ private fun HomeHeader() {
 }
 
 @Composable
-fun CollectionProgressCard(collected: Int, total: Int) {
+fun CollectionProgressCard(collected: Int, total: Int, encounterCount: Int = 0) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer), shape = RoundedCornerShape(24.dp)) {
         Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(stringResource(R.string.my_collection), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.collection_count, collected, total), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
             Text(stringResource(R.string.breeds_discovered), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(pluralStringResource(R.plurals.breed_encounters, encounterCount, encounterCount),
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             LinearProgressIndicator(
                 progress = { if (total > 0) (collected.toFloat() / total).coerceIn(0f, 1f) else 0f },
                 modifier = Modifier.fillMaxWidth().height(8.dp), color = MaterialTheme.colorScheme.primary,
@@ -114,6 +117,8 @@ fun CollectionCategoryCard(category: CollectionCategory, onClick: () -> Unit = {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 Text(stringResource(category.nameRes), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(stringResource(R.string.category_count, category.collected, category.total), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(pluralStringResource(R.plurals.breed_encounters, category.encounterCount, category.encounterCount),
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Text("\u203A", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
         }

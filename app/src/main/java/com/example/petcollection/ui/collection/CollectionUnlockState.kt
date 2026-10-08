@@ -62,7 +62,8 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
     fun saveEncounter(record: EncounterRecord, onSaved: (EncounterRecord) -> Unit = {}) {
         val draft = pendingEncounter ?: return
         if (isWorking) return
-        require(record.id == draft.id && record.breedId == draft.breedId)
+        require(record.id == draft.id && record.breedId in MockBreedRepository.collectionIds)
+        if (!editingExisting) require(record.breedId == draft.breedId)
         val updating = editingExisting
         perform {
             if (updating) {

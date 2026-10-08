@@ -2,8 +2,8 @@
     <string name="other_cats">Other Cats</string>
     <string name="other_dogs">Other Dogs</string>
     <string name="unregistered">Unregistered</string>
-    <string name="other_cats_description">Cat encounters outside the 22 collectible breeds. This album does not affect collection progress.</string>
-    <string name="other_dogs_description">Dog encounters outside the 34 collectible breeds. This album does not affect collection progress.</string>
+    <string name="other_cats_description">Cat encounters outside the %1$d collectible breeds. This album does not affect collection progress.</string>
+    <string name="other_dogs_description">Dog encounters outside the %1$d collectible breeds. This album does not affect collection progress.</string>
     <string name="unregistered_description">Photos waiting to be registered. This album does not affect cat or dog collection progress.</string>
     <string name="collection_add_encounter">Add encounter photo</string>
     <string name="collection_album_empty">No encounters yet. Add a photo to start this album.</string>

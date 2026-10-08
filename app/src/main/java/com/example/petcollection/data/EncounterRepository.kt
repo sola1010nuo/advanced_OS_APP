@@ -24,7 +24,18 @@ data class CollectionData(
             collectedPhotos = photos, coverPhoto = photos.firstOrNull { it.id == selected } ?: photos.lastOrNull())
     }
     fun discoveredCount(ids: Set<String>) = encounters.map { it.breedId }.filter { it in ids }.toSet().size
+
+    /** Catalog defines official breeds; only persisted rows contribute to discovery or totals. */
+    fun statistics(catalog: List<Breed>, species: Species? = null): CollectionStatistics {
+        val officialIds = catalog.filter { it.isCollectible && (species == null || it.species == species) }
+            .map { it.id }.toSet()
+        val encounterIds = catalog.filter { species == null || it.species == species }.map { it.id }.toSet()
+        return CollectionStatistics(discoveredCount(officialIds), officialIds.size,
+            encounters.count { it.breedId in encounterIds })
+    }
 }
+
+data class CollectionStatistics(val discovered: Int, val totalBreeds: Int, val encounterCount: Int)
 
 /** One persistent encounter store shared by all normal breeds and special albums. */
 class EncounterRepository(private val dao: EncounterDao, private val context: Context) {
@@ -46,8 +57,8 @@ class EncounterRepository(private val dao: EncounterDao, private val context: Co
 
     suspend fun update(record: EncounterRecord) {
         val old = requireNotNull(dao.get(record.id))
-        require(record.breedId == old.breedId)
-        check(dao.update(record.copy(photoUri = old.photoUri, createdAt = old.createdAt)) == 1)
+        require(record.breedId in MockBreedRepository.collectionIds)
+        dao.updateAndRepairCovers(record.copy(photoUri = old.photoUri, createdAt = old.createdAt))
     }
     suspend fun selectCover(breedId: String, encounterId: String) = dao.selectCover(breedId, encounterId)
     suspend fun delete(id: String) {
