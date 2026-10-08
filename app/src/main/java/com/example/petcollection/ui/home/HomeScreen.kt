@@ -1,4 +1,4 @@
-﻿package com.example.petcollection.ui.home
+package com.example.petcollection.ui.home
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -42,8 +42,11 @@ fun HomeScreen(
     onOpenCollection: (Species) -> Unit = {},
     recognitionState: PhotoRecognitionState = remember { PhotoRecognitionState() },
     recognizedBreedName: String? = null,
-    onRetryRecognition: () -> Unit = {}
+    onRetryRecognition: () -> Unit = {},
+    collectionStatistics: com.example.petcollection.data.CollectionStatistics? = null
 ) {
+    val progress = collectionStatistics ?: com.example.petcollection.data.CollectionData().statistics(
+        com.example.petcollection.data.MockBreedRepository(androidx.compose.ui.platform.LocalContext.current.resources).getCollectionEntries()).copy(encounterCount = encounterCount)
     val photoPreview = remember { BringIntoViewRequester() }
     LaunchedEffect(selectedPhotoUri, recognitionState.processing) {
         if (selectedPhotoUri != null) {
@@ -56,7 +59,7 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(28.dp)
     ) {
         HomeHeader()
-        CollectionProgressCard(categories.sumOf { it.collected }, categories.sumOf { it.total }, encounterCount)
+        CollectionProgressCard(progress.discovered, progress.totalBreeds, progress.encounterCount)
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionTitle(stringResource(R.string.your_collections))
             categories.forEach { category ->
@@ -74,7 +77,7 @@ fun HomeScreen(
                 SelectedPhotoPreview(recognitionState, recognizedBreedName, onRetryRecognition)
             }
         }
-        AchievementSection(HomePreviewData.achievements, categories.sumOf { it.total })
+        AchievementSection(HomePreviewData.achievements, progress.totalBreeds)
         RecentDiscoveriesSection()
         RecentFootprintsSection()
     }

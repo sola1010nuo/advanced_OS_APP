@@ -14,6 +14,52 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class CollectionPersistenceTest {
+    @Test fun monkeyUnlockAndChosenCoverSurviveDatabaseReopenAndDeleteLastEncounter() = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val name = "monkey-test-" + UUID.randomUUID() + ".db"
+        fun open() = Room.databaseBuilder(context, CollectionDatabase::class.java, name).build()
+        var db = open()
+        var repository = EncounterRepository(db.encounters(), context)
+        val fixture = File(context.cacheDir, "monkey-" + UUID.randomUUID() + ".png")
+        val bitmap = Bitmap.createBitmap(32, 32, Bitmap.Config.ARGB_8888)
+        fixture.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        bitmap.recycle()
+        try {
+            val catalog = MockBreedRepository(context.resources).getCollectionEntries()
+            val monkey = catalog.first { it.id == MockBreedRepository.MONKEY_ID }
+            assertTrue(monkey.isCollectible)
+            assertNull(monkey.species)
+            val total = CollectionData().statistics(catalog).totalBreeds
+            val (first, isFirst) = repository.create(EncounterRecord(monkey.id, Uri.fromFile(fixture).toString()))
+            assertTrue(isFirst)
+            assertEquals(first.id, db.encounters().cover(monkey.id)!!.encounterId)
+            val (second, repeated) = repository.create(EncounterRecord(monkey.id, Uri.fromFile(fixture).toString()))
+            assertFalse(repeated)
+            repository.selectCover(monkey.id, second.id)
+            db.close()
+            db = open()
+            repository = EncounterRepository(db.encounters(), context)
+            var snapshot = repository.collection.first()
+            assertTrue(snapshot.applyTo(monkey).isVisibleInCollection)
+            assertEquals(1, snapshot.statistics(catalog).discovered)
+            assertEquals(total, snapshot.statistics(catalog).totalBreeds)
+            assertEquals(2, snapshot.applyTo(monkey).encounterCount)
+            assertEquals(second.id, snapshot.applyTo(monkey).coverPhoto!!.id)
+            repository.delete(second.id)
+            assertEquals(first.id, db.encounters().cover(monkey.id)!!.encounterId)
+            repository.delete(first.id)
+            snapshot = repository.collection.first { it.encounters.isEmpty() }
+            assertFalse(snapshot.applyTo(monkey).isVisibleInCollection)
+            assertEquals(0, snapshot.statistics(catalog).discovered)
+            assertEquals(total, snapshot.statistics(catalog).totalBreeds)
+            assertNull(snapshot.applyTo(monkey).coverPhoto)
+        } finally {
+            repository.collection.first().encounters.forEach { repository.delete(it.id) }
+            db.close()
+            context.deleteDatabase(name)
+            fixture.delete()
+        }
+    }
     @Test fun reclassificationUpdatesRoomStatisticsAndRepairsCovers() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val db = Room.inMemoryDatabaseBuilder(context, CollectionDatabase::class.java).build()

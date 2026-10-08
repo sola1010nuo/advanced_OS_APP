@@ -58,6 +58,7 @@ class CollectionCrudUiTest {
     private fun add(id: String, name: String, normalFirst: Boolean = false) {
         compose.runOnIdle { assertTrue(state.onBreedRecognized(catalog.getBreed(id)!!, Uri.fromFile(fixture).toString())) }
         val message = when (id) {
+            "monkey" -> if (normalFirst) R.string.monkey_first else R.string.monkey_again
             "other_cat" -> R.string.recognition_other_cat
             "other_dog" -> R.string.recognition_other_dog
             "unregistered" -> R.string.recognition_unregistered
@@ -179,6 +180,59 @@ class CollectionCrudUiTest {
             }
             assertEquals(0, runBlocking { db.encounters().count(breed.id) })
         }
+    }
+    @Test fun secretMonkeyPreviewCancelSaveRepeatCoverAndLastDeleteUseExistingFlow() {
+        mount()
+        val id = MockBreedRepository.MONKEY_ID
+        val breed = catalog.getBreed(id)!!
+        val total = state.collection.value.statistics(catalog.getCollectionEntries()).totalBreeds
+        assertEquals(catalog.getBreeds().size, total)
+        assertEquals(Species.entries.sumOf { MockBreedRepository.total(it) } + 1, total)
+        click(R.string.filter_other)
+        compose.onNodeWithText(breed.name).assertDoesNotExist()
+        compose.onNodeWithText(text(R.string.monkey_rarity)).assertDoesNotExist()
+        for (continueToEditor in listOf(false, true)) {
+            compose.runOnIdle {
+                assertTrue(state.onClassificationResult(id, catalog.getCollectionEntries(), Uri.fromFile(fixture).toString()))
+                assertTrue(state.isFirstDiscovery)
+                assertEquals(Uri.fromFile(fixture).toString(), state.pendingEncounter!!.photoUri)
+            }
+            compose.onNodeWithText(text(R.string.monkey_first)).assertExists()
+            compose.onNodeWithText(text(R.string.monkey_discovery)).assertExists()
+            assertEquals(0, runBlocking { db.encounters().count(id) })
+            if (continueToEditor) click(R.string.recognition_continue)
+            click(R.string.encounter_cancel)
+            compose.onNodeWithText(breed.name).assertDoesNotExist()
+            assertEquals(0, state.collection.value.statistics(catalog.getCollectionEntries()).discovered)
+        }
+        add(id, "Senior first", normalFirst = true)
+        val first = state.encounters.single()
+        assertEquals(first.id, state.collection.value.applyTo(breed).coverPhoto!!.id)
+        compose.onNodeWithText(breed.name).assertIsDisplayed()
+        compose.onNodeWithText(text(R.string.unregistered)).assertIsDisplayed()
+        assertTrue(compose.onNodeWithText(breed.name).fetchSemanticsNode().boundsInRoot.top <
+            compose.onNodeWithText(text(R.string.unregistered)).fetchSemanticsNode().boundsInRoot.top)
+        add(id, "Senior second")
+        assertEquals(1, state.collection.value.statistics(catalog.getCollectionEntries()).discovered)
+        assertEquals(0, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).discovered)
+        assertEquals(0, state.collection.value.statistics(catalog.getCollectionEntries(), Species.DOG).discovered)
+        openAlbum(id, null)
+        compose.onNodeWithText(text(R.string.monkey_legend)).assertExists()
+        compose.onNodeWithText(text(R.string.monkey_inspiration)).assertExists()
+        openPhoto("Senior second")
+        click(R.string.encounter_set_cover)
+        compose.waitUntil(10000) {
+            state.collection.value.applyTo(breed).coverPhoto?.id == state.encounters.first { it.petName == "Senior second" }.id
+        }
+        deleteConfirmed("Senior second")
+        assertEquals(first.id, state.collection.value.applyTo(breed).coverPhoto!!.id)
+        openPhoto("Senior first")
+        deleteConfirmed("Senior first")
+        compose.waitUntil(10000) { !state.collection.value.applyTo(breed).isVisibleInCollection }
+        compose.onNodeWithText(breed.name).assertDoesNotExist()
+        assertEquals(0, state.collection.value.statistics(catalog.getCollectionEntries()).discovered)
+        assertEquals(total, state.collection.value.statistics(catalog.getCollectionEntries()).totalBreeds)
+        compose.onNodeWithText(text(R.string.unregistered)).assertExists()
     }
     @After fun close() = runBlocking {
         val store = androidx.lifecycle.ViewModelStore()

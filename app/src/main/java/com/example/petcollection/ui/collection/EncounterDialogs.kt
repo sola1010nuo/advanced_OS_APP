@@ -45,7 +45,9 @@ fun RecognitionResultDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.recognition_result)) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState()).padding(6.dp)) {
+            if (breed.isSecretMonkey) {
+                MonkeyRecognitionPolaroid(breed, draft, firstDiscovery)
+            } else Column(Modifier.verticalScroll(rememberScrollState()).padding(6.dp)) {
                 Card(
                     shape = RoundedCornerShape(4.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),

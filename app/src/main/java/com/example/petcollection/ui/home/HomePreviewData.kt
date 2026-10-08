@@ -1,4 +1,4 @@
-﻿package com.example.petcollection.ui.home
+package com.example.petcollection.ui.home
 
 import androidx.annotation.StringRes
 import com.example.petcollection.R
@@ -15,7 +15,7 @@ object HomePreviewData {
         CollectionCategory("cat", R.string.cat_collection, MockBreedRepository.total(Species.CAT)),
         CollectionCategory("dog", R.string.dog_collection, MockBreedRepository.total(Species.DOG))
     )
-    val total: Int get() = categories.sumOf { it.total }
+    val total: Int get() = MockBreedRepository.normalBreedIds.size
     val collected: Int get() = categories.sumOf { it.collected }
     val achievements = listOf(
         AchievementPreview(R.string.first_discovery, 1),

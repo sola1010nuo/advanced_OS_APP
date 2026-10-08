@@ -1,0 +1,17 @@
+<resources>
+    <string name="monkey_name">NSYSU Senior</string>
+    <string name="monkey_english_name">NSYSU Senior</string>
+    <string name="monkey_description">The legendary ruler of campus, often spotted roaming its grounds.</string>
+    <string name="monkey_legend">On campus, you might not meet a professor, but you always have a chance to meet a senior.</string>
+    <string name="monkey_inspiration">Inspired by the Formosan macaque</string>
+    <string name="monkey_model_note">This Easter egg is inspired by the Formosan macaque. Monkey classification does not identify a specific monkey species.</string>
+    <string name="monkey_rarity">LEGENDARY</string>
+    <string name="monkey_discovery">LEGENDARY DISCOVERY</string>
+    <string name="monkey_first">Hidden Collection Unlocked!</string>
+    <string name="monkey_again">Meet NSYSU Senior Again!</string>
+    <string name="monkey_congratulations">Congratulations on meeting the legendary ruler of campus!</string>
+    <string name="monkey_origin">Taiwan</string>
+    <string name="monkey_personality">Clever, curious, and energetic</string>
+    <string name="monkey_size">Medium</string>
+    <string name="monkey_coat">Gray-brown fur</string>
+</resources>

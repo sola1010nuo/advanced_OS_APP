@@ -1,0 +1,17 @@
+<resources>
+    <string name="monkey_name">中山大學長</string>
+    <string name="monkey_english_name">NSYSU Senior</string>
+    <string name="monkey_description">傳說中的校園霸主，經常在校園各處出沒。</string>
+    <string name="monkey_legend">在校園裡，你可能遇不到教授，但一定有機會遇到學長。</string>
+    <string name="monkey_inspiration">彩蛋原型：台灣獼猴</string>
+    <string name="monkey_model_note">本彩蛋以台灣獼猴為原型；Monkey 分類不代表具備精確物種辨識能力。</string>
+    <string name="monkey_rarity">傳說級 · LEGENDARY</string>
+    <string name="monkey_discovery">LEGENDARY DISCOVERY</string>
+    <string name="monkey_first">隱藏圖鑑解鎖！</string>
+    <string name="monkey_again">再次遇見中山大學長！</string>
+    <string name="monkey_congratulations">恭喜遇見傳說中的校園霸主！</string>
+    <string name="monkey_origin">台灣</string>
+    <string name="monkey_personality">聰明、好奇、充滿活力</string>
+    <string name="monkey_size">中型</string>
+    <string name="monkey_coat">灰褐色毛皮</string>
+</resources>
