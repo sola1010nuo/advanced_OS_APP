@@ -22,7 +22,7 @@
     <string name="breed_photos">My encounter photos</string>
     <string name="breed_no_photos">No collected photos yet</string>
     <string name="breed_back">Back to Collection</string>
-    <string name="breed_preview_notes">Breed notes are prototype summaries. Personality and appearance vary between individuals.</string>
+    <string name="breed_preview_notes">Breed introductions describe common tendencies. Every cat and dog has its own personality and appearance.</string>
     <string name="breed_description_template">%1$s is known for its %2$s. Typical personality: %3$s.</string>
     <plurals name="breed_encounters"><item quantity="one">%d encounter</item><item quantity="other">%d encounters</item></plurals>
     <plurals name="breed_photo_count"><item quantity="one">%d collected photo</item><item quantity="other">%d collected photos</item></plurals>

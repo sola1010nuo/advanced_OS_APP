@@ -1,7 +1,7 @@
 ﻿<resources>
     <string name="breed_abyssinian_name">阿比西尼亞貓</string>
 
-    <string name="breed_abyssinian_origin">埃及的印度洋海岸</string>
+    <string name="breed_abyssinian_origin">尼羅河沿岸</string>
 
     <string name="breed_abyssinian_personality">好奇、活潑</string>
 
@@ -31,7 +31,7 @@
 
     <string name="breed_birman_name">伯曼貓</string>
 
-    <string name="breed_birman_origin">早期培育於法國</string>
+    <string name="breed_birman_origin">緬甸</string>
 
     <string name="breed_birman_personality">溫和、親人</string>
 
@@ -309,7 +309,7 @@
 
     <string name="breed_english_cocker_spaniel_coat">絲滑毛髮與長耳飾毛</string>
 
-    <string name="breed_english_setter_name">英國雪達犬</string>
+    <string name="breed_english_setter_name">英國蹲獵犬</string>
 
     <string name="breed_english_setter_origin">英國</string>
 
@@ -349,7 +349,7 @@
 
     <string name="breed_golden_retriever_coat">金色雙層毛與飾毛</string>
 
-    <string name="breed_great_pyrenees_name">大白熊犬</string>
+    <string name="breed_great_pyrenees_name">庇里牛斯山犬</string>
 
     <string name="breed_great_pyrenees_origin">法國／西班牙</string>
 
@@ -359,7 +359,7 @@
 
     <string name="breed_great_pyrenees_coat">厚實、以白色為主的雙層毛</string>
 
-    <string name="breed_havanese_name">哈瓦那犬</string>
+    <string name="breed_havanese_name">哈威那</string>
 
     <string name="breed_havanese_origin">古巴</string>
 
@@ -379,7 +379,7 @@
 
     <string name="breed_japanese_chin_coat">絲滑毛髮與飾毛尾巴</string>
 
-    <string name="breed_keeshond_name">荷蘭毛獅犬</string>
+    <string name="breed_keeshond_name">凱斯犬</string>
 
     <string name="breed_keeshond_origin">荷蘭</string>
 
@@ -479,7 +479,7 @@
 
     <string name="breed_saint_bernard_coat">短或長毛與寬大頭部</string>
 
-    <string name="breed_samoyed_name">薩摩耶犬</string>
+    <string name="breed_samoyed_name">薩摩耶</string>
 
     <string name="breed_samoyed_origin">西伯利亞</string>
 
@@ -549,7 +549,7 @@
 
     <string name="breed_soft_coated_wheaten_terrier_coat">柔軟波浪狀麥色毛髮</string>
 
-    <string name="breed_yorkshire_terrier_name">約克夏㹴</string>
+    <string name="breed_yorkshire_terrier_name">約克夏</string>
 
     <string name="breed_yorkshire_terrier_origin">英國</string>
 
@@ -558,5 +558,63 @@
     <string name="breed_yorkshire_terrier_size">玩具型</string>
 
     <string name="breed_yorkshire_terrier_coat">長而絲滑的藍灰與棕色毛髮</string>
+
+    <!-- Independent About This Breed introductions; keep IDs aligned across locales. -->
+    <string name="breed_abyssinian_introduction">別被名字帶往非洲旅行！阿比西尼亞貓的早期身世仍有討論，牠卻很早就登上英國貓展舞台。每根毛上的深淺色帶，讓短毛像灑了細碎光點。牠愛登高、研究新事物，比起長時間窩在腿上，更常選擇陪你展開下一場小探險。</string>
+    <string name="breed_american_shorthair_introduction">美國短毛貓的祖先曾跟著移民船遠渡重洋，用捕鼠本領守護船上糧食，之後也在農場忙碌。今天的牠不必上班，追逗貓棒時卻仍能看見那份專注。銀色虎斑只是眾多花色之一；這位隨和的老朋友，既享受陪伴，也懂得安排自己的悠閒時光。</string>
+    <string name="breed_bengal_introduction">孟加拉貓把森林般的斑紋穿進了客廳，玫瑰形斑點與大理石紋都是牠迷人的招牌。現代品種經過多代培育，源自家貓與亞洲豹貓的早期血緣。牠常把攀爬架當探險路線，也可能對水流格外好奇；陪牠動腦玩耍，比只欣賞漂亮外套更有趣。</string>
+    <string name="breed_birman_introduction">伯曼貓有雙藍眼睛，四隻腳像穿著整齊的白手套，難怪身邊總圍繞著神祕故事。不過，寺廟傳說不能當作確定史實，現代品種的發展與法國密切相關。牠通常喜歡輕聲參與家庭生活；有些繁育者還沿用法國習慣，讓同一年出生的小貓名字以相同字母開頭。</string>
+    <string name="breed_bombay_introduction">孟買貓的名字讓人想到印度，現代品種卻是在美國培育的。黑色美國短毛貓與緬甸貓的組合，帶來亮黑短毛和金銅色眼睛，像一隻迷你黑豹。牠的日常往往比外表更親切：蹭蹭家人、湊近訪客，再把紙箱變成玩具，都是這位小室友的拿手好戲。</string>
+    <string name="breed_british_shorthair_introduction">英國短毛貓不只有經典藍灰色，虎斑、雙色和其他毛色也都是牠的衣櫥。圓臉配上厚實短毛，讓人忍不住想起泰迪熊；但牠通常更欣賞四腳踏地的安穩。比起被抱著四處走，牠可能更願意坐在你身旁，默默記住作息，當一位不搶戲的生活觀察員。</string>
+    <string name="breed_cornish_rex_introduction">柯尼斯捲毛貓的故事始於英國康瓦爾，一隻天生捲毛的小貓成了品種發展的起點。牠貼身的波浪毛缺少一般外層護毛，摸起來格外柔軟。纖細身形不代表安靜，這位活力搭檔常把家變成遊戲場；冷天裡，暖毯與人的身旁則可能成為牠偏愛的休息站。</string>
+    <string name="breed_devon_rex_introduction">德文捲毛貓的寬耳朵、明亮眼睛和柔軟波浪毛，像把童話裡的小精靈帶回家。牠的發展起點是英國德文郡的捲毛貓 Kirlee，捲毛來源與柯尼斯捲毛貓不同。牠往往熱愛參與人的活動，從跟著走動到窩近休息，都像認真履行小幫手的工作，偶爾也順便添點亂。</string>
+    <string name="breed_egyptian_mau_introduction">埃及貓的斑點是自然形成的毛色特色，搭配綠眼睛與靈巧身形，走過客廳也很有野外氣息。現代品種在二十世紀逐步發展，不必替牠補上一張法老時代的身分證。牠常對環境變化很敏銳，熟悉家人後又十分親近；追逐遊戲能讓這位運動好手秀出漂亮的轉身。</string>
+    <string name="breed_exotic_shorthair_introduction">異國短毛貓讓人看見波斯貓的圓潤輪廓，卻換上一件厚實的短毛外套。品種發展與波斯貓、美國短毛貓的早期交配有關，之後才逐漸形成自己的樣貌。牠通常親人又帶點玩心，適合慢慢相處；短毛雖比長毛省事，仍需要梳理，圓圓的小室友可不是免保養玩偶。</string>
+    <string name="breed_maine_coon_introduction">緬因貓在美國東北部發展，濃密毛被、蓬鬆尾巴和帶毛簇的大腳掌，都帶著寒冷地區生活的痕跡。名字裡的浣熊只是聯想，牠並不是貓與浣熊的混種。體格醒目，個性卻常相當隨和，有時還會用啾聲和顫音搭話，讓這位大室友多了幾分溫柔的喜劇感。</string>
+    <string name="breed_manx_introduction">曼島貓來自愛爾蘭海上的曼島，最醒目的特色是尾巴長度的變化：有些沒有尾巴，有些卻有短尾或長尾。牠圓潤的身形與較長的後腿，也讓動作別具辨識度。別把牠只當成安靜的沙發夥伴，舒服窩著之後突然追玩具，正是這位島嶼居民討喜的反差。</string>
+    <string name="breed_munchkin_introduction">曼赤肯貓的短腿來自自然出現的基因變異，現代品種在美國逐步建立。成年身體並不會永遠維持小貓尺寸，短毛、長毛和各式花色都能見到。牠常喜歡追逐玩具，遇到高處也可能分段尋找路線。不同組織對此品種的認可並不一致，認識牠時也值得多了解這段背景。</string>
+    <string name="breed_norwegian_forest_cat_introduction">挪威森林貓像把北方冬天穿在身上，外層長毛與厚實底毛共同形成保護，三角形臉和大尾巴也很醒目。牠在挪威有悠久背景，但最早起源仍不完全明朗。這位攀爬好手通常保有自己的節奏：可以陪你待著，也可能轉身登上高處，選一個能看遍全家的觀景座位。</string>
+    <string name="breed_oriental_shorthair_introduction">東方短毛貓承接暹羅貓的修長線條，卻把毛色與花紋拓展成繽紛的調色盤。現代品種從二十世紀的培育逐步成形，大耳朵配上楔形臉十分搶眼。牠常熱愛聊天與互動，對你的每個小動作都充滿興趣；一起玩遊戲，比只把牠當作漂亮的窗邊擺飾更合牠的心意。</string>
+    <string name="breed_persian_introduction">波斯貓早已是貓展舞台的熟面孔，長毛與圓潤輪廓讓牠看起來自帶柔和濾鏡。名字連著古老的波斯，但早期旅程並沒有完整定論，現代樣貌則經過多年培育。牠通常喜歡平穩的生活，也願意偶爾追玩具；每天耐心梳毛，能把華麗外套的整理變成彼此放鬆的相處時間。</string>
+    <string name="breed_ragdoll_introduction">布偶貓在一九六〇年代的美國加州發展，藍眼睛與逐漸呈現的重點色是熟悉的招牌。名字源於早期貓咪被抱起時放鬆的故事，卻不代表每隻都喜歡任人抱。牠常愛跟著家人在附近活動，也可能學會撿回玩具；尊重牠自己的步調，才能認識這位溫柔夥伴真正的個性。</string>
+    <string name="breed_russian_blue_introduction">俄羅斯藍貓的銀灰毛色與綠眼睛很有辨識度，早期常以阿爾漢格爾貓的名字出現在英國貓展。牠的身世一般連結俄羅斯北方，細節卻留有空白。初次見面時可能先觀察，熟悉後才展現親密與玩心；固定的日常和動腦玩具，能讓這位細心的小室友慢慢放鬆。</string>
+    <string name="breed_scottish_fold_introduction">蘇格蘭摺耳貓的家族故事可追溯到農場貓 Susie，向前折的耳朵讓圓臉多了貓頭鷹般的神情。家族中也有直耳成員，並非每隻小貓都會摺耳。牠通常喜歡在家人附近輕聲互動，偶爾也願意玩撿回遊戲；認識這個品種，除了可愛模樣，也別忘了耳朵背後的基因背景。</string>
+    <string name="breed_siamese_introduction">暹羅貓的名字連著今日的泰國，深色臉部、耳朵與四肢搭配藍眼睛，早就成了經典形象。牠也參與了許多其他品種的發展，像貓界家族樹上一位重要親戚。熱愛交流的牠常會用聲音加入你的日常；如果你願意聊天、玩耍和陪伴，這位小夥伴通常很樂意延長相處時間。</string>
+    <string name="breed_sphynx_introduction">斯芬克斯貓的外表像來自古老傳說，現代品種的發展卻與加拿大和美國出現的無毛貓有關。牠並非一定完全無毛，皮膚可能覆著細細絨毛，觸感很特別。喜歡靠近人的牠也很會尋找暖處；少了厚毛外套，照顧時仍要留意皮膚與環境，並不是省去梳毛就萬事輕鬆。</string>
+    <string name="breed_turkish_angora_introduction">土耳其安哥拉貓的絲滑長毛與羽毛般尾巴，讓走動也像一場輕巧的小演出。牠在原鄉曾受到保育計畫重視，今日的毛色早已不只有白色。外表優雅，內心卻常是好奇的行動派，喜歡登高，也想參與家人的事情；找不到牠時，不妨先看看安全的高處休息站。</string>
+    <string name="breed_american_bulldog_introduction">美國鬥牛犬的背景是農場裡的多功能工作犬，結實體格曾用來處理牲畜與守護家園。不同工作需求形成了外形不盡相同的血系，所以不必期待每隻都長得一樣。牠通常精力充沛，也重視與家人的互動；一起練習、散步和玩耍，能讓這位強壯搭檔把本事用在日常生活。</string>
+    <string name="breed_american_pit_bull_terrier_introduction">美國比特鬥牛㹴源自早期鬥牛犬與㹴犬的組合，移民把牠的祖先帶到美國後，也用於農場工作與陪伴。這是有明確品種標準的名稱，不能拿來概括所有相似外形的犬隻。牠常熱愛活動與人的關注；理解個體、建立良好社會化，再一起玩些需要專注的遊戲，更能認識牠。</string>
+    <string name="breed_basset_hound_introduction">巴吉度獵犬的名字呼應法文的低矮，短腿讓牠能以人步行跟得上的節奏追蹤氣味。長耳朵與鬆皮也與嗅聞工作有關，不只是可愛的裝飾。牠在家可能悠閒，遇到有趣味道卻會突然很有主見；散步時留點聞聞看看時間，就像陪這位低底盤偵探讀一份地面的新聞。</string>
+    <string name="breed_beagle_introduction">米格魯的祖先習慣成群追蹤獵物，因此牠常喜歡有同伴，也對各種味道充滿興趣。垂耳與明亮表情讓人容易心軟，鼻子卻往往比眼睛更忙。牠可以是歡樂的遊戲夥伴，也會為一條氣味路線堅持己見；安全的嗅聞遊戲，能讓這位小獵犬把探索天分用在好玩的任務上。</string>
+    <string name="breed_border_collie_introduction">邊境牧羊犬在英格蘭與蘇格蘭邊界一帶發展，最著名的工作本領之一，是用專注目光與細膩動作引導羊群。牠不只需要跑動，也常需要有意義的任務。學新指令、找玩具或練習敏捷，都能成為這位認真搭檔的日常課題；完成活動後，也別忘了給牠安心休息的時間。</string>
+    <string name="breed_boxer_introduction">拳師犬在德國發展成現代品種，結實而俐落的身形保留了工作犬的力量與靈活。嚴肅外表底下，牠常有相當孩子氣的一面，會熱情邀你玩耍，也珍惜家人的陪伴。穩定的訓練能幫牠把興奮化成好默契，讓這位看似硬派的運動搭檔，在日常裡展現有趣又親密的反差。</string>
+    <string name="breed_chihuahua_introduction">吉娃娃與墨西哥有深厚連結，古早祖先的細節卻沒有完全定論，別急著替牠編一本皇家族譜。牠有短毛與長毛成員，小小身體裡常住著自信又警覺的靈魂。喜歡靠近熟悉的人，也可能先觀察陌生環境；尊重牠的步調與個人空間，能讓這位迷你朋友更安心地參與生活。</string>
+    <string name="breed_corgi_introduction">柯基犬的短腿不是偷懶設計，牠們的背景其實與威爾斯的驅牛工作有關。彭布羅克與卡迪根是兩個不同品種，這裡沿用圖鑑的柯基犬總稱，不把所有成員當成同一款。低低的身形裡常有充足活力；散步、學習和玩遊戲，都能讓這位小牧犬展現比外表更有勁的一面。</string>
+    <string name="breed_english_cocker_spaniel_introduction">英國可卡犬的工作故事與林地裡的丘鷸有關，名字也留下了這段獵鳥背景。牠擺動尾巴、穿梭草叢的熱情，今天可以換成散步與尋找玩具。絲滑毛被和柔和神情十分討喜，心裡卻仍住著愛探索的夥伴；規律活動再加上陪伴，能讓牠的歡樂個性在家裡自在發揮。</string>
+    <string name="breed_english_setter_introduction">英國雪達犬的斑點毛色有個專屬名稱，像在白底外套上灑了細細顏料。牠的祖先是尋找鳥類的獵犬，現代品種也保留了輕盈步伐與戶外熱情。溫柔不等於不需要活動；陪牠走走、嗅聞和練習，回家後再享受安靜時光，就能看見這位優雅搭檔在野外與家中的不同面貌。</string>
+    <string name="breed_french_bulldog_introduction">法國鬥牛犬的故事連著英國移居法國的蕾絲工人，小型鬥牛犬在當地逐漸發展成今日的模樣。大蝙蝠耳是醒目的招牌，親人的互動則讓牠成為城市裡受歡迎的室友。牠通常樂意陪你玩一會兒，也能一起慢慢休息；比起安排盛大的冒險，日常小小的相處往往更有魅力。</string>
+    <string name="breed_german_shorthaired_pointer_introduction">德國短毛指示犬的誕生，回應了獵人想要一位多才多藝搭檔的心願：找鳥、追蹤與水中取回都能派上用場。牠的俐落外形背後，是喜歡動腦也喜歡動身體的工作熱情。長一點的戶外活動配合訓練，比只在家看著牠跑圈更有意思，也讓彼此慢慢建立合作默契。</string>
+    <string name="breed_golden_retriever_introduction">黃金獵犬的家族發展與蘇格蘭的獵鳥活動有關，早期培育重視水陸取回能力，也重視與人的合作。今天的牠除了陪伴家庭，還常出現在服務與搜救工作中。金色外套很吸睛，真正迷人的卻是願意參與的熱情；一起學習和玩取回遊戲，能讓這位暖心搭檔展現自己的本領。</string>
+    <string name="breed_great_pyrenees_introduction">大白熊犬不是放大版的白色玩偶，牠的背景是法國與西班牙之間庇里牛斯山區的羊群守護者。守護工作需要自行判斷，也讓牠常帶著安定而獨立的氣質。厚毛與龐大身形十分醒目，日常卻可能相當從容；耐心建立信任，才能理解這位山地搭檔為何總留意周遭動靜。</string>
+    <string name="breed_havanese_introduction">哈瓦那犬與古巴有深厚連結，是當地發展的伴侶犬，早期詳細血緣則仍有不同說法。牠輕快的步伐和豐富毛色，讓每次出場都像帶著小小舞台感。通常喜歡和人互動，也樂意學些遊戲；與其只欣賞絲柔外套，不如花點時間陪這位熱情室友練習新招，享受牠專注看你的模樣。</string>
+    <string name="breed_japanese_chin_introduction">日本狆在日本貴族生活中留下深刻足跡，牠最早如何抵達當地，卻有不同歷史說法。寬臉、大眼睛和蓬鬆毛被，讓小小身影也很有存在感。牠常對熟悉的人溫柔親近，面對新環境則先觀察；不急著催促，留點安靜相處的空間，便能認識這位優雅伴侶細膩而有趣的一面。</string>
+    <string name="breed_keeshond_introduction">荷蘭毛獅犬曾在荷蘭運河船上擔任警戒與陪伴的角色，蓬鬆外套下面藏著一位熟悉船家生活的夥伴。眼睛周圍像戴眼鏡的花紋，是牠最容易被記住的招牌。牠通常喜歡參與家庭活動，對周遭也很留意；今天不用守船，仍能用熱情招呼和好奇目光，替平凡日常添點精神。</string>
+    <string name="breed_labrador_retriever_introduction">拉布拉多犬的祖先與紐芬蘭的聖約翰水犬有關，後來在英國逐步發展出熟悉的取回犬樣貌。防水毛被與像水獺的尾巴，都留下了水邊工作的線索。牠常願意與人合作，也喜歡參與活動；從找回玩具到學習日常小任務，這位親切搭檔的魅力往往就在一起做事的過程裡。</string>
+    <string name="breed_leonberger_introduction">蘭伯格犬以德國城市萊昂貝格命名，品種發展的故事也連著當地徽章上的獅子形象。成年犬的豐厚毛被與黑色面罩，確實很有大角色登場的氣勢。牠通常重視家人的陪伴，巨大身形卻不代表冷漠；一起散步、學習和慢慢相處，能看見這位醒目夥伴常有的柔和與耐心。</string>
+    <string name="breed_maltese_introduction">馬爾濟斯的名字連著地中海世界，作為小型伴侶犬的歷史相當悠久，最早發展細節卻不宜說得太肯定。白色長毛像一件流動的小披風，下面常是活潑而喜歡互動的性格。牠不只適合坐在腿上，也能享受遊戲與散步；整理外套時多點耐心，便能把照顧變成親近的日常。</string>
+    <string name="breed_miniature_pinscher_introduction">迷你杜賓犬的中文名字容易讓人誤會，但牠並不是杜賓犬的縮小版本，而是有自己歷史的德國品種。抬腿明顯的步態，讓走路也帶著自信登場的節奏。小身形裡常有旺盛好奇心與活力；適合的遊戲、散步和訓練，能讓這位精神十足的小夥伴，把探險熱情用在每天的新發現。</string>
+    <string name="breed_newfoundland_introduction">紐芬蘭犬的名字直接連著加拿大的紐芬蘭島，牠的工作背景同時涵蓋陸地搬運與水邊協助。厚實毛被、強壯身體與部分帶蹼的腳趾，讓游泳成為牠的招牌本領之一。平時常給人溫和的印象，卻是需要認真照顧的大夥伴；了解牠的工作故事，更能欣賞龐大身影裡的合作精神。</string>
+    <string name="breed_pomeranian_introduction">博美犬的名字來自波美拉尼亞地區，祖先曾比今日常見的小型成員大得多。蓬鬆雙層毛與狐狸般表情，把精神十足的模樣放進了小小輪廓。牠常留意環境，也喜歡參與家人的生活；適合的小遊戲與訓練，能讓這位有存在感的夥伴，在熱情招呼之外多學幾項拿手本領。</string>
+    <string name="breed_poodle_introduction">貴賓犬不只是造型高手，品種背景其實連著德國的水鳥取回工作，名字也與在水中濺起水花有關。標準、迷你與玩具尺寸各有不同，本圖鑑保留貴賓犬總稱。捲毛外套下常藏著愛學習的運動夥伴；一起玩取回、練新指令，比只研究髮型，更能看見牠聰明而活潑的一面。</string>
+    <string name="breed_pug_introduction">巴哥犬的歷史與中國宮廷及後來的歐洲貴族生活都有連結，小小身影曾走過不少華麗房間。圓眼、皺眉和緊湊身形很有表情，牠也常帶著愛逗人的玩心。牠通常珍惜人的陪伴，喜歡加入日常的小活動；一段合適的遊戲，再一起安靜休息，就能成為牠很滿意的午後安排。</string>
+    <string name="breed_saint_bernard_introduction">聖伯納犬的名字連著瑞士阿爾卑斯山的修道院，當地大型犬曾協助尋找與救援迷途旅人。除了這段知名工作史，牠也有短毛與長毛兩種外套。巨大身形裡常帶著平穩而溫和的氣質；從小建立相處與訓練默契，能讓這位山區老朋友在現代家庭裡，舒舒服服地找到自己的位置。</string>
+    <string name="breed_samoyed_introduction">薩摩耶犬的名字來自西伯利亞的族群，祖先與人生活，參與放牧馴鹿、狩獵與拉雪橇。向上揚的嘴角讓牠像總在微笑，厚實毛被則留下寒地工作的痕跡。牠通常喜歡陪伴與活動，並不是只供欣賞的白色雲朵；散步、遊戲和相處時間，能讓這位北方搭檔更自在地融入家中。</string>
+    <string name="breed_schnauzer_introduction">雪納瑞家族有迷你、標準與巨型三個不同品種，圖鑑目前沿用雪納瑞總稱，不指定某個尺寸。醒目的鬍鬚與眉毛，讓牠們像認真觀察世界的小老師。家族背景連著德國工作犬，不同成員各有發展；一起散步、玩遊戲和練習，比只看外表，更能認識眼前這位有主見的夥伴。</string>
+    <string name="breed_scottish_terrier_introduction">蘇格蘭㹴的祖先曾在蘇格蘭追蹤藏進地下的動物，結實而低矮的身形也留著這段工作背景。長眉毛與鬍鬚讓牠像一位嚴肅紳士，內心卻常有鮮明主見與探索慾。牠可能不急著討好每個陌生人；耐心互動、散步和適合的遊戲，能慢慢贏得這位小夥伴認真而獨特的信任。</string>
+    <string name="breed_shetland_sheepdog_introduction">喜樂蒂牧羊犬來自蘇格蘭外海的設得蘭群島，嚴峻環境下的小型牧犬背景，留下了厚毛與敏捷步伐。牠的外表雖讓人想到柯利犬，卻有自己的品種發展故事。通常善於留意人的動作，也熱愛學習；把日常訓練變成輕鬆遊戲，能讓這位細心的島嶼搭檔展現合作與反應的本領。</string>
+    <string name="breed_shiba_inu_introduction">柴犬的背景是日本的狩獵犬，靈巧步伐與敏銳感官曾用來尋找小型獵物。熟悉的捲尾和狐狸般輪廓，並不表示牠只是一張可愛表情包。牠常保有自己的判斷，面對陌生人也可能比較含蓄；尊重步調，再用耐心與正向互動建立默契，才會發現這位小夥伴有趣而細緻的個性。</string>
+    <string name="breed_staffordshire_bull_terrier_introduction">斯塔福郡鬥牛㹴的名字來自英國地區，祖先是鬥牛犬與㹴犬的早期組合，歷史並不全是輕鬆故事。現代品種常以結實身形、靈活動作與親人的一面受到注意。牠不是其他相似犬種的另一個名字；透過適當社會化、遊戲和訓練，能更完整地理解眼前這位熱情而有力量的夥伴。</string>
+    <string name="breed_soft_coated_wheaten_terrier_introduction">愛爾蘭軟毛麥色㹴曾是農家多才多藝的幫手，捕獵、警戒與陪伴都在牠的工作故事裡。柔軟流動的麥色毛被，讓牠和許多粗毛㹴犬形成有趣對比。牠通常熱情親近，卻也保有㹴犬的堅持；陪牠活動、學習，再耐心整理外套，能讓這位鄉間老朋友的日常充滿舒服的小樂趣。</string>
+    <string name="breed_yorkshire_terrier_introduction">約克夏㹴今天常以絲滑長毛亮相，祖先的工作卻是在英國約克郡的礦場與紡織廠捕鼠。這段背景讓漂亮外表下面，仍可能住著勇敢又好奇的㹴犬精神。小身形不等於只想被抱著；散步、探索與動腦遊戲，能讓這位精巧搭檔秀出自己的主見，也替收藏裡的優雅照片添上故事。</string>
 </resources>
 

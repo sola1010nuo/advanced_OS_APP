@@ -1,6 +1,6 @@
 ﻿<resources>
     <string name="collection_discovered_count">已發現 %1$d / %2$d</string>
-    <string name="filter_cats">貓咪</string>
+    <string name="filter_cats">咪咪</string>
     <string name="filter_dogs">狗狗</string>
     <string name="filter_other">其他</string>
     <string name="species_cat">貓</string>
@@ -12,7 +12,7 @@
     <string name="breed_photo_placeholder">照片佔位</string>
     <string name="breed_cover_placeholder">尚無封面照片</string>
     <string name="breed_photo_description">%1$s 的照片</string>
-    <string name="breed_about">認識這個品種</string>
+    <string name="breed_about">認識牠</string>
     <string name="breed_characteristics">基本特徵</string>
     <string name="breed_origin">起源</string>
     <string name="breed_personality">常見個性</string>
@@ -22,7 +22,7 @@
     <string name="breed_photos">我的相遇照片</string>
     <string name="breed_no_photos">還沒有收藏照片</string>
     <string name="breed_back">返回圖鑑</string>
-    <string name="breed_preview_notes">品種簡介為原型摘要，個性與外觀會因個體而異。</string>
+    <string name="breed_preview_notes">品種介紹描述常見傾向，每隻貓狗都有自己的個性與模樣。</string>
     <string name="breed_description_template">%1$s 的外觀特色是%2$s。常見個性為%3$s。</string>
     <plurals name="breed_encounters"><item quantity="other">相遇 %d 次</item></plurals>
     <plurals name="breed_photo_count"><item quantity="other">%d 張收藏照片</item></plurals>

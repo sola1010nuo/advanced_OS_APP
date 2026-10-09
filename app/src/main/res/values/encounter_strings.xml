@@ -4,11 +4,11 @@
     <string name="unlock_record">紀錄這次相遇</string>
     <string name="unlock_later">稍後再說</string>
     <string name="encounter_title">紀錄這次相遇</string>
-    <string name="encounter_name">名字（選填）</string>
+    <string name="encounter_name">名字</string>
     <string name="encounter_date">相遇日期</string>
     <string name="encounter_time">相遇時間</string>
-    <string name="encounter_location">地點（選填）</string>
-    <string name="encounter_note">備註（選填）</string>
+    <string name="encounter_location">地點</string>
+    <string name="encounter_note">備註</string>
     <string name="encounter_date_hint">YYYY-MM-DD（年-月-日）</string>
     <string name="encounter_time_hint">HH:mm（24 小時制）</string>
     <string name="encounter_date_error">請輸入有效日期：YYYY-MM-DD</string>

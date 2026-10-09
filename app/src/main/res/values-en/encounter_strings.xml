@@ -4,11 +4,11 @@
     <string name="unlock_record">Record This Encounter</string>
     <string name="unlock_later">Maybe Later</string>
     <string name="encounter_title">Record This Encounter</string>
-    <string name="encounter_name">Pet name (optional)</string>
+    <string name="encounter_name">Pet name</string>
     <string name="encounter_date">Encounter date</string>
     <string name="encounter_time">Encounter time</string>
-    <string name="encounter_location">Location (optional)</string>
-    <string name="encounter_note">Note (optional)</string>
+    <string name="encounter_location">Location</string>
+    <string name="encounter_note">Note</string>
     <string name="encounter_date_hint">YYYY-MM-DD</string>
     <string name="encounter_time_hint">HH:mm (24-hour)</string>
     <string name="encounter_date_error">Enter a valid date: YYYY-MM-DD</string>
