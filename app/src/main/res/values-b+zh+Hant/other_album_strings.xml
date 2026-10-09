@@ -1,0 +1,21 @@
+<resources>
+    <string name="other_organize">整理</string>
+    <string name="other_choose_photos">選擇相簿照片</string>
+    <string name="other_selected_count">已選取 %1$d 張照片</string>
+    <string name="other_return_photos">移回其他照片</string>
+    <string name="other_delete_selected">刪除選取照片</string>
+    <string name="other_delete_selected_confirmation">確定永久刪除選取的 %1$d 張照片及 Encounter 紀錄？此操作無法復原。</string>
+    <string name="other_albums">我的相簿</string>
+    <string name="other_add_album">新增相簿</string>
+    <string name="other_rename">修改名稱</string>
+    <string name="other_earlier">往前</string>
+    <string name="other_later">往後</string>
+    <string name="other_delete_album">刪除相簿</string>
+    <string name="other_photos">其他照片</string>
+    <string name="other_move">移動至相簿</string>
+    <string name="other_cancel">取消</string>
+    <string name="other_delete_choices">請選擇保留相簿內照片，或連同 Encounter 紀錄與照片一起刪除。</string>
+    <string name="other_keep_photos">只刪除相簿，保留照片</string>
+    <string name="other_delete_photos">刪除相簿及照片</string>
+    <string name="other_irreversible">此操作將永久刪除相簿、Encounter 紀錄及照片，無法復原。確定刪除？</string>
+</resources>

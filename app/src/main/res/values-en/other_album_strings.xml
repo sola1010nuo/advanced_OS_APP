@@ -1,0 +1,21 @@
+<resources>
+    <string name="other_organize">Organize</string>
+    <string name="other_choose_photos">Choose album photos</string>
+    <string name="other_selected_count">%1$d photos selected</string>
+    <string name="other_return_photos">Return to Other Photos</string>
+    <string name="other_delete_selected">Delete selected photos</string>
+    <string name="other_delete_selected_confirmation">Permanently delete the %1$d selected photos and their encounters? This cannot be undone.</string>
+    <string name="other_albums">Albums</string>
+    <string name="other_add_album">Add album</string>
+    <string name="other_rename">Rename</string>
+    <string name="other_earlier">Earlier</string>
+    <string name="other_later">Later</string>
+    <string name="other_delete_album">Delete album</string>
+    <string name="other_photos">Other Photos</string>
+    <string name="other_move">Move to album</string>
+    <string name="other_cancel">Cancel</string>
+    <string name="other_delete_choices">Choose whether to keep or delete the photos in this album.</string>
+    <string name="other_keep_photos">Delete album only; keep photos</string>
+    <string name="other_delete_photos">Delete album and photos</string>
+    <string name="other_irreversible">This permanently deletes the album, its encounters and photos. This action cannot be undone. Confirm deletion?</string>
+</resources>
