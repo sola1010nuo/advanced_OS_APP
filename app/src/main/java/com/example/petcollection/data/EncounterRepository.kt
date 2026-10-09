@@ -12,7 +12,9 @@ import java.util.UUID
 data class CollectionData(
     val encounters: List<EncounterRecord> = emptyList(),
     val covers: List<BreedCover> = emptyList(),
-    val loaded: Boolean = false
+    val loaded: Boolean = false,
+    val albums: List<OtherAlbum> = emptyList(),
+    val members: List<OtherAlbumMember> = emptyList()
 ) {
     fun forBreed(id: String) = encounters.filter { it.breedId == id }
         .sortedWith(compareByDescending<EncounterRecord> { it.encounteredAt }.thenByDescending { it.createdAt }.thenBy { it.id })
@@ -39,7 +41,27 @@ data class CollectionStatistics(val discovered: Int, val totalBreeds: Int, val e
 
 /** One persistent encounter store shared by all normal breeds and special albums. */
 class EncounterRepository(private val dao: EncounterDao, private val context: Context) {
-    val collection = combine(dao.observeAll(), dao.observeCovers()) { records, covers -> CollectionData(records, covers, true) }
+    val collection = combine(dao.observeAll(), dao.observeCovers(), dao.observeAlbums(), dao.observeMembers()) { records, covers, albums, members -> CollectionData(records, covers, true, albums, members) }
+    suspend fun createAlbum(name: String): String {
+        val id = UUID.randomUUID().toString()
+        dao.createAlbum(id, name)
+        return id
+    }
+    suspend fun renameAlbum(id: String, name: String) = dao.renameAlbum(id, name)
+    suspend fun reorderAlbum(id: String, offset: Int) = dao.reorderAlbum(id, offset)
+    suspend fun reorderAlbums(ids: List<String>) = dao.reorderAlbums(ids)
+    suspend fun unassignPhotos(ids: List<String>) = dao.unassignPhotos(ids)
+    suspend fun deletePhotos(ids: List<String>) = cleanDeletedPhotos(dao.deleteOtherPhotos(ids))
+    suspend fun movePhotos(ids: List<String>, albumId: String) = dao.movePhotos(ids, albumId)
+    suspend fun albumCover(id: String, encounterId: String) = dao.albumCover(id, encounterId)
+    suspend fun deleteAlbum(id: String, deletePhotos: Boolean) {
+        cleanDeletedPhotos(dao.deleteAlbum(id, deletePhotos))
+    }
+    private suspend fun cleanDeletedPhotos(records: List<EncounterRecord>) {
+        records.mapNotNull { it.photoUri }.distinct().forEach {
+            if (dao.photoReferences(it) == 0) deletePrivatePhoto(it)
+        }
+    }
     fun observeEncounter(id: String) = dao.observeById(id)
     fun observeByBreed(id: String) = dao.observeByBreed(id)
     fun observeCounts() = dao.observeCounts()

@@ -89,6 +89,19 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         }
     }
     fun selectCover(breedId: String, encounterId: String) = perform { repository.selectCover(breedId, encounterId) }
+    fun createAlbum(name: String, onCreated: (String) -> Unit = {}) = perform { onCreated(repository.createAlbum(name)) }
+    fun renameAlbum(id: String, name: String, onRenamed: () -> Unit = {}) = perform { repository.renameAlbum(id, name); onRenamed() }
+    fun reorderAlbum(id: String, offset: Int) = perform { repository.reorderAlbum(id, offset) }
+    fun reorderAlbums(ids: List<String>, onFinished: () -> Unit = {}) = perform {
+        repository.reorderAlbums(ids)
+        collection.first { it.albums.map { album -> album.id } == ids }
+        onFinished()
+    }
+    fun movePhotos(ids: List<String>, albumId: String, onMoved: () -> Unit = {}) = perform { repository.movePhotos(ids, albumId); onMoved() }
+    fun unassignPhotos(ids: List<String>, onMoved: () -> Unit = {}) = perform { repository.unassignPhotos(ids); onMoved() }
+    fun deletePhotos(ids: List<String>, onDeleted: () -> Unit = {}) = perform { repository.deletePhotos(ids); onDeleted() }
+    fun albumCover(id: String, encounterId: String) = perform { repository.albumCover(id, encounterId) }
+    fun deleteAlbum(id: String, deletePhotos: Boolean, onDeleted: () -> Unit = {}) = perform { repository.deleteAlbum(id, deletePhotos); onDeleted() }
     fun deleteEncounter(id: String, onDeleted: () -> Unit) = perform {
         repository.delete(id)
         onDeleted()

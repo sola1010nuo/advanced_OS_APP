@@ -75,6 +75,7 @@ class CollectionCrudUiTest {
     private fun openAlbum(id: String, filter: Int?) {
         compose.onNode(hasScrollAction()).performScrollToIndex(0)
         filter?.let { compose.onNodeWithText(text(it)).performClick() }
+        if (id == "unregistered") return
         val name = catalog.getBreed(id)!!.name
         compose.onNode(hasScrollAction()).performScrollToNode(hasText(name))
         compose.onNodeWithText(name).performClick()
@@ -131,6 +132,148 @@ class CollectionCrudUiTest {
         compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 34)).assertExists()
     }
 
+    @Test fun customAlbumsStartAtFirstCellAndMonkeyStaysBeforeThem() {
+        runBlocking { repository.createAlbum("First custom"); repository.createAlbum("Second custom") }
+        mount()
+        click(R.string.filter_other)
+        compose.onNodeWithText(catalog.getBreed("monkey")!!.name).assertDoesNotExist()
+        val first = compose.onNodeWithText("First custom").fetchSemanticsNode().boundsInRoot
+        val second = compose.onNodeWithText("Second custom").fetchSemanticsNode().boundsInRoot
+        assertEquals(first.top, second.top, 2f)
+        assertTrue(first.left < second.left)
+        runBlocking { db.encounters().create(EncounterRecord("monkey", null)) }
+        compose.waitUntil(10000) { state.collection.value.forBreed("monkey").isNotEmpty() }
+        val monkey = compose.onNodeWithText(catalog.getBreed("monkey")!!.name).fetchSemanticsNode().boundsInRoot
+        val custom = compose.onNodeWithText("First custom").fetchSemanticsNode().boundsInRoot
+        assertTrue(monkey.left < custom.left)
+        val source = compose.onNodeWithText("Second custom").fetchSemanticsNode().boundsInRoot
+        val destination = compose.onNodeWithText("First custom").fetchSemanticsNode().boundsInRoot.center
+        compose.onNodeWithText("Second custom").performTouchInput {
+            down(center); advanceEventTime(700); moveTo(center)
+            moveTo(destination - source.topLeft, delayMillis = 32); up()
+        }
+        compose.waitUntil(10000) { !state.isWorking && state.collection.value.albums.first().name == "Second custom" }
+        assertTrue(compose.onNodeWithText(catalog.getBreed("monkey")!!.name).fetchSemanticsNode().boundsInRoot.left <
+            compose.onNodeWithText("Second custom").fetchSemanticsNode().boundsInRoot.left)
+        val lockedOrder = state.collection.value.albums.map { it.id }
+        val customBounds = compose.onNodeWithText("Second custom").fetchSemanticsNode().boundsInRoot
+        val monkeyCenter = compose.onNodeWithText(catalog.getBreed("monkey")!!.name).fetchSemanticsNode().boundsInRoot.center
+        compose.onNodeWithText("Second custom").performTouchInput {
+            down(center); advanceEventTime(700); moveTo(center)
+            moveTo(monkeyCenter - customBounds.topLeft, delayMillis = 32); up()
+        }
+        compose.runOnIdle { assertEquals(lockedOrder, state.collection.value.albums.map { it.id }) }
+        compose.onNodeWithText(text(R.string.other_earlier)).assertDoesNotExist()
+        compose.onNodeWithText(text(R.string.other_later)).assertDoesNotExist()
+    }
+
+    @Test fun otherPhotosCanMoveIntoAlbumAndReturnAfterAlbumOnlyDeletion() {
+        runBlocking {
+            repository.createAlbum("My album")
+            db.encounters().create(EncounterRecord("unregistered", "content://fixture/other", petName = "Loose photo"))
+        }
+        mount()
+        click(R.string.filter_other)
+        compose.onNodeWithText(text(R.string.collection_add_encounter)).assertDoesNotExist()
+        click(R.string.other_organize)
+        compose.onNode(hasScrollAction()).performScrollToNode(hasText("Loose photo"))
+        compose.onNode(isToggleable()).performClick()
+        click(R.string.other_move)
+        compose.onNode(hasText("My album") and hasAnyAncestor(isDialog())).performClick()
+        compose.waitUntil(10000) { !state.isWorking && state.collection.value.members.size == 1 }
+        compose.onNodeWithText("Loose photo").assertDoesNotExist()
+        compose.onNode(hasScrollAction()).performScrollToIndex(0)
+        compose.onNodeWithText("My album").performClick()
+        compose.onNode(hasScrollAction()).performScrollToNode(hasText("Loose photo"))
+        compose.onNodeWithText("Loose photo").performClick()
+        compose.onNodeWithText(text(R.string.encounter_current_cover)).performScrollTo().assertIsDisplayed()
+        click(R.string.encounter_back_album)
+        click(R.string.other_delete_album)
+        compose.onNodeWithText(text(R.string.other_cancel)).performClick()
+        assertEquals(1, state.collection.value.albums.size)
+        click(R.string.other_delete_album)
+        compose.onNodeWithText(text(R.string.other_keep_photos)).performClick()
+        compose.waitUntil(10000) { !state.isWorking && state.collection.value.albums.isEmpty() }
+        compose.onNode(hasScrollAction()).performScrollToNode(hasText("Loose photo"))
+        compose.onNodeWithText("Loose photo").assertIsDisplayed()
+        assertEquals(1, state.encounters.size)
+        assertTrue(state.collection.value.members.isEmpty())
+    }
+
+    @Test fun newAlbumImmediatelySelectsPhotosAllowsEmptyAndRenamesFromTitle() {
+        runBlocking {
+            db.encounters().create(EncounterRecord("unregistered", "content://fixture/one", petName = "One"))
+            db.encounters().create(EncounterRecord("unregistered", "content://fixture/two", petName = "Two"))
+        }
+        mount()
+        click(R.string.filter_other)
+        click(R.string.other_add_album)
+        compose.onNode(hasSetTextAction()).performTextReplacement("New album")
+        compose.onNode(hasText(text(R.string.collection_done)) and hasAnyAncestor(isDialog())).performClick()
+        compose.waitUntil(10000) { !state.isWorking && state.collection.value.albums.size == 1 }
+        compose.onNodeWithText(text(R.string.other_choose_photos)).assertExists()
+        compose.onNodeWithText("One").performClick()
+        compose.onNodeWithText("Two").performClick()
+        compose.onNodeWithText(context.getString(R.string.other_selected_count, 2)).assertExists()
+        click(R.string.collection_done)
+        compose.waitUntil(10000) { !state.isWorking && state.collection.value.members.size == 2 }
+        compose.onNodeWithTag("album_title").performClick()
+        compose.onNode(hasSetTextAction()).performTextReplacement("   ")
+        compose.onNode(hasText(text(R.string.collection_done)) and hasAnyAncestor(isDialog())).assertIsNotEnabled()
+        compose.onNode(hasSetTextAction()).performTextReplacement("Renamed album")
+        compose.onNode(hasText(text(R.string.collection_done)) and hasAnyAncestor(isDialog())).performClick()
+        compose.waitUntil(10000) { !state.isWorking && state.collection.value.albums.single().name == "Renamed album" }
+        click(R.string.breed_back)
+        compose.onNodeWithText(text(R.string.other_delete_album)).assertDoesNotExist()
+        compose.onNodeWithText(text(R.string.other_rename)).assertDoesNotExist()
+        click(R.string.other_add_album)
+        compose.onNode(hasSetTextAction()).performTextReplacement("Empty album")
+        compose.onNode(hasText(text(R.string.collection_done)) and hasAnyAncestor(isDialog())).performClick()
+        compose.waitUntil(10000) { !state.isWorking && state.collection.value.albums.size == 2 }
+        click(R.string.collection_done)
+        compose.onNodeWithTag("album_title").assertTextEquals("Empty album")
+        assertEquals(2, state.collection.value.members.size)
+        click(R.string.breed_back)
+        compose.onNodeWithText("Renamed album").performClick()
+        click(R.string.other_delete_album)
+        compose.onNodeWithText(text(R.string.other_delete_photos)).performClick()
+        compose.onNodeWithText(text(R.string.other_irreversible)).assertExists()
+        compose.onNodeWithText(text(R.string.other_delete_photos)).performClick()
+        compose.waitUntil(10000) { !state.isWorking && state.encounters.isEmpty() }
+        assertEquals("Empty album", state.collection.value.albums.single().name)
+    }
+
+    @Test fun albumSelectionCanReturnMoveAndDeletePhotosWithConfirmation() {
+        runBlocking {
+            val album = repository.createAlbum("Source")
+            repository.createAlbum("Destination")
+            val records = (1..3).map { EncounterRecord("unregistered", "content://fixture/$it", petName = "Photo $it") }
+            records.forEach { db.encounters().create(it) }
+            repository.movePhotos(records.map { it.id }, album)
+        }
+        mount()
+        click(R.string.filter_other)
+        compose.onNodeWithText("Source").performClick()
+        click(R.string.other_organize)
+        compose.onNodeWithText("Photo 1").performClick()
+        click(R.string.other_return_photos)
+        compose.waitUntil(10000) { !state.isWorking && state.collection.value.members.size == 2 }
+        click(R.string.other_organize)
+        compose.onNodeWithText("Photo 2").performClick()
+        click(R.string.other_move)
+        compose.onNode(hasText("Destination") and hasAnyAncestor(isDialog())).performClick()
+        compose.waitUntil(10000) { !state.isWorking && state.collection.value.members.map { it.albumId }.toSet().size == 2 }
+        click(R.string.other_organize)
+        compose.onNodeWithText("Photo 3").performClick()
+        click(R.string.other_delete_selected)
+        compose.onNode(hasText(text(R.string.other_cancel)) and hasAnyAncestor(isDialog())).performClick()
+        assertEquals(3, state.encounters.size)
+        click(R.string.other_delete_selected)
+        compose.onNode(hasText(text(R.string.encounter_delete)) and hasAnyAncestor(isDialog())).performClick()
+        compose.waitUntil(10000) { !state.isWorking && state.encounters.size == 2 }
+        assertEquals(setOf("Photo 1", "Photo 2"), state.encounters.map { it.petName }.toSet())
+    }
+
     @Test fun allSpecialAlbumsSupportCrudWithoutUnlockOrProgress() {
         mount()
         compose.onNodeWithText(text(R.string.filter_cats)).assertIsSelected()
@@ -139,7 +282,7 @@ class CollectionCrudUiTest {
         compose.onNodeWithText(text(R.string.unregistered)).assertDoesNotExist()
         compose.onNodeWithText(text(R.string.filter_other)).performClick()
         compose.onNodeWithText(text(R.string.filter_other)).assertIsSelected()
-        compose.onNodeWithText(text(R.string.unregistered)).assertIsDisplayed()
+        compose.onNodeWithText(text(R.string.other_photos)).assertIsDisplayed()
         compose.onNodeWithText(text(R.string.other_cats)).assertDoesNotExist()
         compose.onNodeWithText(text(R.string.other_dogs)).assertDoesNotExist()
         compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 22)).assertDoesNotExist()
@@ -155,7 +298,7 @@ class CollectionCrudUiTest {
             compose.waitUntil(10000) { !state.isWorking && state.encounters.any { it.petName == "Edited $id" } }
             deleteConfirmed("Edited $id")
             assertEquals(0, state.collection.value.discoveredCount(MockBreedRepository.normalBreedIds))
-            click(R.string.breed_back)
+            if (id != "unregistered") click(R.string.breed_back)
         }
     }
 
@@ -209,9 +352,9 @@ class CollectionCrudUiTest {
         val first = state.encounters.single()
         assertEquals(first.id, state.collection.value.applyTo(breed).coverPhoto!!.id)
         compose.onNodeWithText(breed.name).assertIsDisplayed()
-        compose.onNodeWithText(text(R.string.unregistered)).assertIsDisplayed()
+        compose.onNodeWithText(text(R.string.other_photos)).assertIsDisplayed()
         assertTrue(compose.onNodeWithText(breed.name).fetchSemanticsNode().boundsInRoot.top <
-            compose.onNodeWithText(text(R.string.unregistered)).fetchSemanticsNode().boundsInRoot.top)
+            compose.onNodeWithText(text(R.string.other_photos)).fetchSemanticsNode().boundsInRoot.top)
         add(id, "Senior second")
         assertEquals(1, state.collection.value.statistics(catalog.getCollectionEntries()).discovered)
         assertEquals(0, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).discovered)
@@ -232,7 +375,7 @@ class CollectionCrudUiTest {
         compose.onNodeWithText(breed.name).assertDoesNotExist()
         assertEquals(0, state.collection.value.statistics(catalog.getCollectionEntries()).discovered)
         assertEquals(total, state.collection.value.statistics(catalog.getCollectionEntries()).totalBreeds)
-        compose.onNodeWithText(text(R.string.unregistered)).assertExists()
+        compose.onNodeWithText(text(R.string.other_photos)).assertExists()
     }
     @After fun close() = runBlocking {
         val store = androidx.lifecycle.ViewModelStore()

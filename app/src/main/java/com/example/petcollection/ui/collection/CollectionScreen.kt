@@ -27,7 +27,7 @@ import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.data.Species
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-private enum class CollectionCategory(val species: Species?, val labelRes: Int) {
+internal enum class CollectionCategory(val species: Species?, val labelRes: Int) {
     CAT(Species.CAT, R.string.filter_cats),
     DOG(Species.DOG, R.string.filter_dogs),
     OTHER(null, R.string.filter_other)
@@ -69,6 +69,7 @@ fun CollectionScreen(
     }
     LaunchedEffect(data, selectedEncounterId) {
         if (data.loaded && selectedEncounterId != null && selectedEncounter == null) selectedEncounterId = null
+        if (data.loaded && selectedBreedId != null && selectedBreed == null) selectedBreedId = null
     }
     if (!data.loaded) {
         Column(modifier.padding(24.dp)) {
@@ -82,6 +83,11 @@ fun CollectionScreen(
             title = { Text(stringResource(R.string.collection_storage_error)) }, text = {},
             confirmButton = { TextButton(onClick = unlockState::clearError) { Text(stringResource(R.string.collection_done)) } },
             dismissButton = {})
+    }
+    if (selectedSpecies == CollectionCategory.OTHER.name && selectedBreedId == null) {
+        OtherAlbumsScreen(data, breeds, unlockState, modifier,
+            onCategory = { selectedSpecies = it.name }, onMonkey = { selectedBreedId = it })
+        return
     }
     if (selectedBreed != null && selectedEncounter != null) {
         EncounterDetailScreen(selectedBreed, selectedEncounter,
@@ -134,19 +140,6 @@ fun CollectionScreen(
             items(breeds.filter { it.isVisibleInCollection && it.species == species && (species != null || it.isCollectible) }
                 .sortedBy { !it.isCollectible }, key = { it.id }) { breed ->
                 BreedCard(breed, onClick = { selectedBreedId = breed.id })
-            }
-            // Preserve the existing Other album, after the first secret collectible card.
-            if (category == CollectionCategory.OTHER) {
-                breeds.firstOrNull { it.id == "unregistered" }?.let { album ->
-                    item(span = { GridItemSpan(maxLineSpan) }, key = album.id) {
-                        OutlinedCard(onClick = { selectedBreedId = album.id }, modifier = Modifier.fillMaxWidth()) {
-                            Column(Modifier.padding(16.dp)) {
-                                Text(album.name, style = MaterialTheme.typography.titleMedium)
-                                Text(pluralStringResource(R.plurals.breed_encounters, album.encounterCount, album.encounterCount))
-                            }
-                        }
-                    }
-                }
             }
         }
     }
