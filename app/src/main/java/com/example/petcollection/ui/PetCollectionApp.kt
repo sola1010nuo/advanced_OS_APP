@@ -46,6 +46,10 @@ import com.example.petcollection.ui.home.CollectionCategory
 import com.example.petcollection.ui.home.HomeScreen
 import com.example.petcollection.ui.home.PhotoRecognitionState
 import com.example.petcollection.ui.theme.PetCollectionTheme
+import com.example.petcollection.ui.settings.EffectsSettingRow
+import com.example.petcollection.ui.settings.EffectsSettingsUiState
+import com.example.petcollection.ui.settings.LocalEffectsEnabled
+import com.example.petcollection.ui.settings.rememberEffectsSettingsState
 import java.util.Locale
 
 private enum class Destination(@param:StringRes val label: Int) {
@@ -58,6 +62,8 @@ private enum class Appearance(@param:StringRes val label: Int) {
 @Composable
 fun PetCollectionApp() {
     val collectionUnlockState = rememberCollectionUnlockState()
+    val effectsSettingsState = rememberEffectsSettingsState()
+    val effectsSettings by effectsSettingsState.state.collectAsState()
     // UI prototype only: retained across rotation, reset on a fresh app launch.
     var language by rememberSaveable { mutableStateOf("zh-Hant") }
     var appearance by rememberSaveable { mutableStateOf(Appearance.SYSTEM.name) }
@@ -110,6 +116,7 @@ fun PetCollectionApp() {
         }
     }
     CompositionLocalProvider(LocalContext provides localizedContext, LocalConfiguration provides configuration,
+        LocalEffectsEnabled provides effectsSettings.enabled.takeIf { effectsSettings.loaded },
         *listOfNotNull(activityResultOwner?.let { LocalActivityResultRegistryOwner provides it }).toTypedArray()) {
         PetCollectionTheme(darkTheme = dark) {
             // Collection already mounts this same host. Mount it here for Home and other destinations.
@@ -154,7 +161,8 @@ fun PetCollectionApp() {
                         unlockState = collectionUnlockState, initialSpecies = Species.valueOf(collectionSpecies))
                     Destination.FOOTPRINTS -> FootprintsScreen(contentModifier)
                     Destination.SETTINGS -> SettingsScreen(
-                        language, { language = it }, Appearance.valueOf(appearance), { appearance = it.name }, contentModifier
+                        language, { language = it }, Appearance.valueOf(appearance), { appearance = it.name },
+                        effectsSettings, effectsSettingsState::setEnabled, contentModifier
                     )
                 }
             }
@@ -192,6 +200,7 @@ private fun FootprintsScreen(modifier: Modifier) {
 private fun SettingsScreen(
     language: String, onLanguageChange: (String) -> Unit,
     appearance: Appearance, onAppearanceChange: (Appearance) -> Unit,
+    effects: EffectsSettingsUiState, onEffectsChange: (Boolean) -> Unit,
     modifier: Modifier
 ) {
     Page(R.string.settings, modifier) {
@@ -204,7 +213,10 @@ private fun SettingsScreen(
                 SettingOption(item.label, appearance == item) { onAppearanceChange(item) }
             }
         }
-        Text(stringResource(R.string.settings_hint), style = MaterialTheme.typography.bodySmall,
+        SettingsGroup(R.string.effects) {
+            EffectsSettingRow(effects, onEffectsChange)
+        }
+        Text(stringResource(R.string.settings_hint_with_effects), style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

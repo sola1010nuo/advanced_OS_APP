@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.petcollection.data.*
+import com.example.petcollection.ui.effects.RecognitionEffectsState
 import java.time.LocalDateTime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 
 /** Room is the collection source of truth; only the active unsaved form is kept in UI state. */
 class CollectionUnlockState(private val repository: EncounterRepository) : ViewModel() {
+    val recognitionEffects = RecognitionEffectsState()
     var operationError by mutableStateOf(false)
         private set
     var isWorking by mutableStateOf(false)
@@ -37,6 +39,7 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
     fun onBreedRecognized(breed: Breed, photoUri: String?, photoTime: LocalDateTime? = null): Boolean {
         if (pendingEncounter != null || isWorking || !collection.value.loaded) return false
         require(breed.id in MockBreedRepository.collectionIds)
+        recognitionEffects.clear()
         pendingEncounter = EncounterRecord(breedId = breed.id, photoUri = photoUri,
             encounteredAt = photoTime ?: LocalDateTime.now())
         editingExisting = false
@@ -51,7 +54,9 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
      */
     fun onClassificationResult(canonicalId: String, catalog: List<Breed>, photoUri: String): Boolean {
         val breed = catalog.firstOrNull { it.id == canonicalId } ?: return false
-        return onBreedRecognized(breed, photoUri)
+        if (!onBreedRecognized(breed, photoUri)) return false
+        recognitionEffects.onClassificationCompleted(requireNotNull(pendingEncounter).id, breed)
+        return true
     }
 
     fun startEdit(record: EncounterRecord) {
@@ -61,9 +66,13 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         showRecognitionResult = false
         operationError = false
     }
-    fun editEncounter() { showRecognitionResult = false }
+    fun editEncounter() {
+        recognitionEffects.clear()
+        showRecognitionResult = false
+    }
     fun dismissEncounter() {
         if (isWorking) return
+        recognitionEffects.clear()
         pendingEncounter = null
         showRecognitionResult = false
         operationError = false

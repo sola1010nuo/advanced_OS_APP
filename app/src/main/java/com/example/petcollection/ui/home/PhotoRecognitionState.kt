@@ -34,6 +34,7 @@ class PhotoRecognitionState {
 
     suspend fun recognize(context: Context, uri: Uri, catalog: List<Breed>, unlockState: CollectionUnlockState) {
         val currentRequest = ++request
+        unlockState.recognitionEffects.clear()
         bitmap = null
         breedId = null
         confidence = null

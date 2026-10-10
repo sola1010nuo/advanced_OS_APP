@@ -22,6 +22,10 @@ import com.example.petcollection.R
 import com.example.petcollection.data.Breed
 import com.example.petcollection.data.BreedPhoto
 import com.example.petcollection.data.EncounterRecord
+import com.example.petcollection.ui.effects.RecognitionEffectAnchor
+import com.example.petcollection.ui.effects.RecognitionEffectsState
+import com.example.petcollection.ui.effects.LocalRecognitionEffectLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -33,8 +37,10 @@ fun RecognitionResultDialog(
     draft: EncounterRecord,
     firstDiscovery: Boolean,
     onContinue: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    effects: RecognitionEffectsState? = null
 ) {
+    val effectsLifecycleOwner = LocalLifecycleOwner.current
     val message = when (breed.id) {
         "other_cat" -> R.string.recognition_other_cat
         "other_dog" -> R.string.recognition_other_dog
@@ -45,8 +51,9 @@ fun RecognitionResultDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.recognition_result)) },
         text = {
+            CompositionLocalProvider(LocalRecognitionEffectLifecycleOwner provides effectsLifecycleOwner) {
             if (breed.isSecretMonkey) {
-                MonkeyRecognitionPolaroid(breed, draft, firstDiscovery)
+                MonkeyRecognitionPolaroid(breed, draft, firstDiscovery, effects)
             } else Column(Modifier.verticalScroll(rememberScrollState()).padding(6.dp)) {
                 Card(
                     shape = RoundedCornerShape(4.dp),
@@ -54,8 +61,10 @@ fun RecognitionResultDialog(
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                 ) {
                     Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                        BreedImageArea(breed, BreedPhoto(draft.id, draft.photoUri), locked = false,
-                            modifier = Modifier.fillMaxWidth().aspectRatio(1f))
+                        RecognitionEffectAnchor(effects, draft.id, Modifier.fillMaxWidth().aspectRatio(1f)) {
+                            BreedImageArea(breed, BreedPhoto(draft.id, draft.photoUri), locked = false,
+                                modifier = Modifier.fillMaxSize())
+                        }
                         Column(Modifier.padding(horizontal = 8.dp, vertical = 20.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(stringResource(message), style = MaterialTheme.typography.titleLarge,
@@ -64,6 +73,7 @@ fun RecognitionResultDialog(
                         }
                     }
                 }
+            }
             }
         },
         confirmButton = { Button(onClick = onContinue) { Text(stringResource(R.string.recognition_continue)) } },

@@ -1,0 +1,7 @@
+<resources>
+    <string name="effects">特效</string>
+    <string name="effects_enabled">辨識結果動畫</string>
+    <string name="effects_description">辨識完成後播放動物專屬特效。</string>
+    <string name="effects_settings_error">無法讀取或儲存特效設定，請再試一次。</string>
+    <string name="settings_hint_with_effects">語言與外觀於重新開啟後會回到預設；特效設定會保留。</string>
+</resources>

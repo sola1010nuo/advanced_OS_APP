@@ -1,0 +1,7 @@
+<resources>
+    <string name="effects">Effects</string>
+    <string name="effects_enabled">Recognition result animations</string>
+    <string name="effects_description">Play animal effects after recognition completes.</string>
+    <string name="effects_settings_error">Could not load or save effects settings. Please try again.</string>
+    <string name="settings_hint_with_effects">Language and appearance reset after restarting the app. Effects settings are saved.</string>
+</resources>
