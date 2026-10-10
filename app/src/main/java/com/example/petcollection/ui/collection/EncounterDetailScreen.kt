@@ -36,8 +36,8 @@ fun EncounterDetailScreen(breed: Breed, record: EncounterRecord, onBack: () -> U
         Card { BreedImageArea(breed, BreedPhoto(record.id, record.photoUri), false,
             Modifier.fillMaxWidth().height(280.dp)) }
         record.petName?.let { EncounterField(R.string.encounter_name, it) }
-        EncounterField(R.string.encounter_date, record.encounteredAt.toLocalDate().toString())
-        EncounterField(R.string.encounter_time, record.encounteredAt.format(DateTimeFormatter.ofPattern("HH:mm")))
+        EncounterField(R.string.encounter_date, record.encounteredAt?.toLocalDate()?.toString() ?: stringResource(R.string.photo_date_missing))
+        record.encounteredAt?.let { EncounterField(R.string.encounter_time, it.format(DateTimeFormatter.ofPattern("HH:mm"))) }
         record.location?.let { EncounterField(R.string.encounter_location, it) }
         record.note?.let { EncounterField(R.string.encounter_note, it) }
         if (record.photoUri != null) {

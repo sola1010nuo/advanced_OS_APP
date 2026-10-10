@@ -91,8 +91,8 @@ fun EncounterEditorDialog(
     hasError: Boolean = false
 ) {
     var name by rememberSaveable(initialEncounter.id) { mutableStateOf(initialEncounter.petName.orEmpty()) }
-    var date by rememberSaveable(initialEncounter.id) { mutableStateOf(initialEncounter.encounteredAt.toLocalDate().toString()) }
-    var time by rememberSaveable(initialEncounter.id) { mutableStateOf(initialEncounter.encounteredAt.format(DateTimeFormatter.ofPattern("HH:mm"))) }
+    var date by rememberSaveable(initialEncounter.id) { mutableStateOf(initialEncounter.encounteredAt?.toLocalDate()?.toString().orEmpty()) }
+    var time by rememberSaveable(initialEncounter.id) { mutableStateOf(initialEncounter.encounteredAt?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "00:00") }
     var location by rememberSaveable(initialEncounter.id) { mutableStateOf(initialEncounter.location.orEmpty()) }
     var note by rememberSaveable(initialEncounter.id) { mutableStateOf(initialEncounter.note.orEmpty()) }
     val parsedDate = runCatching { LocalDate.parse(date) }.getOrNull()
@@ -111,8 +111,8 @@ fun EncounterEditorDialog(
                     label = { Text(stringResource(R.string.encounter_name)) }, singleLine = true)
                 OutlinedTextField(value = date, onValueChange = { date = it }, modifier = Modifier.fillMaxWidth(),
                     label = { Text(stringResource(R.string.encounter_date)) }, singleLine = true,
-                    isError = parsedDate == null,
-                    supportingText = { Text(stringResource(if (parsedDate == null) R.string.encounter_date_error else R.string.encounter_date_hint)) })
+                    isError = date.isNotBlank() && parsedDate == null,
+                    supportingText = { Text(stringResource(if (date.isNotBlank() && parsedDate == null) R.string.encounter_date_error else R.string.photo_date_optional)) })
                 OutlinedTextField(value = time, onValueChange = { time = it }, modifier = Modifier.fillMaxWidth(),
                     label = { Text(stringResource(R.string.encounter_time)) }, singleLine = true,
                     isError = parsedTime == null,
@@ -125,10 +125,10 @@ fun EncounterEditorDialog(
             }
         },
         confirmButton = {
-            Button(enabled = !saving && parsedDate != null && parsedTime != null, onClick = {
-                if (parsedDate != null && parsedTime != null) {
+            Button(enabled = !saving && (date.isBlank() || parsedDate != null) && parsedTime != null, onClick = {
+                if ((date.isBlank() || parsedDate != null) && parsedTime != null) {
                     onSave(initialEncounter.copy(
-                        petName = name.trim().ifEmpty { null }, encounteredAt = parsedDate.atTime(parsedTime),
+                        petName = name.trim().ifEmpty { null }, encounteredAt = parsedDate?.atTime(parsedTime),
                         location = location.trim().ifEmpty { null }, note = note.trim().ifEmpty { null }
                     ))
                 }

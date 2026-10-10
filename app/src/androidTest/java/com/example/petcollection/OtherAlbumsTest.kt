@@ -16,7 +16,7 @@ class OtherAlbumsTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val name = "albums-${UUID.randomUUID()}.db"
         fun open() = Room.databaseBuilder(context, CollectionDatabase::class.java, name)
-            .addMigrations(CollectionDatabase.MIGRATION_1_2).build()
+            .addMigrations(CollectionDatabase.MIGRATION_1_2, CollectionDatabase.MIGRATION_2_3).build()
         var db = open()
         var repo = EncounterRepository(db.encounters(), context)
         val source = File(context.cacheDir, "album-${UUID.randomUUID()}").apply { writeText("photo fixture") }
@@ -132,7 +132,7 @@ class OtherAlbumsTest {
         raw.version = 1
         raw.close()
         val db = Room.databaseBuilder(context, CollectionDatabase::class.java, name)
-            .addMigrations(CollectionDatabase.MIGRATION_1_2).build()
+            .addMigrations(CollectionDatabase.MIGRATION_1_2, CollectionDatabase.MIGRATION_2_3).build()
         try {
             assertEquals(record, db.encounters().get(record.id))
             assertEquals(record.id, db.encounters().cover(record.breedId)!!.encounterId)

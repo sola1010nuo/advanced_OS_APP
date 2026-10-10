@@ -25,6 +25,7 @@ import com.example.petcollection.data.Breed
 import com.example.petcollection.data.BreedRepository
 import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.data.Species
+import com.example.petcollection.data.PhotoAlbumKey
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 internal enum class CollectionCategory(val species: Species?, val labelRes: Int) {
@@ -98,7 +99,11 @@ fun CollectionScreen(
             busy = unlockState.isWorking, modifier = modifier)
     } else if (selectedBreed != null) {
         BreedDetailScreen(selectedBreed, onBack = { selectedBreedId = null }, modifier = modifier,
-            encounters = data.forBreed(selectedBreed.id), onOpenEncounter = { selectedEncounterId = it },
+            encounters = data.sortedPhotos(PhotoAlbumKey.breed(selectedBreed.id), data.forBreed(selectedBreed.id)),
+            sortMode = data.photoSortMode(PhotoAlbumKey.breed(selectedBreed.id)), busy = unlockState.isWorking,
+            onSortMode = { unlockState.setPhotoSortMode(PhotoAlbumKey.breed(selectedBreed.id), it) },
+            onReorder = { ids, finished -> unlockState.reorderPhotos(PhotoAlbumKey.breed(selectedBreed.id), ids, finished) },
+            onOpenEncounter = { selectedEncounterId = it },
             onAddEncounter = {
                 if (!unlockState.isWorking) {
                     pickerTargetId = selectedBreed.id

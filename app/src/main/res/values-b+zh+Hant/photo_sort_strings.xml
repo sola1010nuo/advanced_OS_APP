@@ -1,0 +1,8 @@
+<resources>
+    <string name="photo_sort">排序</string>
+    <string name="photo_sort_newest">從新到舊</string>
+    <string name="photo_sort_oldest">從舊到新</string>
+    <string name="photo_sort_custom">自訂排序</string>
+    <string name="photo_date_optional">YYYY-MM-DD（可留空）</string>
+    <string name="photo_date_missing">未填寫日期</string>
+</resources>

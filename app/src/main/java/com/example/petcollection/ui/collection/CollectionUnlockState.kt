@@ -106,6 +106,14 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         collection.first { it.albums.map { album -> album.id } == ids }
         onFinished()
     }
+    fun setPhotoSortMode(key: String, mode: PhotoSortMode) = perform { repository.setPhotoSortMode(key, mode) }
+    fun reorderPhotos(key: String, ids: List<String>, onFinished: () -> Unit) = perform {
+        try {
+            repository.reorderPhotos(key, ids)
+            collection.first { data -> data.photoSortMode(key) == PhotoSortMode.CUSTOM &&
+                data.photoOrder.filter { it.albumKey == key }.sortedBy { it.position }.map { it.encounterId } == ids }
+        } finally { onFinished() }
+    }
     fun movePhotos(ids: List<String>, albumId: String, onMoved: () -> Unit = {}) = perform { repository.movePhotos(ids, albumId); onMoved() }
     fun unassignPhotos(ids: List<String>, onMoved: () -> Unit = {}) = perform { repository.unassignPhotos(ids); onMoved() }
     fun deletePhotos(ids: List<String>, onDeleted: () -> Unit = {}) = perform { repository.deletePhotos(ids); onDeleted() }

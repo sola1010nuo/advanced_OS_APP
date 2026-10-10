@@ -53,8 +53,16 @@ internal fun OtherAlbumsScreen(data: CollectionData, breeds: List<Breed>, state:
     val album = data.albums.find { it.id == albumId }
     val memberIds = data.members.filter { it.albumId == albumId }.map { it.encounterId }.toSet()
     val assigned = data.members.map { it.encounterId }.toSet()
-    val photos = data.forBreed(other.id).filter { it.photoUri != null &&
+    val photoKey = if (album != null && choosingFor == null) PhotoAlbumKey.other(album.id) else PhotoAlbumKey.UNASSIGNED
+    val sourcePhotos = data.forBreed(other.id).filter { it.photoUri != null &&
         if (album != null && choosingFor == null) it.id in memberIds else it.id !in assigned }
+    val sortedPhotos = data.sortedPhotos(photoKey, sourcePhotos)
+    val photoDrag = rememberPhotoGridDragState(photoKey, grid, sortedPhotos.map { it.id })
+    val photosById = sourcePhotos.associateBy { it.id }
+    val photos = photoDrag.order.mapNotNull { photosById[it] }
+    LaunchedEffect(selecting, choosingFor, detailId) {
+        if (selecting || choosingFor != null || detailId != null) photoDrag.cancel()
+    }
     val detail = data.encounters.find { it.id == detailId && it.breedId == other.id }
     BackHandler(albumId != null || detailId != null || selecting || choosingFor != null) {
         if (state.isWorking) return@BackHandler
@@ -77,7 +85,11 @@ internal fun OtherAlbumsScreen(data: CollectionData, breeds: List<Breed>, state:
             onSetCover = { if (album != null) state.albumCover(album.id, detail.id) else state.selectCover(other.id, detail.id) },
             busy = state.isWorking, modifier = modifier)
     } else LazyVerticalGrid(columns = GridCells.Fixed(2), state = grid,
-        modifier = modifier.fillMaxSize(),
+        userScrollEnabled = photoDrag.draggingId == null,
+        modifier = modifier.fillMaxSize().testTag("album-photo-grid").then(
+            photoDrag.gestureModifier(!state.isWorking && !selecting && choosingFor == null && !photoDrag.saving) { ids ->
+                state.reorderPhotos(photoKey, ids, photoDrag::finishSaving)
+            }),
         contentPadding = PaddingValues(24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item(span = { GridItemSpan(2) }) {
@@ -97,7 +109,10 @@ internal fun OtherAlbumsScreen(data: CollectionData, breeds: List<Breed>, state:
                     }
                     TextButton(enabled = !state.isWorking, onClick = { albumId = null; exitSelection() }) { Text(stringResource(R.string.breed_back)) }
                 } else {
-                    Text(stringResource(R.string.collection), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.collection), style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    }
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         CollectionCategory.entries.forEach { category ->
                             FilterChip(selected = category == CollectionCategory.OTHER, onClick = { onCategory(category) },
@@ -158,11 +173,17 @@ internal fun OtherAlbumsScreen(data: CollectionData, breeds: List<Breed>, state:
         }
         item(span = { GridItemSpan(2) }) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(if (album == null || choosingFor != null) R.string.other_photos else R.string.breed_photos),
-                        style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                    if (!selecting && choosingFor == null) TextButton(enabled = photos.isNotEmpty() && !state.isWorking,
+                Text(stringResource(if (album == null || choosingFor != null) R.string.other_photos else R.string.breed_photos),
+                    style = MaterialTheme.typography.titleLarge)
+                if (choosingFor == null) Row(Modifier.fillMaxWidth().testTag("photo-section-actions"),
+                    horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+                    TextButton(enabled = !selecting && photos.isNotEmpty() && !state.isWorking &&
+                        !photoDrag.saving && photoDrag.draggingId == null,
+                        modifier = Modifier.testTag("manage-photos"),
                         onClick = { selecting = true }) { Text(stringResource(R.string.other_organize)) }
+                    PhotoSortButton(if (photoDrag.draggingId != null) PhotoSortMode.CUSTOM else data.photoSortMode(photoKey),
+                        !state.isWorking && !selecting && !photoDrag.saving && photoDrag.draggingId == null,
+                        onSelect = { state.setPhotoSortMode(photoKey, it) })
                 }
                 if (photos.isEmpty()) Text(stringResource(R.string.collection_album_empty))
                 if (selecting || choosingFor != null) {
@@ -193,12 +214,17 @@ internal fun OtherAlbumsScreen(data: CollectionData, breeds: List<Breed>, state:
             val selectionMode = selecting || choosingFor != null
             val checked = photo.id in selected
             fun toggle() { selected = if (checked) selected - photo.id else selected + photo.id }
-            Card(onClick = { if (!state.isWorking) { if (selectionMode) toggle() else detailId = photo.id } },
-                modifier = Modifier.testTag("photo_${photo.id}").then(if (checked) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)) else Modifier)) {
+            val dragging = photoDrag.draggingId == photo.id
+            Card(onClick = { if (!state.isWorking && photoDrag.draggingId == null && !photoDrag.saving) { if (selectionMode) toggle() else detailId = photo.id } },
+                modifier = Modifier.testTag("photo_${photo.id}")
+                    .animateItem(fadeInSpec = null, fadeOutSpec = null,
+                        placementSpec = if (dragging) null else androidx.compose.animation.core.spring())
+                    .then(photoDrag.itemModifier(photo.id))
+                    .then(if (checked) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)) else Modifier)) {
                 BreedImageArea(other, BreedPhoto(photo.id, photo.photoUri), false, Modifier.fillMaxWidth().aspectRatio(1f))
                 Row {
                     if (selectionMode) Checkbox(checked = checked, enabled = !state.isWorking, onCheckedChange = { toggle() })
-                    Text(photo.petName ?: photo.encounteredAt.toLocalDate().toString(), Modifier.padding(top = 12.dp))
+                    Text(photo.petName ?: photo.encounteredAt?.toLocalDate()?.toString() ?: stringResource(R.string.photo_date_missing), Modifier.padding(top = 12.dp))
                 }
             }
         }

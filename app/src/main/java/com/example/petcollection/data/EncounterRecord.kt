@@ -10,12 +10,13 @@ import androidx.room.PrimaryKey
 /** One pet encounter, independent of whether its breed has already been unlocked.
  * Keep the local time and zone together for future timeline/map storage.
  * Photo metadata time can be supplied by the caller; otherwise use the current time.
+ * The photo editor may explicitly clear this date; sorting treats null as undated.
  */
 @Entity(tableName = "encounters", indices = [Index("breedId")])
 data class EncounterRecord(
     val breedId: String,
     val photoUri: String?,
-    val encounteredAt: LocalDateTime = LocalDateTime.now(),
+    val encounteredAt: LocalDateTime? = LocalDateTime.now(),
     val timeZoneId: String = ZoneId.systemDefault().id,
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val petName: String? = null,
