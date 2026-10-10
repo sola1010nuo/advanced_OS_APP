@@ -82,17 +82,24 @@ class EncounterLocalizationTest {
     }
 
     @Test fun actualAppLanguageSettingChangesBreedStatusLabel() {
+        // The installed app may already have user photos. Verify the corresponding
+        // status without clearing their database or assuming an undiscovered breed.
+        val statusLabel = if (kotlinx.coroutines.runBlocking {
+            CollectionDatabase.getInstance(base).encounters().count("abyssinian")
+        } > 0) R.string.breed_discovered else R.string.breed_locked_hint
         compose.setContent { PetCollectionApp() }
         compose.onNodeWithText(zh.getString(R.string.settings)).performClick()
         compose.onNodeWithText(en.getString(R.string.language_en)).performClick()
         compose.onNodeWithText(en.getString(R.string.collection)).performClick()
         compose.waitUntil(10000) { compose.onAllNodesWithText(en.getString(R.string.breed_abyssinian_name)).fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText(en.getString(R.string.breed_abyssinian_name)).performClick()
-        compose.onNodeWithText(en.getString(R.string.breed_locked_hint)).performScrollTo().assertIsDisplayed()
+        compose.onNode(hasScrollAction()).performScrollToNode(hasText(en.getString(statusLabel)))
+        compose.onNodeWithText(en.getString(statusLabel)).performScrollTo().assertIsDisplayed()
         compose.onNodeWithText(en.getString(R.string.settings)).performClick()
         compose.onNodeWithText(zh.getString(R.string.language_zh)).performClick()
         compose.onNodeWithText(zh.getString(R.string.collection)).performClick()
         compose.onNodeWithText(zh.getString(R.string.breed_abyssinian_name)).performClick()
-        compose.onNodeWithText(zh.getString(R.string.breed_locked_hint)).performScrollTo().assertIsDisplayed()
+        compose.onNode(hasScrollAction()).performScrollToNode(hasText(zh.getString(statusLabel)))
+        compose.onNodeWithText(zh.getString(statusLabel)).performScrollTo().assertIsDisplayed()
     }
 }

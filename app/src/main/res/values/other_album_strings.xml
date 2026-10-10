@@ -1,5 +1,5 @@
 <resources>
-    <string name="other_organize">整理</string>
+    <string name="other_organize">管理相片</string>
     <string name="other_choose_photos">選擇相簿照片</string>
     <string name="other_selected_count">已選取 %1$d 張照片</string>
     <string name="other_return_photos">移回其他照片</string>

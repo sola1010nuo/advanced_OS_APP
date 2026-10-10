@@ -26,12 +26,88 @@ data class BreedCover(@PrimaryKey val breedId: String, val encounterId: String)
 data class EncounterCount(val breedId: String, val count: Int)
 
 class EncounterConverters {
-    @TypeConverter fun encode(value: LocalDateTime): String = value.toString()
-    @TypeConverter fun decode(value: String): LocalDateTime = LocalDateTime.parse(value)
+    @TypeConverter fun encode(value: LocalDateTime?): String? = value?.toString()
+    @TypeConverter fun decode(value: String?): LocalDateTime? = value?.let(LocalDateTime::parse)
 }
 
 @Dao
 abstract class EncounterDao {
+    @Query("SELECT * FROM photo_sort_modes")
+    abstract fun observePhotoSortModes(): Flow<List<PhotoSortSetting>>
+    @Query("SELECT * FROM photo_custom_order ORDER BY position, encounterId")
+    abstract fun observePhotoOrder(): Flow<List<PhotoOrder>>
+    @Query("SELECT * FROM photo_custom_order WHERE albumKey = :key ORDER BY position, encounterId")
+    abstract suspend fun photoOrder(key: String): List<PhotoOrder>
+    @Query("SELECT * FROM photo_custom_order ORDER BY position, encounterId")
+    abstract suspend fun allPhotoOrder(): List<PhotoOrder>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun putPhotoSortMode(setting: PhotoSortSetting)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun putPhotoOrder(order: List<PhotoOrder>)
+    @Query("DELETE FROM photo_custom_order WHERE albumKey = :key")
+    abstract suspend fun clearPhotoOrder(key: String)
+    @Query("DELETE FROM photo_sort_modes WHERE albumKey = :key")
+    abstract suspend fun clearPhotoSortMode(key: String)
+    @Query("SELECT * FROM encounters ORDER BY createdAt, id")
+    abstract suspend fun allRecords(): List<EncounterRecord>
+    @Query("SELECT * FROM other_album_members")
+    abstract suspend fun allMembers(): List<OtherAlbumMember>
+
+    private suspend fun albumRecords(key: String): List<EncounterRecord> {
+        val records = allRecords()
+        return when {
+            key.startsWith("breed:") -> records.filter { it.breedId == key.removePrefix("breed:") }
+            key == PhotoAlbumKey.UNASSIGNED -> {
+                val assigned = allMembers().map { it.encounterId }.toSet()
+                records.filter { it.breedId == "unregistered" && it.photoUri != null && it.id !in assigned }
+            }
+            key.startsWith("other:") -> {
+                val id = key.removePrefix("other:")
+                require(albums().any { it.id == id })
+                val members = members(id).map { it.encounterId }.toSet()
+                records.filter { it.breedId == "unregistered" && it.photoUri != null && it.id in members }
+            }
+            else -> error("Unknown album")
+        }
+    }
+
+    /** Run in the same transaction as membership changes. Preserve survivors and append arrivals. */
+    private suspend fun reconcilePhotoOrders() {
+        val records = allRecords()
+        val memberAlbums = allMembers().associate { it.encounterId to it.albumId }
+        val grouped = allPhotoOrder().map { it.albumKey }.distinct()
+            .associateWith { emptyList<EncounterRecord>() }.toMutableMap()
+        records.groupBy { PhotoAlbumKey.breed(it.breedId) }.forEach { (key, photos) -> grouped[key] = photos }
+        grouped[PhotoAlbumKey.UNASSIGNED] = emptyList()
+        albums().forEach { grouped[PhotoAlbumKey.other(it.id)] = emptyList() }
+        records.filter { it.breedId == "unregistered" && it.photoUri != null }.groupBy {
+            memberAlbums[it.id]?.let(PhotoAlbumKey::other) ?: PhotoAlbumKey.UNASSIGNED
+        }.forEach { (key, photos) -> grouped[key] = photos }
+        for ((key, photos) in grouped) {
+            val valid = photos.map { it.id }.toSet()
+            val current = photoOrder(key).map { it.encounterId }
+            val existing = current.filter { it in valid }
+            val existingIds = existing.toSet()
+            val ids = existing + photos.map { it.id }.filter { it !in existingIds }
+            if (ids != current) {
+                clearPhotoOrder(key)
+                putPhotoOrder(ids.mapIndexed { index, id -> PhotoOrder(key, id, index) })
+            }
+        }
+    }
+
+    @Transaction open suspend fun setPhotoSortMode(key: String, mode: PhotoSortMode) {
+        albumRecords(key) // Validate the album before persisting its mode.
+        putPhotoSortMode(PhotoSortSetting(key, mode.name))
+    }
+
+    @Transaction open suspend fun reorderPhotos(key: String, ids: List<String>) {
+        val valid = albumRecords(key).map { it.id }.toSet()
+        require(ids.size == valid.size && ids.toSet() == valid)
+        clearPhotoOrder(key)
+        putPhotoOrder(ids.mapIndexed { index, id -> PhotoOrder(key, id, index) })
+        putPhotoSortMode(PhotoSortSetting(key, PhotoSortMode.CUSTOM.name))
+    }
     @Query("SELECT * FROM other_albums ORDER BY position, id")
     abstract fun observeAlbums(): Flow<List<OtherAlbum>>
     @Query("SELECT * FROM other_album_members")
@@ -81,6 +157,7 @@ abstract class EncounterDao {
         requireOtherPhotos(ids)
         ids.forEach { removeMember(it) }
         repairAlbumCovers()
+        reconcilePhotoOrders()
     }
     @Transaction open suspend fun deleteOtherPhotos(ids: List<String>): List<EncounterRecord> {
         requireOtherPhotos(ids)
@@ -91,6 +168,7 @@ abstract class EncounterDao {
         requireOtherPhotos(ids)
         ids.forEach { putMember(OtherAlbumMember(it, albumId)) }
         repairAlbumCovers()
+        reconcilePhotoOrders()
     }
     @Transaction open suspend fun albumCover(id: String, encounterId: String) {
         require(members(id).any { it.encounterId == encounterId })
@@ -101,6 +179,9 @@ abstract class EncounterDao {
         require(albums().any { it.id == id })
         val deleted = if (deletePhotos) members(id).mapNotNull { deleteAndRepairCover(it.encounterId) } else emptyList()
         removeAlbum(id)
+        clearPhotoOrder(PhotoAlbumKey.other(id))
+        clearPhotoSortMode(PhotoAlbumKey.other(id))
+        reconcilePhotoOrders()
         return deleted
     }
     @Query("SELECT * FROM encounters ORDER BY createdAt, id")
@@ -149,12 +230,14 @@ abstract class EncounterDao {
                 putCover(BreedCover(record.breedId, record.id))
             }
         }
+        reconcilePhotoOrders()
     }
 
     @Transaction
     open suspend fun create(record: EncounterRecord): Boolean {
         val first = count(record.breedId) == 0
         insert(record)
+        reconcilePhotoOrders()
         if (record.photoUri != null && cover(record.breedId) == null) putCover(BreedCover(record.breedId, record.id))
         return first
     }
@@ -177,11 +260,57 @@ abstract class EncounterDao {
     }
 }
 
-@Database(entities = [EncounterRecord::class, BreedCover::class, OtherAlbum::class, OtherAlbumMember::class], version = 2, exportSchema = true)
+@Database(entities = [EncounterRecord::class, BreedCover::class, OtherAlbum::class, OtherAlbumMember::class,
+    PhotoSortSetting::class, PhotoOrder::class], version = 3, exportSchema = true)
 @TypeConverters(EncounterConverters::class)
 abstract class CollectionDatabase : RoomDatabase() {
     abstract fun encounters(): EncounterDao
     companion object {
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Back up FK children before rebuilding the existing date column as nullable.
+                // Dropping encounters with live children would cascade-delete their contents.
+                db.execSQL("CREATE TEMP TABLE saved_covers AS SELECT * FROM breed_covers")
+                db.execSQL("CREATE TEMP TABLE saved_members AS SELECT * FROM other_album_members")
+                db.execSQL("DROP TABLE breed_covers")
+                db.execSQL("DROP TABLE other_album_members")
+                db.execSQL("CREATE TABLE encounters_new (breedId TEXT NOT NULL, photoUri TEXT, encounteredAt TEXT, timeZoneId TEXT NOT NULL, id TEXT NOT NULL PRIMARY KEY, petName TEXT, location TEXT, note TEXT, createdAt INTEGER NOT NULL)")
+                db.execSQL("INSERT INTO encounters_new SELECT breedId, photoUri, encounteredAt, timeZoneId, id, petName, location, note, createdAt FROM encounters")
+                db.execSQL("DROP TABLE encounters")
+                db.execSQL("ALTER TABLE encounters_new RENAME TO encounters")
+                db.execSQL("CREATE INDEX index_encounters_breedId ON encounters(breedId)")
+                db.execSQL("CREATE TABLE breed_covers (breedId TEXT NOT NULL PRIMARY KEY, encounterId TEXT NOT NULL, FOREIGN KEY(encounterId) REFERENCES encounters(id) ON DELETE CASCADE)")
+                db.execSQL("CREATE INDEX index_breed_covers_encounterId ON breed_covers(encounterId)")
+                db.execSQL("INSERT INTO breed_covers SELECT * FROM saved_covers")
+                db.execSQL("CREATE TABLE other_album_members (encounterId TEXT NOT NULL PRIMARY KEY, albumId TEXT NOT NULL, FOREIGN KEY(albumId) REFERENCES other_albums(id) ON DELETE CASCADE, FOREIGN KEY(encounterId) REFERENCES encounters(id) ON DELETE CASCADE)")
+                db.execSQL("CREATE INDEX index_other_album_members_albumId ON other_album_members(albumId)")
+                db.execSQL("INSERT INTO other_album_members SELECT * FROM saved_members")
+                db.execSQL("DROP TABLE saved_covers")
+                db.execSQL("DROP TABLE saved_members")
+                db.execSQL("CREATE TABLE photo_sort_modes (albumKey TEXT NOT NULL PRIMARY KEY, mode TEXT NOT NULL)")
+                db.execSQL("CREATE TABLE photo_custom_order (albumKey TEXT NOT NULL, encounterId TEXT NOT NULL, position INTEGER NOT NULL, PRIMARY KEY(albumKey, encounterId), FOREIGN KEY(encounterId) REFERENCES encounters(id) ON DELETE CASCADE)")
+                db.execSQL("CREATE INDEX index_photo_custom_order_encounterId ON photo_custom_order(encounterId)")
+                // Seed the old visible order once; later photos are appended by DAO transactions.
+                db.query("SELECT id, breedId FROM encounters ORDER BY encounteredAt DESC, createdAt DESC, id").use { cursor ->
+                    val positions = mutableMapOf<String, Int>()
+                    while (cursor.moveToNext()) {
+                        val key = PhotoAlbumKey.breed(cursor.getString(1))
+                        val position = positions[key] ?: 0
+                        db.execSQL("INSERT INTO photo_custom_order VALUES (?, ?, ?)", arrayOf(key, cursor.getString(0), position))
+                        positions[key] = position + 1
+                    }
+                }
+                db.query("SELECT e.id, m.albumId FROM encounters e LEFT JOIN other_album_members m ON m.encounterId = e.id WHERE e.breedId = 'unregistered' AND e.photoUri IS NOT NULL ORDER BY e.encounteredAt DESC, e.createdAt DESC, e.id").use { cursor ->
+                    val positions = mutableMapOf<String, Int>()
+                    while (cursor.moveToNext()) {
+                        val key = if (cursor.isNull(1)) PhotoAlbumKey.UNASSIGNED else PhotoAlbumKey.other(cursor.getString(1))
+                        val position = positions[key] ?: 0
+                        db.execSQL("INSERT INTO photo_custom_order VALUES (?, ?, ?)", arrayOf(key, cursor.getString(0), position))
+                        positions[key] = position + 1
+                    }
+                }
+            }
+        }
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("CREATE TABLE IF NOT EXISTS other_albums (id TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, position INTEGER NOT NULL, coverId TEXT)")
@@ -192,7 +321,7 @@ abstract class CollectionDatabase : RoomDatabase() {
         @Volatile private var instance: CollectionDatabase? = null
         fun getInstance(context: Context): CollectionDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(context.applicationContext, CollectionDatabase::class.java,
-                "collection.db").addMigrations(MIGRATION_1_2).build().also { instance = it }
+                "collection.db").addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
         }
     }
 }

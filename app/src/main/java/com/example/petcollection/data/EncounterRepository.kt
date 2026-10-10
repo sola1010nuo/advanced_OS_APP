@@ -14,8 +14,14 @@ data class CollectionData(
     val covers: List<BreedCover> = emptyList(),
     val loaded: Boolean = false,
     val albums: List<OtherAlbum> = emptyList(),
-    val members: List<OtherAlbumMember> = emptyList()
+    val members: List<OtherAlbumMember> = emptyList(),
+    val photoSortModes: List<PhotoSortSetting> = emptyList(),
+    val photoOrder: List<PhotoOrder> = emptyList()
 ) {
+    fun photoSortMode(key: String) = photoSortModes.find { it.albumKey == key }?.mode
+        ?.let { runCatching { PhotoSortMode.valueOf(it) }.getOrNull() } ?: PhotoSortMode.NEWEST
+    fun sortedPhotos(key: String, records: List<EncounterRecord>) = sortAlbumPhotos(records,
+        photoSortMode(key), photoOrder.filter { it.albumKey == key })
     fun forBreed(id: String) = encounters.filter { it.breedId == id }
         .sortedWith(compareByDescending<EncounterRecord> { it.encounteredAt }.thenByDescending { it.createdAt }.thenBy { it.id })
     fun applyTo(breed: Breed): Breed {
@@ -41,7 +47,12 @@ data class CollectionStatistics(val discovered: Int, val totalBreeds: Int, val e
 
 /** One persistent encounter store shared by all normal breeds and special albums. */
 class EncounterRepository(private val dao: EncounterDao, private val context: Context) {
-    val collection = combine(dao.observeAll(), dao.observeCovers(), dao.observeAlbums(), dao.observeMembers()) { records, covers, albums, members -> CollectionData(records, covers, true, albums, members) }
+    val collection = combine(
+        combine(dao.observeAll(), dao.observeCovers(), dao.observeAlbums(), dao.observeMembers()) { records, covers, albums, members -> CollectionData(records, covers, true, albums, members) },
+        dao.observePhotoSortModes(), dao.observePhotoOrder()
+    ) { data, modes, order -> data.copy(photoSortModes = modes, photoOrder = order) }
+    suspend fun setPhotoSortMode(key: String, mode: PhotoSortMode) = dao.setPhotoSortMode(key, mode)
+    suspend fun reorderPhotos(key: String, ids: List<String>) = dao.reorderPhotos(key, ids)
     suspend fun createAlbum(name: String): String {
         val id = UUID.randomUUID().toString()
         dao.createAlbum(id, name)

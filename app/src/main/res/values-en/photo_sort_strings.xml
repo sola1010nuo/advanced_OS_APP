@@ -1,0 +1,8 @@
+<resources>
+    <string name="photo_sort">Sort</string>
+    <string name="photo_sort_newest">Newest First</string>
+    <string name="photo_sort_oldest">Oldest First</string>
+    <string name="photo_sort_custom">Custom Order</string>
+    <string name="photo_date_optional">YYYY-MM-DD (optional)</string>
+    <string name="photo_date_missing">No date</string>
+</resources>

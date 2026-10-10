@@ -1,5 +1,5 @@
 <resources>
-    <string name="other_organize">Organize</string>
+    <string name="other_organize">Manage Photos</string>
     <string name="other_choose_photos">Choose album photos</string>
     <string name="other_selected_count">%1$d photos selected</string>
     <string name="other_return_photos">Return to Other Photos</string>
