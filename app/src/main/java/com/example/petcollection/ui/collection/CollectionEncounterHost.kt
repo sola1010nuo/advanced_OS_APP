@@ -15,7 +15,8 @@ fun CollectionEncounterHost(
     val breed = breeds.firstOrNull { it.id == draft.breedId } ?: return
     if (state.showRecognitionResult) {
         RecognitionResultDialog(breed, draft, state.isFirstDiscovery,
-            onContinue = state::editEncounter, onDismiss = state::dismissEncounter)
+            onContinue = state::editEncounter, onDismiss = state::dismissEncounter,
+            effects = state.recognitionEffects)
     } else {
         EncounterEditorDialog(breed, draft, onSave = { record ->
             state.saveEncounter(record, onEncounterSaved)
