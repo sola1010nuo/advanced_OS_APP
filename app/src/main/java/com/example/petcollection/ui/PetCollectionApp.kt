@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
 import androidx.core.view.WindowCompat
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -41,6 +42,7 @@ import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.data.Species
 import com.example.petcollection.ui.collection.CollectionEncounterHost
 import com.example.petcollection.ui.collection.CollectionScreen
+import com.example.petcollection.ui.collection.CollectionUnlockState
 import com.example.petcollection.ui.collection.rememberCollectionUnlockState
 import com.example.petcollection.ui.home.CollectionCategory
 import com.example.petcollection.ui.home.HomeScreen
@@ -60,8 +62,7 @@ private enum class Appearance(@param:StringRes val label: Int) {
 }
 
 @Composable
-fun PetCollectionApp() {
-    val collectionUnlockState = rememberCollectionUnlockState()
+fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberCollectionUnlockState()) {
     val effectsSettingsState = rememberEffectsSettingsState()
     val effectsSettings by effectsSettingsState.state.collectAsState()
     // UI prototype only: retained across rotation, reset on a fresh app launch.
@@ -69,6 +70,8 @@ fun PetCollectionApp() {
     var appearance by rememberSaveable { mutableStateOf(Appearance.SYSTEM.name) }
     var destination by rememberSaveable { mutableStateOf(Destination.HOME.name) }
     var collectionSpecies by rememberSaveable { mutableStateOf(Species.CAT.name) }
+    // Reselecting Collection discards only its local detail/album routes, not stored photos.
+    var collectionRootRequest by rememberSaveable { mutableIntStateOf(0) }
     // Each picker selection starts one automatic recognition, including selecting the same URI again.
     var selectedPhotoUri by rememberSaveable { mutableStateOf<String?>(null) }
     var photoRequest by rememberSaveable { mutableIntStateOf(0) }
@@ -127,7 +130,13 @@ fun PetCollectionApp() {
                         Destination.entries.forEach { item ->
                             NavigationBarItem(
                                 selected = destination == item.name,
-                                onClick = { destination = item.name },
+                                onClick = {
+                                    if (item == Destination.COLLECTION && destination == item.name) {
+                                        collectionRootRequest++
+                                    }
+                                    destination = item.name
+                                },
+                                modifier = Modifier.testTag("navigation-${item.name}"),
                                 icon = { DestinationIcon(item) },
                                 label = { Text(stringResource(item.label)) }
                             )
@@ -157,8 +166,10 @@ fun PetCollectionApp() {
                         onRetryRecognition = { photoRequest++ },
                         collectionStatistics = collectionData.statistics(entries)
                     )
-                    Destination.COLLECTION -> CollectionScreen(contentModifier,
-                        unlockState = collectionUnlockState, initialSpecies = Species.valueOf(collectionSpecies))
+                    Destination.COLLECTION -> key(collectionRootRequest) {
+                        CollectionScreen(contentModifier, unlockState = collectionUnlockState,
+                            initialSpecies = Species.valueOf(collectionSpecies))
+                    }
                     Destination.FOOTPRINTS -> FootprintsScreen(contentModifier)
                     Destination.SETTINGS -> SettingsScreen(
                         language, { language = it }, Appearance.valueOf(appearance), { appearance = it.name },
