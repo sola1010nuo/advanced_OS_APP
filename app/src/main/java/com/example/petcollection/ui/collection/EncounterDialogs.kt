@@ -70,6 +70,7 @@ fun RecognitionResultDialog(
                             Text(stringResource(message), style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold)
                             if (breed.showsDiscoveryState) Text(breed.name, style = MaterialTheme.typography.titleMedium)
+                            RarityStars(breed)
                         }
                     }
                 }

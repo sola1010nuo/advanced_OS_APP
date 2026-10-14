@@ -191,7 +191,7 @@ class CollectionCrudUiTest {
         assertTrue(state.collection.value.covers.isEmpty())
         click(R.string.breed_back)
         compose.onNode(hasScrollAction()).performScrollToIndex(0)
-        compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 34)).assertExists()
+        compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 36)).assertExists()
     }
 
     @Test fun customAlbumsStartAtFirstCellAndMonkeyStaysBeforeThem() {
@@ -348,7 +348,7 @@ class CollectionCrudUiTest {
         compose.onNodeWithText(text(R.string.other_cats)).assertDoesNotExist()
         compose.onNodeWithText(text(R.string.other_dogs)).assertDoesNotExist()
         compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 28)).assertDoesNotExist()
-        compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 34)).assertDoesNotExist()
+        compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 36)).assertDoesNotExist()
         for ((id, filter) in listOf("other_cat" to R.string.filter_cats, "other_dog" to R.string.filter_dogs,
             "unregistered" to R.string.filter_other)) {
             openAlbum(id, filter)

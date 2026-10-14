@@ -9,7 +9,9 @@ import com.example.petcollection.data.Species
 // Screen input; production values come from CollectionData, not preview fixtures.
 data class CollectionCategory(val id: String, @param:StringRes val nameRes: Int, val total: Int,
     val collected: Int = 0, val encounterCount: Int = 0)
-data class AchievementPreview(@param:StringRes val nameRes: Int, val breedThreshold: Int? = null)
+data class AchievementPreview(@param:StringRes val nameRes: Int, val breedThreshold: Int? = null) {
+    fun isUnlocked(collected: Int, total: Int) = total > 0 && collected >= (breedThreshold ?: total)
+}
 
 object HomePreviewData {
     fun categories(catalog: List<Breed>): List<CollectionCategory> = Species.entries.map { species ->

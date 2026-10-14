@@ -80,7 +80,7 @@ fun HomeScreen(
                 SelectedPhotoPreview(recognitionState, recognizedBreedName, onRetryRecognition)
             }
         }
-        AchievementSection(HomePreviewData.achievements, progress.totalBreeds)
+        AchievementSection(HomePreviewData.achievements, progress.totalBreeds, progress.discovered)
         RecentDiscoveriesSection()
         RecentFootprintsSection()
     }
@@ -157,28 +157,31 @@ private fun PetIllustration(cat: Boolean, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AchievementSection(achievements: List<AchievementPreview>, total: Int) {
+fun AchievementSection(achievements: List<AchievementPreview>, total: Int, collected: Int = 0) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SectionTitle(stringResource(R.string.achievements))
-        Text(stringResource(R.string.achievement_hint), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(stringResource(R.string.achievement_progress_hint), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(achievements, key = { it.nameRes }) { AchievementBadge(it, total) }
+            items(achievements, key = { it.nameRes }) { AchievementBadge(it, total, collected) }
         }
     }
 }
 
 @Composable
-fun AchievementBadge(achievement: AchievementPreview, total: Int) {
+fun AchievementBadge(achievement: AchievementPreview, total: Int, collected: Int = 0) {
     val threshold = achievement.breedThreshold ?: total
+    val unlocked = achievement.isUnlocked(collected, total)
     OutlinedCard(
         modifier = Modifier.width(144.dp), shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("\u2606", style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(if (unlocked) "\u2605" else "\u2606", style = MaterialTheme.typography.displaySmall,
+                color = if (unlocked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
             Text(stringResource(achievement.nameRes), modifier = Modifier.heightIn(min = 40.dp), style = MaterialTheme.typography.labelLarge, textAlign = TextAlign.Center)
             Text(pluralStringResource(R.plurals.breed_threshold, threshold, threshold), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(stringResource(R.string.locked), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(if (unlocked) R.string.achievement_unlocked else R.string.locked),
+                style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

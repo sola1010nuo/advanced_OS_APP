@@ -20,7 +20,10 @@ data class Breed(
     val collectedPhotos: List<BreedPhoto> = emptyList(),
     val isCollectible: Boolean = true,
     val isHiddenUntilDiscovered: Boolean = false,
-    val isCoatCategory: Boolean = false
+    val isCoatCategory: Boolean = false,
+    val rarity: BreedRarity? = null,
+    val rarityOrder: Int = Int.MAX_VALUE,
+    val isLegacyBreed: Boolean = false
 ) {
     val showsDiscoveryState: Boolean get() = isCollectible || isCoatCategory
     /** Visibility is independent of membership in the collectible catalog. */

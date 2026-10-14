@@ -47,7 +47,7 @@ class CollectionUnlockStateTest {
         val records = listOf("other_cat", "other_dog", "unregistered").map { EncounterRecord(it, null) }
         assertEquals(0, CollectionData(records).discoveredCount(MockBreedRepository.normalBreedIds))
         assertEquals(22, MockBreedRepository.total(Species.CAT))
-        assertEquals(34, MockBreedRepository.total(Species.DOG))
+        assertEquals(36, MockBreedRepository.total(Species.DOG))
     }
 
     @Test fun statisticsSeparateDistinctBreedsFromEncountersAndFollowReclassificationAndDeletion() {

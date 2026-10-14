@@ -165,7 +165,7 @@ class CollectionPersistenceTest {
             assertNull(db.encounters().cover("corgi"))
             assertEquals(0, snapshot.discoveredCount(MockBreedRepository.normalBreedIds))
             assertEquals(22, catalog.count { it.isCollectible && it.species == Species.CAT })
-            assertEquals(34, catalog.count { it.isCollectible && it.species == Species.DOG })
+            assertEquals(36, catalog.count { it.isCollectible && it.species == Species.DOG })
         } finally {
             db.close()
             context.deleteDatabase(name)

@@ -1,0 +1,12 @@
+<resources>
+    <string name="rarity_common">Common</string>
+    <string name="rarity_uncommon">Uncommon</string>
+    <string name="rarity_rare">Rare</string>
+    <string name="rarity_epic">Epic</string>
+    <string name="rarity_legendary">Legendary</string>
+    <string name="rarity_description">%1$d stars: %2$s</string>
+    <string name="legacy_breed_albums">Legacy Breed Albums</string>
+    <string name="legacy_breed_note">This breed is no longer in the current model or collection catalog. Existing photos and album records remain available to view and organize.</string>
+    <string name="achievement_unlocked">Unlocked</string>
+    <string name="achievement_progress_hint">Save encounters and discover catalog entries to unlock collection badges.</string>
+</resources>

@@ -11,15 +11,15 @@ class BreedIntroductionResourcesTest {
     private val resourceRoot = File("src/main/res").takeIf { it.isDirectory }
         ?: File("app/src/main/res")
     private val locales = listOf("values", "values-b+zh+Hant", "values-en")
-    private val expectedKeys = (MockBreedRepository.normalBreedIds - MockBreedRepository.MONKEY_ID)
+    private val expectedKeys = (MockBreedRepository.normalBreedIds + MockBreedRepository.legacyBreedIds - MockBreedRepository.MONKEY_ID)
         .map { "breed_${it}_introduction" }.toSet()
 
     @Test fun everyCatAndDogHasAnIndependentIntroductionInEveryLocale() {
-        assertEquals(56, expectedKeys.size)
+        assertEquals(64, expectedKeys.size)
         locales.forEach { locale ->
             val introductions = introductions(locale)
             assertEquals("Introduction coverage in $locale", expectedKeys, introductions.keys)
-            assertEquals("Introductions must be distinct in $locale", 56, introductions.values.toSet().size)
+            assertEquals("Introductions must be distinct in $locale", 64, introductions.values.toSet().size)
             introductions.forEach { (key, text) ->
                 assertTrue("Blank introduction: $locale/$key", text.isNotBlank())
                 assertTrue("Template placeholder: $locale/$key", !text.contains(Regex("%[0-9$]*[sd]")))

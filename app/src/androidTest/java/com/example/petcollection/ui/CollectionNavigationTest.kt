@@ -69,13 +69,13 @@ class CollectionNavigationTest {
         compose.waitUntil(10000) { state.collection.value.statistics(catalog.getCollectionEntries()).discovered == 9 }
         compose.onNodeWithText(resources.getString(R.string.collection_discovered_count, 7, 28)).assertExists()
         compose.onNodeWithTag("navigation-HOME").performClick()
-        compose.onNodeWithText(resources.getString(R.string.collection_count, 9, 63)).assertExists()
+        compose.onNodeWithText(resources.getString(R.string.collection_count, 9, 65)).assertExists()
         compose.onNodeWithText(resources.getString(R.string.category_count, 7, 28)).assertExists()
-        compose.onNodeWithText(resources.getString(R.string.category_count, 1, 34)).assertExists()
+        compose.onNodeWithText(resources.getString(R.string.category_count, 1, 36)).assertExists()
         compose.onNodeWithTag("navigation-COLLECTION").performClick()
         compose.onNodeWithText(resources.getString(R.string.collection_discovered_count, 7, 28)).assertExists()
         compose.onNodeWithText(resources.getString(R.string.filter_dogs)).performClick()
-        compose.onNodeWithText(resources.getString(R.string.collection_discovered_count, 1, 34)).assertExists()
+        compose.onNodeWithText(resources.getString(R.string.collection_discovered_count, 1, 36)).assertExists()
     }
 
     private fun assertRoot() {
