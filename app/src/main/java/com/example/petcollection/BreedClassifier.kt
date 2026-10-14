@@ -3,6 +3,7 @@ package com.example.petcollection
 import android.content.Context
 import android.graphics.Bitmap
 import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.DataType
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -58,7 +59,19 @@ class BreedClassifier(
             .bufferedReader()
             .use { it.readLines() }
 
-        interpreter = Interpreter(loadModelFile(modelFileName))
+        require(labels.isNotEmpty() && labels.all { it.isNotBlank() } && labels.distinct().size == labels.size)
+        val detector = Interpreter(loadModelFile(modelFileName))
+        try {
+            require(detector.inputTensorCount == 1 && detector.outputTensorCount == 1)
+            require(detector.getInputTensor(0).dataType() == DataType.FLOAT32)
+            require(detector.getOutputTensor(0).dataType() == DataType.FLOAT32)
+            require(detector.getInputTensor(0).shape().contentEquals(intArrayOf(1, 224, 224, 3)))
+            require(detector.getOutputTensor(0).shape().contentEquals(intArrayOf(1, labels.size)))
+            interpreter = detector
+        } catch (error: Throwable) {
+            detector.close()
+            throw error
+        }
     }
 
     fun classify(bitmap: Bitmap): Result {

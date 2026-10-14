@@ -40,6 +40,9 @@ fun BreedDetailScreen(
                     TextButton(onClick = onBack) { Text(stringResource(R.string.breed_back)) }
                 }
                 Text(breed.name, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                RarityStars(breed)
+                if (breed.isLegacyBreed) Text(stringResource(R.string.legacy_breed_note),
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (breed.isSecretMonkey) {
                     Text(stringResource(R.string.monkey_english_name), style = MaterialTheme.typography.titleMedium)
                     MonkeyLegendaryBadge()

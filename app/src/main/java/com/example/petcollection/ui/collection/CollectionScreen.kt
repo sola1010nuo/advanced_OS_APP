@@ -26,6 +26,7 @@ import com.example.petcollection.data.BreedRepository
 import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.data.Species
 import com.example.petcollection.data.PhotoAlbumKey
+import com.example.petcollection.data.BreedRarityCatalog
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 internal enum class CollectionCategory(val species: Species?, val labelRes: Int) {
@@ -143,9 +144,17 @@ fun CollectionScreen(
                 }
             }
             items(breeds.filter { it.isVisibleInCollection && it.species == species && (species != null || it.isCollectible)
-                && !it.isCoatCategory && !(species == Species.CAT && it.id == "other_cat") }
-                .sortedBy { !it.isCollectible }, key = { it.id }) { breed ->
+                && !it.isCoatCategory && !it.isLegacyBreed && !(species == Species.CAT && it.id == "other_cat") }
+                .sortedWith(BreedRarityCatalog.order), key = { it.id }) { breed ->
                 BreedCard(breed, onClick = { selectedBreedId = breed.id })
+            }
+            if (species == Species.DOG && breeds.any { it.isLegacyBreed && it.isVisibleInCollection }) {
+                item(span = { GridItemSpan(maxLineSpan) }, key = "legacy-heading") {
+                    Text(stringResource(R.string.legacy_breed_albums), style = MaterialTheme.typography.titleMedium)
+                }
+                items(breeds.filter { it.isLegacyBreed && it.isVisibleInCollection }, key = { it.id }) { breed ->
+                    BreedCard(breed, onClick = { selectedBreedId = breed.id })
+                }
             }
             if (species == Species.CAT) {
                 item(span = { GridItemSpan(maxLineSpan) }, key = "coat-heading") {
@@ -200,6 +209,10 @@ private fun BreedCard(breed: Breed, onClick: () -> Unit) {
             if (breed.isSecretMonkey) MonkeyLegendaryBadge()
             Text(breed.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.heightIn(min = 40.dp))
+            if (breed.rarity != null) Box(Modifier.heightIn(min = 44.dp),
+                contentAlignment = androidx.compose.ui.Alignment.CenterStart) {
+                RarityStars(breed)
+            }
             Text(if (breed.showsDiscoveryState) stringResource(if (breed.isDiscovered) R.string.breed_discovered else R.string.breed_undiscovered)
                 else pluralStringResource(R.plurals.breed_encounters, breed.encounterCount, breed.encounterCount),
                 style = MaterialTheme.typography.labelMedium,

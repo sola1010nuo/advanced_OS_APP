@@ -6,7 +6,7 @@ import com.example.petcollection.R
 
 /** Resource-backed breed catalog; encounter and cover state live in Room. */
 class MockBreedRepository(private val resources: Resources) : BreedRepository {
-    override fun getCollectionEntries(): List<Breed> = getBreeds() + coatEntries.map { (id, name, description) ->
+    override fun getCollectionEntries(): List<Breed> = getBreeds() + legacyEntries.map { toBreed(it, legacy = true) } + coatEntries.map { (id, name, description) ->
         Breed(id, resources.getString(name), Species.CAT, resources.getString(description),
             "", "", "", "", isCollectible = false, isCoatCategory = true)
     } + listOf(
@@ -21,15 +21,20 @@ class MockBreedRepository(private val resources: Resources) : BreedRepository {
         "", "", "", "",
         isCollectible = false
     )
-    override fun getBreeds(): List<Breed> = entries.map { entry ->
+    override fun getBreeds(): List<Breed> = entries.map { toBreed(it) }
+
+    private fun toBreed(entry: Entry, legacy: Boolean = false): Breed {
+        val profile = if (entry.species != null && !legacy) requireNotNull(BreedRarityCatalog.profile(entry.id)) else null
         val name = resources.getString(entry.name)
         val coat = resources.getString(entry.coat)
         val personality = resources.getString(entry.personality)
-        Breed(
+        return Breed(
             id = entry.id, name = name, species = entry.species,
             description = resources.getString(entry.introduction),
             origin = resources.getString(entry.origin), personality = personality,
-            size = resources.getString(entry.size), coat = coat, isHiddenUntilDiscovered = entry.hidden
+            size = resources.getString(entry.size), coat = coat,
+            isHiddenUntilDiscovered = entry.hidden || legacy, isCollectible = !legacy,
+            rarity = profile?.rarity, rarityOrder = profile?.order ?: Int.MAX_VALUE, isLegacyBreed = legacy
         )
     }
 
@@ -53,8 +58,18 @@ class MockBreedRepository(private val resources: Resources) : BreedRepository {
         val coatCategoryIds: Set<String> get() = coatEntries.map { it.first }.toSet()
         const val MONKEY_ID = "monkey"
         val normalBreedIds: Set<String> get() = entries.map { it.id }.toSet()
-        val collectionIds: Set<String> get() = normalBreedIds + coatCategoryIds + setOf("other_cat", "other_dog", "unregistered")
+        val legacyBreedIds: Set<String> get() = legacyEntries.map { it.id }.toSet()
+        val collectionIds: Set<String> get() = normalBreedIds + legacyBreedIds + coatCategoryIds + setOf("other_cat", "other_dog", "unregistered")
         fun total(species: Species): Int = entries.count { it.species == species }
+
+        private val legacyEntries = listOf(
+            Entry("english_setter", Species.DOG, R.string.breed_english_setter_name, R.string.breed_english_setter_origin, R.string.breed_english_setter_personality, R.string.breed_english_setter_size, R.string.breed_english_setter_coat, R.string.breed_english_setter_introduction),
+            Entry("great_pyrenees", Species.DOG, R.string.breed_great_pyrenees_name, R.string.breed_great_pyrenees_origin, R.string.breed_great_pyrenees_personality, R.string.breed_great_pyrenees_size, R.string.breed_great_pyrenees_coat, R.string.breed_great_pyrenees_introduction),
+            Entry("havanese", Species.DOG, R.string.breed_havanese_name, R.string.breed_havanese_origin, R.string.breed_havanese_personality, R.string.breed_havanese_size, R.string.breed_havanese_coat, R.string.breed_havanese_introduction),
+            Entry("japanese_chin", Species.DOG, R.string.breed_japanese_chin_name, R.string.breed_japanese_chin_origin, R.string.breed_japanese_chin_personality, R.string.breed_japanese_chin_size, R.string.breed_japanese_chin_coat, R.string.breed_japanese_chin_introduction),
+            Entry("keeshond", Species.DOG, R.string.breed_keeshond_name, R.string.breed_keeshond_origin, R.string.breed_keeshond_personality, R.string.breed_keeshond_size, R.string.breed_keeshond_coat, R.string.breed_keeshond_introduction),
+            Entry("leonberger", Species.DOG, R.string.breed_leonberger_name, R.string.breed_leonberger_origin, R.string.breed_leonberger_personality, R.string.breed_leonberger_size, R.string.breed_leonberger_coat, R.string.breed_leonberger_introduction),
+        )
 
         private val entries = listOf(
             Entry(MONKEY_ID, null, R.string.monkey_name, R.string.monkey_origin,
@@ -91,16 +106,10 @@ class MockBreedRepository(private val resources: Resources) : BreedRepository {
             Entry("chihuahua", Species.DOG, R.string.breed_chihuahua_name, R.string.breed_chihuahua_origin, R.string.breed_chihuahua_personality, R.string.breed_chihuahua_size, R.string.breed_chihuahua_coat, R.string.breed_chihuahua_introduction),
             Entry("corgi", Species.DOG, R.string.breed_corgi_name, R.string.breed_corgi_origin, R.string.breed_corgi_personality, R.string.breed_corgi_size, R.string.breed_corgi_coat, R.string.breed_corgi_introduction),
             Entry("english_cocker_spaniel", Species.DOG, R.string.breed_english_cocker_spaniel_name, R.string.breed_english_cocker_spaniel_origin, R.string.breed_english_cocker_spaniel_personality, R.string.breed_english_cocker_spaniel_size, R.string.breed_english_cocker_spaniel_coat, R.string.breed_english_cocker_spaniel_introduction),
-            Entry("english_setter", Species.DOG, R.string.breed_english_setter_name, R.string.breed_english_setter_origin, R.string.breed_english_setter_personality, R.string.breed_english_setter_size, R.string.breed_english_setter_coat, R.string.breed_english_setter_introduction),
             Entry("french_bulldog", Species.DOG, R.string.breed_french_bulldog_name, R.string.breed_french_bulldog_origin, R.string.breed_french_bulldog_personality, R.string.breed_french_bulldog_size, R.string.breed_french_bulldog_coat, R.string.breed_french_bulldog_introduction),
             Entry("german_shorthaired_pointer", Species.DOG, R.string.breed_german_shorthaired_pointer_name, R.string.breed_german_shorthaired_pointer_origin, R.string.breed_german_shorthaired_pointer_personality, R.string.breed_german_shorthaired_pointer_size, R.string.breed_german_shorthaired_pointer_coat, R.string.breed_german_shorthaired_pointer_introduction),
             Entry("golden_retriever", Species.DOG, R.string.breed_golden_retriever_name, R.string.breed_golden_retriever_origin, R.string.breed_golden_retriever_personality, R.string.breed_golden_retriever_size, R.string.breed_golden_retriever_coat, R.string.breed_golden_retriever_introduction),
-            Entry("great_pyrenees", Species.DOG, R.string.breed_great_pyrenees_name, R.string.breed_great_pyrenees_origin, R.string.breed_great_pyrenees_personality, R.string.breed_great_pyrenees_size, R.string.breed_great_pyrenees_coat, R.string.breed_great_pyrenees_introduction),
-            Entry("havanese", Species.DOG, R.string.breed_havanese_name, R.string.breed_havanese_origin, R.string.breed_havanese_personality, R.string.breed_havanese_size, R.string.breed_havanese_coat, R.string.breed_havanese_introduction),
-            Entry("japanese_chin", Species.DOG, R.string.breed_japanese_chin_name, R.string.breed_japanese_chin_origin, R.string.breed_japanese_chin_personality, R.string.breed_japanese_chin_size, R.string.breed_japanese_chin_coat, R.string.breed_japanese_chin_introduction),
-            Entry("keeshond", Species.DOG, R.string.breed_keeshond_name, R.string.breed_keeshond_origin, R.string.breed_keeshond_personality, R.string.breed_keeshond_size, R.string.breed_keeshond_coat, R.string.breed_keeshond_introduction),
             Entry("labrador_retriever", Species.DOG, R.string.breed_labrador_retriever_name, R.string.breed_labrador_retriever_origin, R.string.breed_labrador_retriever_personality, R.string.breed_labrador_retriever_size, R.string.breed_labrador_retriever_coat, R.string.breed_labrador_retriever_introduction),
-            Entry("leonberger", Species.DOG, R.string.breed_leonberger_name, R.string.breed_leonberger_origin, R.string.breed_leonberger_personality, R.string.breed_leonberger_size, R.string.breed_leonberger_coat, R.string.breed_leonberger_introduction),
             Entry("maltese", Species.DOG, R.string.breed_maltese_name, R.string.breed_maltese_origin, R.string.breed_maltese_personality, R.string.breed_maltese_size, R.string.breed_maltese_coat, R.string.breed_maltese_introduction),
             Entry("miniature_pinscher", Species.DOG, R.string.breed_miniature_pinscher_name, R.string.breed_miniature_pinscher_origin, R.string.breed_miniature_pinscher_personality, R.string.breed_miniature_pinscher_size, R.string.breed_miniature_pinscher_coat, R.string.breed_miniature_pinscher_introduction),
             Entry("newfoundland", Species.DOG, R.string.breed_newfoundland_name, R.string.breed_newfoundland_origin, R.string.breed_newfoundland_personality, R.string.breed_newfoundland_size, R.string.breed_newfoundland_coat, R.string.breed_newfoundland_introduction),
@@ -116,6 +125,14 @@ class MockBreedRepository(private val resources: Resources) : BreedRepository {
             Entry("staffordshire_bull_terrier", Species.DOG, R.string.breed_staffordshire_bull_terrier_name, R.string.breed_staffordshire_bull_terrier_origin, R.string.breed_staffordshire_bull_terrier_personality, R.string.breed_staffordshire_bull_terrier_size, R.string.breed_staffordshire_bull_terrier_coat, R.string.breed_staffordshire_bull_terrier_introduction),
             Entry("soft_coated_wheaten_terrier", Species.DOG, R.string.breed_soft_coated_wheaten_terrier_name, R.string.breed_soft_coated_wheaten_terrier_origin, R.string.breed_soft_coated_wheaten_terrier_personality, R.string.breed_soft_coated_wheaten_terrier_size, R.string.breed_soft_coated_wheaten_terrier_coat, R.string.breed_soft_coated_wheaten_terrier_introduction),
             Entry("yorkshire_terrier", Species.DOG, R.string.breed_yorkshire_terrier_name, R.string.breed_yorkshire_terrier_origin, R.string.breed_yorkshire_terrier_personality, R.string.breed_yorkshire_terrier_size, R.string.breed_yorkshire_terrier_coat, R.string.breed_yorkshire_terrier_introduction),
+            Entry("bernese_mountain_dog", Species.DOG, R.string.breed_bernese_mountain_dog_name, R.string.breed_bernese_mountain_dog_origin, R.string.breed_bernese_mountain_dog_personality, R.string.breed_bernese_mountain_dog_size, R.string.breed_bernese_mountain_dog_coat, R.string.breed_bernese_mountain_dog_introduction),
+            Entry("bichon_frise", Species.DOG, R.string.breed_bichon_frise_name, R.string.breed_bichon_frise_origin, R.string.breed_bichon_frise_personality, R.string.breed_bichon_frise_size, R.string.breed_bichon_frise_coat, R.string.breed_bichon_frise_introduction),
+            Entry("dachshund", Species.DOG, R.string.breed_dachshund_name, R.string.breed_dachshund_origin, R.string.breed_dachshund_personality, R.string.breed_dachshund_size, R.string.breed_dachshund_coat, R.string.breed_dachshund_introduction),
+            Entry("japanese_spitz", Species.DOG, R.string.breed_japanese_spitz_name, R.string.breed_japanese_spitz_origin, R.string.breed_japanese_spitz_personality, R.string.breed_japanese_spitz_size, R.string.breed_japanese_spitz_coat, R.string.breed_japanese_spitz_introduction),
+            Entry("shih_tzu", Species.DOG, R.string.breed_shih_tzu_name, R.string.breed_shih_tzu_origin, R.string.breed_shih_tzu_personality, R.string.breed_shih_tzu_size, R.string.breed_shih_tzu_coat, R.string.breed_shih_tzu_introduction),
+            Entry("siberian_husky", Species.DOG, R.string.breed_siberian_husky_name, R.string.breed_siberian_husky_origin, R.string.breed_siberian_husky_personality, R.string.breed_siberian_husky_size, R.string.breed_siberian_husky_coat, R.string.breed_siberian_husky_introduction),
+            Entry("taiwan_dog", Species.DOG, R.string.breed_taiwan_dog_name, R.string.breed_taiwan_dog_origin, R.string.breed_taiwan_dog_personality, R.string.breed_taiwan_dog_size, R.string.breed_taiwan_dog_coat, R.string.breed_taiwan_dog_introduction),
+            Entry("west_highland_white_terrier", Species.DOG, R.string.breed_west_highland_white_terrier_name, R.string.breed_west_highland_white_terrier_origin, R.string.breed_west_highland_white_terrier_personality, R.string.breed_west_highland_white_terrier_size, R.string.breed_west_highland_white_terrier_coat, R.string.breed_west_highland_white_terrier_introduction),
         )
     }
 }

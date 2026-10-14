@@ -1,0 +1,12 @@
+<resources>
+    <string name="rarity_common">常見</string>
+    <string name="rarity_uncommon">少見</string>
+    <string name="rarity_rare">稀有</string>
+    <string name="rarity_epic">珍稀</string>
+    <string name="rarity_legendary">極稀有</string>
+    <string name="rarity_description">%1$d 星：%2$s</string>
+    <string name="legacy_breed_albums">舊版品種相簿</string>
+    <string name="legacy_breed_note">此品種已不在目前辨識模型與圖鑑中。舊照片與相簿資料保留，可繼續查看及整理。</string>
+    <string name="achievement_unlocked">已解鎖</string>
+    <string name="achievement_progress_hint">儲存收藏並解鎖圖鑑，即可達成對應的收集徽章。</string>
+</resources>

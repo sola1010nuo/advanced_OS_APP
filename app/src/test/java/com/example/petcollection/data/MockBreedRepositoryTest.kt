@@ -37,8 +37,8 @@ class MockBreedRepositoryTest {
 
     @Test fun datasetMatchesTrainingScope() {
         assertEquals(22, MockBreedRepository.total(Species.CAT))
-        assertEquals(34, MockBreedRepository.total(Species.DOG))
-        assertEquals(56, Species.entries.sumOf { MockBreedRepository.total(it) })
+        assertEquals(36, MockBreedRepository.total(Species.DOG))
+        assertEquals(58, Species.entries.sumOf { MockBreedRepository.total(it) })
     }
 
     @Test fun breedDefaultsAreLockedWithoutEncounterData() {
