@@ -31,6 +31,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.example.petcollection.ui.SettingsGearIcon
 
 @Composable
 fun HomeScreen(
@@ -43,7 +47,8 @@ fun HomeScreen(
     recognitionState: PhotoRecognitionState = remember { PhotoRecognitionState() },
     recognizedBreedName: String? = null,
     onRetryRecognition: () -> Unit = {},
-    collectionStatistics: com.example.petcollection.data.CollectionStatistics? = null
+    collectionStatistics: com.example.petcollection.data.CollectionStatistics? = null,
+    onOpenSettings: () -> Unit = {}
 ) {
     val catalog = com.example.petcollection.data.MockBreedRepository(
         androidx.compose.ui.platform.LocalContext.current.resources).getCollectionEntries()
@@ -61,7 +66,7 @@ fun HomeScreen(
         modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 28.dp),
         verticalArrangement = Arrangement.spacedBy(28.dp)
     ) {
-        HomeHeader()
+        HomeHeader(onOpenSettings)
         CollectionProgressCard(progress.discovered, progress.totalBreeds, progress.encounterCount)
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionTitle(stringResource(R.string.your_collections))
@@ -80,17 +85,20 @@ fun HomeScreen(
                 SelectedPhotoPreview(recognitionState, recognizedBreedName, onRetryRecognition)
             }
         }
-        AchievementSection(HomePreviewData.achievements, progress.totalBreeds, progress.discovered)
-        RecentDiscoveriesSection()
         RecentFootprintsSection()
     }
 }
 @Composable
-private fun HomeHeader() {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(R.string.home_eyebrow), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
-        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-        Text(stringResource(R.string.home_subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+private fun HomeHeader(onOpenSettings: () -> Unit) {
+    val settingsLabel = stringResource(R.string.settings)
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.home_eyebrow), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.home_subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        IconButton(onClick = onOpenSettings, modifier = Modifier.testTag("home-settings")
+            .semantics { contentDescription = settingsLabel }) { SettingsGearIcon() }
     }
 }
 
@@ -168,11 +176,12 @@ fun AchievementSection(achievements: List<AchievementPreview>, total: Int, colle
 }
 
 @Composable
-fun AchievementBadge(achievement: AchievementPreview, total: Int, collected: Int = 0) {
+fun AchievementBadge(achievement: AchievementPreview, total: Int, collected: Int = 0,
+    modifier: Modifier = Modifier.width(144.dp)) {
     val threshold = achievement.breedThreshold ?: total
     val unlocked = achievement.isUnlocked(collected, total)
     OutlinedCard(
-        modifier = Modifier.width(144.dp), shape = RoundedCornerShape(20.dp),
+        modifier = modifier, shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -63,12 +63,12 @@ class CollectionUnlockStateTest {
             EncounterRecord("other_dog", null), EncounterRecord("unregistered", null))
         val data = CollectionData(records, loaded = true)
         assertEquals(CollectionStatistics(1, 1, 3), data.statistics(catalog, Species.DOG))
-        assertEquals(CollectionStatistics(0, 1, 1), data.statistics(catalog, Species.CAT))
-        assertEquals(CollectionStatistics(1, 2, 5), data.statistics(catalog))
+        assertEquals(CollectionStatistics(1, 2, 1), data.statistics(catalog, Species.CAT))
+        assertEquals(CollectionStatistics(2, 3, 5), data.statistics(catalog))
         val reclassified = data.copy(encounters = records.map { if (it.id == first.id) it.copy(breedId = "cat") else it })
-        assertEquals(CollectionStatistics(2, 2, 5), reclassified.statistics(catalog))
+        assertEquals(CollectionStatistics(3, 3, 5), reclassified.statistics(catalog))
         val deleted = reclassified.copy(encounters = reclassified.encounters.filter { it.id != second.id })
         assertEquals(CollectionStatistics(0, 1, 1), deleted.statistics(catalog, Species.DOG))
-        assertEquals(CollectionStatistics(1, 2, 4), deleted.statistics(catalog))
+        assertEquals(CollectionStatistics(2, 3, 4), deleted.statistics(catalog))
     }
 }

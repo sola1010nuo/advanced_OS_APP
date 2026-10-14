@@ -112,7 +112,7 @@ class CollectionCrudUiTest {
             assertTrue(state.applyTo(catalog.getBreed(id)!!).isDiscovered)
             add(id, "Second $id")
             assertEquals(1, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).discovered)
-            assertEquals(28, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).totalBreeds)
+            assertEquals(29, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).totalBreeds)
             openPhoto("Second $id")
             click(R.string.encounter_set_cover)
             compose.waitUntil(10000) {

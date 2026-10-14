@@ -16,7 +16,7 @@ class PhotoSortingPersistenceTest {
     @Test fun allAlbumTypesPersistIndependentModesAndCustomOrdersAcrossReopen() = runBlocking {
         val name = "photo-sort-${UUID.randomUUID()}.db"
         fun open() = Room.databaseBuilder(context, CollectionDatabase::class.java, name)
-            .addMigrations(CollectionDatabase.MIGRATION_1_2, CollectionDatabase.MIGRATION_2_3).build()
+            .addMigrations(CollectionDatabase.MIGRATION_1_2, CollectionDatabase.MIGRATION_2_3, CollectionDatabase.MIGRATION_3_4).build()
         var db = open()
         try {
             var dao = db.encounters()
@@ -100,7 +100,7 @@ class PhotoSortingPersistenceTest {
         raw.execSQL("INSERT INTO other_album_members VALUES ('photo-2', 'saved')")
         raw.version = 2
         raw.close()
-        val db = Room.databaseBuilder(context, CollectionDatabase::class.java, name).addMigrations(CollectionDatabase.MIGRATION_2_3).build()
+        val db = Room.databaseBuilder(context, CollectionDatabase::class.java, name).addMigrations(CollectionDatabase.MIGRATION_2_3, CollectionDatabase.MIGRATION_3_4).build()
         try {
             val dao = db.encounters()
             records.forEach { assertEquals(it, dao.get(it.id)) }

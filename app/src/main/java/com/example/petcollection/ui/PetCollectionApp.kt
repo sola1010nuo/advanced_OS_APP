@@ -1,8 +1,11 @@
 package com.example.petcollection.ui
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import android.content.Intent
+import android.content.Context
+import android.content.ContextWrapper
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -11,12 +14,14 @@ import android.content.res.Configuration
 import android.os.LocaleList
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -34,9 +39,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.core.view.WindowCompat
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.petcollection.R
 import com.example.petcollection.data.MockBreedRepository
 import com.example.petcollection.data.Species
@@ -46,6 +54,8 @@ import com.example.petcollection.ui.collection.CollectionUnlockState
 import com.example.petcollection.ui.collection.rememberCollectionUnlockState
 import com.example.petcollection.ui.home.CollectionCategory
 import com.example.petcollection.ui.home.HomeScreen
+import com.example.petcollection.ui.home.AchievementsScreen
+import com.example.petcollection.ui.home.AchievementNotifications
 import com.example.petcollection.ui.home.PhotoRecognitionState
 import com.example.petcollection.ui.theme.PetCollectionTheme
 import com.example.petcollection.ui.settings.EffectsSettingRow
@@ -53,10 +63,14 @@ import com.example.petcollection.ui.settings.EffectsSettingsUiState
 import com.example.petcollection.ui.settings.LocalEffectsEnabled
 import com.example.petcollection.ui.settings.rememberEffectsSettingsState
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 private enum class Destination(@param:StringRes val label: Int) {
-    HOME(R.string.home), COLLECTION(R.string.collection), FOOTPRINTS(R.string.footprints), SETTINGS(R.string.settings)
+    HOME(R.string.home), COLLECTION(R.string.collection), CAMERA(R.string.camera),
+    FOOTPRINTS(R.string.footprints), ACHIEVEMENTS(R.string.nav_achievements), SETTINGS(R.string.settings)
 }
+private val bottomDestinations = listOf(Destination.HOME, Destination.COLLECTION, Destination.CAMERA,
+    Destination.FOOTPRINTS, Destination.ACHIEVEMENTS)
 private enum class Appearance(@param:StringRes val label: Int) {
     SYSTEM(R.string.follow_system), LIGHT(R.string.light_mode), DARK(R.string.dark_mode)
 }
@@ -69,6 +83,8 @@ fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberColl
     var language by rememberSaveable { mutableStateOf("zh-Hant") }
     var appearance by rememberSaveable { mutableStateOf(Appearance.SYSTEM.name) }
     var destination by rememberSaveable { mutableStateOf(Destination.HOME.name) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     var collectionSpecies by rememberSaveable { mutableStateOf(Species.CAT.name) }
     // Reselecting Collection discards only its local detail/album routes, not stored photos.
     var collectionRootRequest by rememberSaveable { mutableIntStateOf(0) }
@@ -77,7 +93,14 @@ fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberColl
     var photoRequest by rememberSaveable { mutableIntStateOf(0) }
     val recognitionState = remember { PhotoRecognitionState() }
     val baseContext = LocalContext.current
+    val view = LocalView.current
+    val settingsBackEnabled = destination == Destination.SETTINGS.name && collectionUnlockState.pendingEncounter == null
+    val activity = baseContext.activityOrNull() ?: view.context.activityOrNull()
+    BackHandler(settingsBackEnabled) {
+        destination = Destination.HOME.name
+    }
     val collectionData by collectionUnlockState.collection.collectAsState()
+    val achievementData by collectionUnlockState.achievements.collectAsState()
     val activityResultOwner = LocalActivityResultRegistryOwner.current
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -109,10 +132,9 @@ fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberColl
         Appearance.LIGHT -> false
         Appearance.DARK -> true
     }
-    val view = LocalView.current
     SideEffect {
-        (baseContext as? Activity)?.let { activity ->
-            WindowCompat.getInsetsController(activity.window, view).apply {
+        activity?.let { host ->
+            WindowCompat.getInsetsController(host.window, view).apply {
                 isAppearanceLightStatusBars = !dark
                 isAppearanceLightNavigationBars = !dark
             }
@@ -122,31 +144,29 @@ fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberColl
         LocalEffectsEnabled provides effectsSettings.enabled.takeIf { effectsSettings.loaded },
         *listOfNotNull(activityResultOwner?.let { LocalActivityResultRegistryOwner provides it }).toTypedArray()) {
         PetCollectionTheme(darkTheme = dark) {
+            val cameraMessage = stringResource(R.string.camera_coming_soon)
             // Collection already mounts this same host. Mount it here for Home and other destinations.
             if (destination != Destination.COLLECTION.name) CollectionEncounterHost(collectionUnlockState, breeds)
+            Box(Modifier.fillMaxSize()) {
             Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
                 bottomBar = {
-                    NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
-                        Destination.entries.forEach { item ->
-                            NavigationBarItem(
-                                selected = destination == item.name,
-                                onClick = {
-                                    if (item == Destination.COLLECTION && destination == item.name) {
-                                        collectionRootRequest++
-                                    }
-                                    destination = item.name
-                                },
-                                modifier = Modifier.testTag("navigation-${item.name}"),
-                                icon = { DestinationIcon(item) },
-                                label = { Text(stringResource(item.label)) }
-                            )
+                    AppBottomBar(destination, onNavigate = { item ->
+                        if (item == Destination.COLLECTION && destination == item.name) {
+                            collectionRootRequest++
                         }
-                    }
+                        destination = item.name
+                    }, onCamera = {
+                        scope.launch {
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                            snackbarHostState.showSnackbar(cameraMessage)
+                        }
+                    })
                 }
             ) { padding ->
                 val contentModifier = Modifier.padding(padding).consumeWindowInsets(padding)
                 when (Destination.valueOf(destination)) {
-                    Destination.HOME -> HomeScreen(
+                    Destination.HOME, Destination.CAMERA -> HomeScreen(
                         modifier = contentModifier,
                         categories = Species.entries.map { species ->
                             val stats = collectionData.statistics(entries, species)
@@ -164,22 +184,82 @@ fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberColl
                         recognitionState = recognitionState,
                         recognizedBreedName = breeds.firstOrNull { it.id == recognitionState.breedId }?.name,
                         onRetryRecognition = { photoRequest++ },
-                        collectionStatistics = collectionData.statistics(entries)
+                        collectionStatistics = collectionData.statistics(entries),
+                        onOpenSettings = { destination = Destination.SETTINGS.name }
                     )
                     Destination.COLLECTION -> key(collectionRootRequest) {
                         CollectionScreen(contentModifier, unlockState = collectionUnlockState,
                             initialSpecies = Species.valueOf(collectionSpecies))
                     }
                     Destination.FOOTPRINTS -> FootprintsScreen(contentModifier)
-                    Destination.SETTINGS -> SettingsScreen(
-                        language, { language = it }, Appearance.valueOf(appearance), { appearance = it.name },
-                        effectsSettings, effectsSettingsState::setEnabled, contentModifier
-                    )
+                    Destination.ACHIEVEMENTS -> AchievementsScreen(achievementData, contentModifier)
+                    Destination.SETTINGS -> {
+                        SettingsScreen(
+                            language, { language = it }, Appearance.valueOf(appearance), { appearance = it.name },
+                            effectsSettings, effectsSettingsState::setEnabled, contentModifier,
+                            onBack = { destination = Destination.HOME.name }
+                        )
+                    }
                 }
+            }
+            AchievementNotifications(collectionUnlockState, Modifier.align(Alignment.TopCenter)
+                .statusBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth())
             }
         }
     }
 }
+
+private tailrec fun Context.activityOrNull(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.activityOrNull()
+    else -> null
+}
+
+
+
+@Composable
+private fun AppBottomBar(destination: String, onNavigate: (Destination) -> Unit, onCamera: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    Column(Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))) {
+        // Reserve the raised camera's footprint so it cannot cover page content.
+        Spacer(Modifier.height(16.dp))
+        Row(Modifier.fillMaxWidth().height(80.dp).background(colors.surfaceContainer).selectableGroup()) {
+            bottomDestinations.forEach { item ->
+                val camera = item == Destination.CAMERA
+                val selected = destination == item.name ||
+                    (item == Destination.HOME && destination == Destination.SETTINGS.name)
+                val label = stringResource(item.label)
+                Column(Modifier.weight(1f).fillMaxHeight().then(
+                    if (camera) Modifier else Modifier.selectable(selected, role = Role.Tab,
+                        onClick = { onNavigate(item) }).testTag("navigation-${item.name}")
+                ).padding(top = 12.dp, bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box(Modifier.fillMaxWidth().height(40.dp), contentAlignment = Alignment.Center) {
+                        if (camera) FloatingActionButton(onClick = onCamera, shape = CircleShape,
+                            containerColor = colors.primaryContainer, contentColor = colors.onPrimaryContainer,
+                            modifier = Modifier.requiredSize(64.dp).offset(y = (-12).dp)
+                                .testTag("navigation-CAMERA").semantics { contentDescription = label }) {
+                            DestinationIcon(item, Modifier.size(28.dp))
+                        } else Surface(shape = RoundedCornerShape(16.dp),
+                            color = if (selected) colors.secondaryContainer else colors.surfaceContainer,
+                            contentColor = if (selected) colors.onSecondaryContainer else colors.onSurfaceVariant,
+                            modifier = Modifier.size(56.dp, 32.dp)) {
+                            Box(contentAlignment = Alignment.Center) { DestinationIcon(item) }
+                        }
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text(label, style = MaterialTheme.typography.labelSmall, maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = if (selected) colors.primary else colors.onSurfaceVariant)
+                }
+            }
+        }
+        Spacer(Modifier.fillMaxWidth().height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
+            .background(colors.surfaceContainer))
+    }
+}
+
+@Composable
+internal fun SettingsGearIcon(modifier: Modifier = Modifier) = DestinationIcon(Destination.SETTINGS, modifier)
 
 @Composable
 private fun Page(title: Int, modifier: Modifier, content: @Composable ColumnScope.() -> Unit) {
@@ -212,9 +292,12 @@ private fun SettingsScreen(
     language: String, onLanguageChange: (String) -> Unit,
     appearance: Appearance, onAppearanceChange: (Appearance) -> Unit,
     effects: EffectsSettingsUiState, onEffectsChange: (Boolean) -> Unit,
-    modifier: Modifier
+    modifier: Modifier, onBack: () -> Unit
 ) {
     Page(R.string.settings, modifier) {
+        TextButton(onClick = onBack, modifier = Modifier.testTag("settings-back-home")) {
+            Text(stringResource(R.string.back_home))
+        }
         SettingsGroup(R.string.language) {
             SettingOption(R.string.language_zh, language == "zh-Hant") { onLanguageChange("zh-Hant") }
             SettingOption(R.string.language_en, language == "en") { onLanguageChange("en") }
@@ -278,6 +361,29 @@ private fun DestinationIcon(destination: Destination, modifier: Modifier = Modif
                 drawOval(color, Offset(w * .58f, h * .5f), Size(w * .26f, h * .4f), style = stroke)
                 drawCircle(color, w * .08f, Offset(w * .29f, h * .19f))
                 drawCircle(color, w * .08f, Offset(w * .71f, h * .34f))
+            }
+            Destination.CAMERA -> {
+                drawRoundRect(color, Offset(w * .1f, h * .26f), Size(w * .8f, h * .6f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * .1f), style = stroke)
+                drawCircle(color, w * .18f, Offset(w * .5f, h * .56f), style = stroke)
+                drawPath(Path().apply {
+                    moveTo(w * .3f, h * .26f); lineTo(w * .38f, h * .13f)
+                    lineTo(w * .62f, h * .13f); lineTo(w * .7f, h * .26f)
+                }, color, style = stroke)
+            }
+            Destination.ACHIEVEMENTS -> {
+                drawPath(Path().apply {
+                    moveTo(w * .25f, h * .13f); lineTo(w * .75f, h * .13f); lineTo(w * .7f, h * .46f)
+                    quadraticTo(w * .5f, h * .72f, w * .3f, h * .46f); close()
+                }, color, style = stroke)
+                drawLine(color, Offset(w * .5f, h * .58f), Offset(w * .5f, h * .83f), stroke.width)
+                drawLine(color, Offset(w * .29f, h * .88f), Offset(w * .71f, h * .88f), stroke.width)
+                drawPath(Path().apply {
+                    moveTo(w * .25f, h * .2f); lineTo(w * .1f, h * .2f)
+                    quadraticTo(w * .08f, h * .5f, w * .32f, h * .46f)
+                    moveTo(w * .75f, h * .2f); lineTo(w * .9f, h * .2f)
+                    quadraticTo(w * .92f, h * .5f, w * .68f, h * .46f)
+                }, color, style = stroke)
             }
             Destination.SETTINGS -> {
                 drawCircle(color, w * .28f, style = stroke)
