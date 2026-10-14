@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original PetCollection achievement illustration; local vector, no external assets. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp" android:height="48dp" android:viewportWidth="96" android:viewportHeight="96">
+<path android:pathData="M 18,88 C 18,86.34314575 31.4314575,85 48,85 C 64.5685425,85 78,86.34314575 78,88 C 78,89.65685425 64.5685425,91 48,91 C 31.4314575,91 18,89.65685425 18,88 Z" android:fillColor="#927965" android:fillAlpha="0.18" />
+<path android:pathData="M 66,69 Q 88,61 82,74 Q 77,82 65,79 Z" android:fillColor="#E2AC73" android:strokeColor="#65564C" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" />
+<path android:pathData="M 20,66 C 20,56.61115925 32.536027000000004,49 48,49 C 63.463972999999996,49 76,56.61115925 76,66 C 76,75.38884075 63.463972999999996,83 48,83 C 32.536027000000004,83 20,75.38884075 20,66 Z" android:fillColor="#E2AC73" android:strokeColor="#65564C" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" />
+<path android:pathData="M 22,82 C 22,79.23857625 25.581722,77 30,77 C 34.418278,77 38,79.23857625 38,82 C 38,84.76142375 34.418278,87 30,87 C 25.581722,87 22,84.76142375 22,82 Z" android:fillColor="#F3DEC0" android:strokeColor="#65564C" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" />
+<path android:pathData="M 58,82 C 58,79.23857625 61.581722,77 66,77 C 70.418278,77 74,79.23857625 74,82 C 74,84.76142375 70.418278,87 66,87 C 61.581722,87 58,84.76142375 58,82 Z" android:fillColor="#F3DEC0" android:strokeColor="#65564C" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" />
+<path android:pathData="M 18,33 L 17,8 Q 33,11 37,30 Z" android:fillColor="#E2AC73" android:strokeColor="#65564C" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" />
+<path android:pathData="M 58,29 Q 64,12 81,8 L 78,35 Z" android:fillColor="#E2AC73" android:strokeColor="#65564C" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" />
+<path android:pathData="M 22,29 L 22,17 L 31,29 Z" android:fillColor="#D5A298" />
+<path android:pathData="M 65,29 L 76,17 L 74,31 Z" android:fillColor="#D5A298" />
+<path android:pathData="M 19,33 Q 49,19 77,34 Q 83,51 65,58 Q 49,66 31,58 Q 13,51 19,33 Z" android:fillColor="#E2AC73" android:strokeColor="#65564C" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" />
+<path android:pathData="M 44,26 L 53,26 L 58,45 Q 75,53 61,59 Q 48,65 33,58 Q 23,51 39,45 Z" android:fillColor="#FFF0D9" />
+<path android:pathData="M 30.4,40 C 30.4,38.78497355 31.1163444,37.8 32,37.8 C 32.8836556,37.8 33.6,38.78497355 33.6,40 C 33.6,41.21502645 32.8836556,42.2 32,42.2 C 31.1163444,42.2 30.4,41.21502645 30.4,40 Z" android:fillColor="#65564C" />
+<path android:pathData="M 63.4,40 C 63.4,38.78497355 64.1163444,37.8 65,37.8 C 65.8836556,37.8 66.6,38.78497355 66.6,40 C 66.6,41.21502645 65.8836556,42.2 65,42.2 C 64.1163444,42.2 63.4,41.21502645 63.4,40 Z" android:fillColor="#65564C" />
+<path android:pathData="M 21.7,46 C 21.7,44.950658975 23.177460325,44.1 25,44.1 C 26.822539675,44.1 28.3,44.950658975 28.3,46 C 28.3,47.049341025 26.822539675,47.9 25,47.9 C 23.177460325,47.9 21.7,47.049341025 21.7,46 Z" android:fillColor="#DB9D91" />
+<path android:pathData="M 68.7,46 C 68.7,44.950658975 70.177460325,44.1 72,44.1 C 73.822539675,44.1 75.3,44.950658975 75.3,46 C 75.3,47.049341025 73.822539675,47.9 72,47.9 C 70.177460325,47.9 68.7,47.049341025 68.7,46 Z" android:fillColor="#DB9D91" />
+<path android:pathData="M 44,46 Q 49,43 54,46 Q 53,51 49,52 Q 45,51 44,46 Z" android:fillColor="#65564C" />
+<path android:pathData="M 49,52 L 49,55 Q 46,59 43,55 M 49,55 Q 52,59 55,55" android:fillColor="#00000000" android:strokeColor="#65564C" android:strokeWidth="1.6" android:strokeLineCap="round" android:strokeLineJoin="round" />
+<path android:pathData="M 45,58 Q 49,63 53,58 L 53,61 Q 49,67 45,61 Z" android:fillColor="#DCA19B" />
+<path android:pathData="M 38,64 Q 47,69 57,64 L 54,78 L 42,78 Z" android:fillColor="#FFF0D9" />
+</vector>

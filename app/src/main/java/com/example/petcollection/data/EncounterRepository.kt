@@ -5,8 +5,15 @@ import android.content.Intent
 import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.security.MessageDigest
+import java.time.ZoneId
 import java.util.UUID
 
 data class CollectionData(
@@ -35,7 +42,7 @@ data class CollectionData(
 
     /** Breeds, coat entries and the secret monkey share discovery totals from persisted rows. */
     fun statistics(catalog: List<Breed>, species: Species? = null): CollectionStatistics {
-        val catalogIds = catalog.filter { it.showsDiscoveryState && (species == null || it.species == species) }
+        val catalogIds = catalog.filter { it.countsInCollection && (species == null || it.species == species) }
             .map { it.id }.toSet()
         val encounterIds = catalog.filter { species == null || it.species == species }.map { it.id }.toSet()
         return CollectionStatistics(discoveredCount(catalogIds), catalogIds.size,
@@ -47,6 +54,47 @@ data class CollectionStatistics(val discovered: Int, val totalBreeds: Int, val e
 
 /** One persistent encounter store shared by all normal breeds and special albums. */
 class EncounterRepository(private val dao: EncounterDao, private val context: Context) {
+    private val achievementCatalog by lazy { MockBreedRepository(context.resources).getCollectionEntries() }
+    private val initialization = Mutex()
+    private var achievementsInitialized = false
+    val achievements = flow {
+        initializeAchievements()
+        emitAll(combine(dao.observeAll(), dao.observeAchievementPhotos(), dao.observeAchievementUnlocks()) { records, photos, unlocks ->
+            val byId = photos.associateBy { it.encounterId }
+            AchievementData(AchievementRules.evaluate(achievementCatalog, records, photos), unlocks,
+                records.count { it.photoUri != null && byId[it.id]?.fingerprint == null }, true)
+        })
+    }
+
+    /** Existing badge state was derived from encounters, not separately persisted. Backfill quietly, without invented dates. */
+    suspend fun initializeAchievements() = initialization.withLock {
+        if (!achievementsInitialized) {
+            val known = dao.achievementPhotos().map { it.encounterId }.toSet()
+            dao.allRecords().filter { it.photoUri != null && it.id !in known }.forEach { record ->
+                dao.insertAchievementPhoto(AchievementPhoto(record.id, fingerprint(requireNotNull(record.photoUri))))
+            }
+            dao.reconcileAchievements(achievementCatalog)
+            achievementsInitialized = true
+        }
+    }
+
+    suspend fun claimAchievementAnnouncement(id: String): Boolean = dao.claimAchievementAnnouncement(id) == 1
+
+    private suspend fun fingerprint(reference: String): String? = withContext(Dispatchers.IO) {
+        try {
+            val digest = MessageDigest.getInstance("SHA-256")
+            requireNotNull(context.contentResolver.openInputStream(Uri.parse(reference))).use { input ->
+                val buffer = ByteArray(64 * 1024)
+                while (true) {
+                    val size = input.read(buffer)
+                    if (size < 0) break
+                    digest.update(buffer, 0, size)
+                }
+            }
+            digest.digest().joinToString("") { "%02x".format(it.toInt() and 255) }
+        } catch (cancelled: CancellationException) { throw cancelled }
+        catch (_: Exception) { null } // A missing historical photo contributes no fabricated unique-photo progress.
+    }
     val collection = combine(
         combine(dao.observeAll(), dao.observeCovers(), dao.observeAlbums(), dao.observeMembers()) { records, covers, albums, members -> CollectionData(records, covers, true, albums, members) },
         dao.observePhotoSortModes(), dao.observePhotoOrder()
@@ -77,11 +125,17 @@ class EncounterRepository(private val dao: EncounterDao, private val context: Co
     fun observeByBreed(id: String) = dao.observeByBreed(id)
     fun observeCounts() = dao.observeCounts()
 
-    suspend fun create(record: EncounterRecord): Pair<EncounterRecord, Boolean> {
+    suspend fun create(record: EncounterRecord, recognized: Boolean = false): Pair<EncounterRecord, Boolean> {
         require(record.breedId in MockBreedRepository.collectionIds)
+        initializeAchievements()
         val stored = record.copy(photoUri = record.photoUri?.let { retainPhoto(it) })
         try {
-            return stored to dao.create(stored)
+            val hash = stored.photoUri?.let { fingerprint(it) }
+            val savedAt = System.currentTimeMillis()
+            val recognizedCatDog = recognized && achievementCatalog.any { it.id == stored.breedId && it.species != null }
+            val metadata = stored.photoUri?.let { AchievementPhoto(stored.id, hash,
+                savedAt.takeIf { recognizedCatDog }, ZoneId.systemDefault().id.takeIf { recognizedCatDog }) }
+            return stored to dao.createTracked(stored, metadata, achievementCatalog, savedAt)
         } catch (error: Exception) {
             if (stored.photoUri != record.photoUri) stored.photoUri?.let { deletePrivatePhoto(it) }
             throw error
@@ -89,9 +143,10 @@ class EncounterRepository(private val dao: EncounterDao, private val context: Co
     }
 
     suspend fun update(record: EncounterRecord) {
+        initializeAchievements()
         val old = requireNotNull(dao.get(record.id))
         require(record.breedId in MockBreedRepository.collectionIds)
-        dao.updateAndRepairCovers(record.copy(photoUri = old.photoUri, createdAt = old.createdAt))
+        dao.updateTracked(record.copy(photoUri = old.photoUri, createdAt = old.createdAt), achievementCatalog, System.currentTimeMillis())
     }
     suspend fun selectCover(breedId: String, encounterId: String) = dao.selectCover(breedId, encounterId)
     suspend fun delete(id: String) {

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ach_first">Say Cheese!</string>
+    <string name="ach_first_description">Discover any collection entry.</string>
+    <string name="ach_explorer">Pet Explorer</string>
+    <string name="ach_explorer_description">Discover 10 different cat or dog breeds.</string>
+    <string name="ach_shutter">Shutter Happy</string>
+    <string name="ach_shutter_description">Collect 50 different photos.</string>
+    <string name="ach_complete">Collection Master</string>
+    <string name="ach_complete_description">Discover the complete current collection.</string>
+    <string name="ach_colors">Colorful Cat Collector</string>
+    <string name="ach_colors_description">Discover all 6 cat coat colors.</string>
+    <string name="ach_cats">All About Cats</string>
+    <string name="ach_cats_description">Discover all cat breeds.</string>
+    <string name="ach_dogs">Dog Expedition</string>
+    <string name="ach_dogs_description">Discover all dog breeds.</string>
+    <string name="ach_cat_observer">Cat Observer</string>
+    <string name="ach_cat_observer_description">Discover 5 different cat.</string>
+    <string name="ach_dog_friend">Dog Friend</string>
+    <string name="ach_dog_friend_description">Discover 5 different dog.</string>
+    <string name="ach_rare">Rarity Hunter</string>
+    <string name="ach_rare_description">Discover any 5-star cat or dog breed.</string>
+    <string name="ach_places">Pet Footprints</string>
+    <string name="ach_places_description">Record 5 different encounter locations.</string>
+    <string name="ach_monkey">Robbed Today?</string>
+    <string name="ach_monkey_description">Discover the secret monkey.</string>
+    <string name="ach_night">Night Owl</string>
+    <string name="ach_night_description">Recognize and save a cat or dog photo between 00:00 and 04:59, using the actual save time.</string>
+    <string name="ach_repeat">You Again!</string>
+    <string name="ach_repeat_description">Collect 10 different photos of the same cat or dog breed.</string>
+    <string name="ach_tortoiseshell">A Splash of Color</string>
+    <string name="ach_tortoiseshell_description">Discover the tortoiseshell coat color.</string>
+    <string name="achievement_summary">%1$d / %2$d unlocked</string>
+    <string name="achievement_percent">%1$d%% complete</string>
+    <string name="achievement_public">Public achievements</string>
+    <string name="achievement_hidden">Hidden achievements</string>
+    <string name="achievement_progress">Progress %1$d / %2$d</string>
+    <string name="achievement_date">Unlocked on %1$s</string>
+    <string name="achievement_locked">Locked</string>
+    <string name="achievement_earned">Unlocked</string>
+    <string name="achievement_place_unavailable">Editable location text cannot reliably identify distinct encounter places yet.</string>
+    <string name="achievement_photo_unavailable">%1$d photos cannot be read and are excluded from unique-photo progress.</string>
+    <string name="achievement_history_note">Existing collections count toward achievements. Dates appear only when reliable. Event achievements are tracked from this version.</string>
+    <string name="achievement_notice">Achievement unlocked: %1$s</string>
+    <string name="achievement_loading">Loading achievements…</string>
+</resources>

@@ -31,7 +31,9 @@ class MockBreedRepositoryTest {
         assertEquals(CollectionStatistics(6, 7, 7), duplicate.statistics(coats + official, Species.CAT))
         val other = official.copy(id = "other_cat", isCollectible = false)
         val withOther = duplicate.copy(encounters = duplicate.encounters + EncounterRecord(other.id, null))
-        assertEquals(CollectionStatistics(6, 7, 8), withOther.statistics(coats + official + other, Species.CAT))
+        assertEquals(CollectionStatistics(7, 8, 8), withOther.statistics(coats + official + other, Species.CAT))
+        assertFalse(other.showsDiscoveryState)
+        assertTrue(other.countsInCollection)
         assertFalse(data.applyTo(official).isDiscovered)
     }
 

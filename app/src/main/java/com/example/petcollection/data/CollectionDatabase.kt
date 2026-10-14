@@ -32,6 +32,41 @@ class EncounterConverters {
 
 @Dao
 abstract class EncounterDao {
+    @Query("SELECT * FROM achievement_unlocks ORDER BY unlockedAt, id")
+    abstract fun observeAchievementUnlocks(): Flow<List<AchievementUnlock>>
+    @Query("SELECT * FROM achievement_photos")
+    abstract fun observeAchievementPhotos(): Flow<List<AchievementPhoto>>
+    @Query("SELECT * FROM achievement_unlocks")
+    abstract suspend fun achievementUnlocks(): List<AchievementUnlock>
+    @Query("SELECT * FROM achievement_photos")
+    abstract suspend fun achievementPhotos(): List<AchievementPhoto>
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract suspend fun insertAchievement(unlock: AchievementUnlock)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract suspend fun insertAchievementPhoto(photo: AchievementPhoto)
+    @Query("UPDATE achievement_unlocks SET announced = 1 WHERE id = :id AND announced = 0")
+    abstract suspend fun claimAchievementAnnouncement(id: String): Int
+
+    @Transaction
+    open suspend fun reconcileAchievements(catalog: List<Breed>, unlockedAt: Long? = null, announce: Boolean = false) {
+        val existing = achievementUnlocks().map { it.id }.toSet()
+        AchievementRules.evaluate(catalog, allRecords(), achievementPhotos()).filter { it.fulfilled && it.achievement.name !in existing }
+            .forEach { insertAchievement(AchievementUnlock(it.achievement.name, unlockedAt, !announce)) }
+    }
+
+    @Transaction
+    open suspend fun createTracked(record: EncounterRecord, photo: AchievementPhoto?, catalog: List<Breed>, savedAt: Long): Boolean {
+        val first = create(record)
+        photo?.let { insertAchievementPhoto(it) }
+        reconcileAchievements(catalog, savedAt, true)
+        return first
+    }
+
+    @Transaction
+    open suspend fun updateTracked(record: EncounterRecord, catalog: List<Breed>, savedAt: Long) {
+        updateAndRepairCovers(record)
+        reconcileAchievements(catalog, savedAt, true)
+    }
     @Query("SELECT * FROM photo_sort_modes")
     abstract fun observePhotoSortModes(): Flow<List<PhotoSortSetting>>
     @Query("SELECT * FROM photo_custom_order ORDER BY position, encounterId")
@@ -261,11 +296,17 @@ abstract class EncounterDao {
 }
 
 @Database(entities = [EncounterRecord::class, BreedCover::class, OtherAlbum::class, OtherAlbumMember::class,
-    PhotoSortSetting::class, PhotoOrder::class], version = 3, exportSchema = true)
+    PhotoSortSetting::class, PhotoOrder::class, AchievementUnlock::class, AchievementPhoto::class], version = 4, exportSchema = true)
 @TypeConverters(EncounterConverters::class)
 abstract class CollectionDatabase : RoomDatabase() {
     abstract fun encounters(): EncounterDao
     companion object {
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE achievement_unlocks (id TEXT NOT NULL PRIMARY KEY, unlockedAt INTEGER, announced INTEGER NOT NULL)")
+                db.execSQL("CREATE TABLE achievement_photos (encounterId TEXT NOT NULL PRIMARY KEY, fingerprint TEXT, recognizedSavedAt INTEGER, savedZoneId TEXT)")
+            }
+        }
         val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Back up FK children before rebuilding the existing date column as nullable.
@@ -321,7 +362,7 @@ abstract class CollectionDatabase : RoomDatabase() {
         @Volatile private var instance: CollectionDatabase? = null
         fun getInstance(context: Context): CollectionDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(context.applicationContext, CollectionDatabase::class.java,
-                "collection.db").addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
+                "collection.db").addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build().also { instance = it }
         }
     }
 }

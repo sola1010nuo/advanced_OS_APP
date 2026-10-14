@@ -26,6 +26,7 @@ data class Breed(
     val isLegacyBreed: Boolean = false
 ) {
     val showsDiscoveryState: Boolean get() = isCollectible || isCoatCategory
+    val countsInCollection: Boolean get() = showsDiscoveryState || id == "other_cat"
     /** Visibility is independent of membership in the collectible catalog. */
     val isVisibleInCollection: Boolean get() = !isHiddenUntilDiscovered || isDiscovered
     val isSecretMonkey: Boolean get() = id == MockBreedRepository.MONKEY_ID

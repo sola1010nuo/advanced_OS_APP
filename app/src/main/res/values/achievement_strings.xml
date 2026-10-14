@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ach_first">1 2 3 起司~</string>
+    <string name="ach_first_description">首次解鎖任意圖鑑</string>
+    <string name="ach_explorer">毛孩探險家</string>
+    <string name="ach_explorer_description">解鎖 10 種不同貓狗品種</string>
+    <string name="ach_shutter">快門停不下來</string>
+    <string name="ach_shutter_description">收藏 50 張不同照片</string>
+    <string name="ach_complete">圖鑑大師</string>
+    <string name="ach_complete_description">解鎖全部圖鑑</string>
+    <string name="ach_colors">彩色咪收藏家</string>
+    <string name="ach_colors_description">解鎖全部貓咪毛色。</string>
+    <string name="ach_cats">咪咪貓貓</string>
+    <string name="ach_cats_description">解鎖全部貓咪品種</string>
+    <string name="ach_dogs">汪汪探險隊</string>
+    <string name="ach_dogs_description">解鎖全部狗狗品種。</string>
+    <string name="ach_cat_observer">喵星人觀察員</string>
+    <string name="ach_cat_observer_description">解鎖 5 種不同貓咪</string>
+    <string name="ach_dog_friend">汪星人好朋友</string>
+    <string name="ach_dog_friend_description">解鎖 5 種不同狗狗</string>
+    <string name="ach_rare">稀有獵人</string>
+    <string name="ach_rare_description">解鎖任意一種 5 星貓狗</string>
+    <string name="ach_places">毛孩足跡</string>
+    <string name="ach_places_description">記錄 5 個不同的相遇地點</string>
+    <string name="ach_monkey">你今天被搶了嗎？</string>
+    <string name="ach_monkey_description">解鎖神祕猴子。</string>
+    <string name="ach_night">夜貓子</string>
+    <string name="ach_night_description">凌晨 00:00～04:59 成功辨識並收藏貓狗照片，以實際收藏時間計算</string>
+    <string name="ach_repeat">又是你！</string>
+    <string name="ach_repeat_description">同一個貓狗品種收藏 10 張不同照片</string>
+    <string name="ach_tortoiseshell">這隻喵有點花</string>
+    <string name="ach_tortoiseshell_description">首次收藏玳瑁貓毛色</string>
+    <string name="achievement_summary">已解鎖 %1$d／%2$d</string>
+    <string name="achievement_percent">完成 %1$d%%</string>
+    <string name="achievement_public">公開成就</string>
+    <string name="achievement_hidden">隱藏成就</string>
+    <string name="achievement_progress">進度 %1$d／%2$d</string>
+    <string name="achievement_date">解鎖於 %1$s</string>
+    <string name="achievement_locked">尚未解鎖</string>
+    <string name="achievement_earned">已解鎖</string>
+    <string name="achievement_place_unavailable">目前只有可編輯的地點文字，無法可靠計算不同相遇地點。</string>
+    <string name="achievement_photo_unavailable">有 %1$d 張照片無法讀取，暫不計入不同照片進度。</string>
+    <string name="achievement_history_note">舊收藏可回溯成就；沒有可靠紀錄時不顯示解鎖日期。事件型成就從本版本開始追蹤。</string>
+    <string name="achievement_notice">成就解鎖：%1$s</string>
+    <string name="achievement_loading">正在整理成就…</string>
+</resources>

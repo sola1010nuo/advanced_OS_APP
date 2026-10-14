@@ -25,6 +25,11 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         emit(CollectionData())
     }.stateIn(viewModelScope, SharingStarted.Eagerly, CollectionData())
     val encounters: List<EncounterRecord> get() = collection.value.encounters
+    val achievements = repository.achievements.catch {
+        operationError = true
+        emit(AchievementData())
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, AchievementData())
+    suspend fun claimAchievementAnnouncement(id: String) = repository.claimAchievementAnnouncement(id)
     var pendingEncounter by mutableStateOf<EncounterRecord?>(null)
         private set
     var showRecognitionResult by mutableStateOf(false)
@@ -95,7 +100,7 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
                 pendingEncounter = null
                 onSaved(record)
             } else {
-                val (stored, _) = repository.create(record)
+                val (stored, _) = repository.create(record, recognized = true)
                 pendingEncounter = null
                 onSaved(stored)
             }

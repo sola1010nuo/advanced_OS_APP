@@ -48,9 +48,9 @@ class DogModelUpdateTest {
                 assertEquals(breed.id, accepted.breedId)
                 assertEquals("other_dog", RecognitionPolicy.route(AnimalPrediction(AnimalCategory.DOG, .99f), catalog) { label to .749f }.breedId)
             }
-            assertEquals(65, CollectionData().statistics(catalog).totalBreeds)
+            assertEquals(66, CollectionData().statistics(catalog).totalBreeds)
             assertEquals(36, CollectionData().statistics(catalog, Species.DOG).totalBreeds)
-            assertEquals(28, CollectionData().statistics(catalog, Species.CAT).totalBreeds)
+            assertEquals(29, CollectionData().statistics(catalog, Species.CAT).totalBreeds)
             catalog.filter { it.isCoatCategory || it.isSecretMonkey || !it.showsDiscoveryState }.forEach { assertNull(it.rarity) }
         }
         val image = Bitmap.createBitmap(224, 224, Bitmap.Config.ARGB_8888)
@@ -92,7 +92,7 @@ class DogModelUpdateTest {
             val loaded = EncounterRepository(db.encounters(), context).collection.first { it.loaded }
             assertEquals(CollectionStatistics(36, 36, 43), loaded.statistics(catalog, Species.DOG))
             assertEquals(36, loaded.statistics(catalog).discovered)
-            assertEquals(65, loaded.statistics(catalog).totalBreeds)
+            assertEquals(66, loaded.statistics(catalog).totalBreeds)
             for (id in activeIds) {
                 val breed = loaded.applyTo(catalog.first { it.id == id })
                 assertTrue(breed.isDiscovered)

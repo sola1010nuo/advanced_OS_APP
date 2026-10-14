@@ -101,7 +101,7 @@ class RecognitionPolicyTest {
                     assertTrue(record.breedId in MockBreedRepository.collectionIds)
                     assertEquals(1, data.forBreed(album.id).size)
                     assertEquals(1, data.applyTo(album).collectedPhotos.size)
-                    assertEquals(0, data.statistics(catalog, album.species).discovered)
+                    assertEquals(if (otherId == "other_cat") 1 else 0, data.statistics(catalog, album.species).discovered)
                     assertEquals(1, data.statistics(catalog, album.species).encounterCount)
                     assertEquals(0, data.applyTo(catalog.first { it.id == officialId }).encounterCount)
                 }
