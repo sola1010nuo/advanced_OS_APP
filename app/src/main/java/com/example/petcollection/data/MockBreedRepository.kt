@@ -6,8 +6,10 @@ import com.example.petcollection.R
 
 /** Resource-backed breed catalog; encounter and cover state live in Room. */
 class MockBreedRepository(private val resources: Resources) : BreedRepository {
-    override fun getCollectionEntries(): List<Breed> = getBreeds() + listOf(
-        category("other_cat", Species.CAT, R.string.other_cats, R.string.other_cats_description),
+    override fun getCollectionEntries(): List<Breed> = getBreeds() + coatEntries.map { (id, name, description) ->
+        Breed(id, resources.getString(name), Species.CAT, resources.getString(description),
+            "", "", "", "", isCollectible = false, isCoatCategory = true)
+    } + listOf(
         category("other_dog", Species.DOG, R.string.other_dogs, R.string.other_dogs_description),
         category("unregistered", null, R.string.unregistered, R.string.unregistered_description)
     )
@@ -39,9 +41,19 @@ class MockBreedRepository(private val resources: Resources) : BreedRepository {
     )
 
     companion object {
+        private val coatEntries = listOf(
+            Triple("coat_orange_tabby", R.string.coat_orange_tabby, R.string.coat_orange_tabby_description),
+            Triple("coat_calico", R.string.coat_calico, R.string.coat_calico_description),
+            Triple("coat_tortoiseshell", R.string.coat_tortoiseshell, R.string.coat_tortoiseshell_description),
+            Triple("coat_tabby", R.string.coat_tabby, R.string.coat_tabby_description),
+            Triple("coat_tuxedo", R.string.coat_tuxedo, R.string.coat_tuxedo_description),
+            Triple("coat_black", R.string.coat_black, R.string.coat_black_description),
+            Triple("other_cat", R.string.other_cats, R.string.coat_other_description)
+        )
+        val coatCategoryIds: Set<String> get() = coatEntries.map { it.first }.toSet()
         const val MONKEY_ID = "monkey"
         val normalBreedIds: Set<String> get() = entries.map { it.id }.toSet()
-        val collectionIds: Set<String> get() = normalBreedIds + setOf("other_cat", "other_dog", "unregistered")
+        val collectionIds: Set<String> get() = normalBreedIds + coatCategoryIds + setOf("other_cat", "other_dog", "unregistered")
         fun total(species: Species): Int = entries.count { it.species == species }
 
         private val entries = listOf(

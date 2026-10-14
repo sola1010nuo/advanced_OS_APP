@@ -142,9 +142,25 @@ fun CollectionScreen(
 
                 }
             }
-            items(breeds.filter { it.isVisibleInCollection && it.species == species && (species != null || it.isCollectible) }
+            items(breeds.filter { it.isVisibleInCollection && it.species == species && (species != null || it.isCollectible)
+                && !it.isCoatCategory && !(species == Species.CAT && it.id == "other_cat") }
                 .sortedBy { !it.isCollectible }, key = { it.id }) { breed ->
                 BreedCard(breed, onClick = { selectedBreedId = breed.id })
+            }
+            if (species == Species.CAT) {
+                item(span = { GridItemSpan(maxLineSpan) }, key = "coat-heading") {
+                    Row(Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        HorizontalDivider(Modifier.weight(1f))
+                        Text(stringResource(R.string.coat_categories), style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold)
+                        HorizontalDivider(Modifier.weight(1f))
+                    }
+                }
+                items(breeds.filter { it.isCoatCategory && it.isVisibleInCollection }, key = { it.id }) { breed ->
+                    BreedCard(breed, onClick = { selectedBreedId = breed.id })
+                }
             }
         }
     }
@@ -173,16 +189,19 @@ private fun BreedCard(breed: Breed, onClick: () -> Unit) {
             else CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
         BreedImageArea(
             breed = breed, photo = breed.coverPhoto,
-            locked = breed.isCollectible && !breed.isDiscovered, modifier = Modifier.fillMaxWidth().aspectRatio(1.15f)
+            locked = breed.showsDiscoveryState && !breed.isDiscovered, modifier = Modifier.fillMaxWidth().aspectRatio(1.15f)
         )
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (breed.isSecretMonkey) MonkeyLegendaryBadge()
             Text(breed.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.heightIn(min = 40.dp))
-            Text(if (breed.isCollectible) stringResource(if (breed.isDiscovered) R.string.breed_discovered else R.string.breed_undiscovered)
+            Text(if (breed.showsDiscoveryState) stringResource(if (breed.isDiscovered) R.string.breed_discovered else R.string.breed_undiscovered)
                 else pluralStringResource(R.plurals.breed_encounters, breed.encounterCount, breed.encounterCount),
                 style = MaterialTheme.typography.labelMedium,
                 color = if (breed.isDiscovered) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+            if (breed.isCoatCategory) Text(pluralStringResource(R.plurals.breed_encounters,
+                breed.encounterCount, breed.encounterCount), style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

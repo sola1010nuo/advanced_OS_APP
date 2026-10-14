@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="coat_categories">Coat Color Categories</string>
+    <string name="unclassified_cat_photos">Unclassified Cat Photos</string>
+    <string name="coat_orange_tabby">Orange Tabby</string>
+    <string name="coat_calico">Calico</string>
+    <string name="coat_tortoiseshell">Tortoiseshell</string>
+    <string name="coat_tabby">Tabby</string>
+    <string name="coat_tuxedo">Tuxedo</string>
+    <string name="coat_black">Black Cat</string>
+    <string name="coat_orange_tabby_description">Mostly orange fur, often with tabby markings. This is a coat category rather than a breed. Add matching photos manually.</string>
+    <string name="coat_calico_description">Patches of three colors, typically white, orange and black. This is a coat category rather than a breed. Add matching photos manually.</string>
+    <string name="coat_tortoiseshell_description">Mottled black and orange fur with a tortoiseshell appearance. This is a coat category rather than a breed. Add matching photos manually.</string>
+    <string name="coat_tabby_description">Fur with stripes, spots or swirling tabby markings. This is a coat category rather than a breed. Add matching photos manually.</string>
+    <string name="coat_tuxedo_description">Mostly black and white fur, often with a white chest and belly resembling a tuxedo. This is a coat category rather than a breed. Add matching photos manually.</string>
+    <string name="coat_black_description">Predominantly black fur. This is a coat category rather than a breed. Add matching photos manually.</string>
+    <string name="coat_other_description">Cats whose coat does not match the six supported colors or cannot be classified confidently, including white or blue-gray coats. This is a coat album, not a breed.</string>
+</resources>

@@ -58,10 +58,10 @@ fun BreedDetailScreen(
         item(span = { GridItemSpan(2) }) {
             Card(shape = RoundedCornerShape(24.dp)) {
                 BreedImageArea(breed, breed.coverPhoto,
-                    locked = breed.isCollectible && !breed.isDiscovered,
+                    locked = breed.showsDiscoveryState && !breed.isDiscovered,
                     modifier = Modifier.fillMaxWidth().height(220.dp))
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (breed.isCollectible) {
+                    if (breed.showsDiscoveryState) {
                         Text(stringResource(if (breed.isDiscovered) R.string.breed_discovered else R.string.breed_undiscovered),
                             style = MaterialTheme.typography.titleMedium)
                         if (!breed.isDiscovered) Text(stringResource(R.string.breed_locked_hint),

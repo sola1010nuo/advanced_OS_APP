@@ -69,7 +69,7 @@ fun RecognitionResultDialog(
                             verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(stringResource(message), style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold)
-                            if (breed.isCollectible) Text(breed.name, style = MaterialTheme.typography.titleMedium)
+                            if (breed.showsDiscoveryState) Text(breed.name, style = MaterialTheme.typography.titleMedium)
                         }
                     }
                 }
