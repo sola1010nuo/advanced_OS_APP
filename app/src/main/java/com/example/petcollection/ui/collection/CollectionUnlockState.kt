@@ -31,6 +31,8 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         private set
     var isFirstDiscovery by mutableStateOf(false)
         private set
+    var recognitionConfidence by mutableStateOf<Float?>(null)
+        private set
     private var editingExisting = false
 
     fun applyTo(breed: Breed, data: CollectionData = collection.value): Breed = data.applyTo(breed)
@@ -40,6 +42,7 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         if (pendingEncounter != null || isWorking || !collection.value.loaded) return false
         require(breed.id in MockBreedRepository.collectionIds)
         recognitionEffects.clear()
+        recognitionConfidence = null
         pendingEncounter = EncounterRecord(breedId = breed.id, photoUri = photoUri,
             encounteredAt = photoTime ?: LocalDateTime.now())
         editingExisting = false
@@ -52,9 +55,10 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
     /** Future three-class classifier: pass canonical "monkey" here, with the selected URI.
      * This only creates a preview draft; the editor remains the sole save entry point.
      */
-    fun onClassificationResult(canonicalId: String, catalog: List<Breed>, photoUri: String): Boolean {
+    fun onClassificationResult(canonicalId: String, catalog: List<Breed>, photoUri: String, confidence: Float? = null): Boolean {
         val breed = catalog.firstOrNull { it.id == canonicalId } ?: return false
         if (!onBreedRecognized(breed, photoUri)) return false
+        recognitionConfidence = confidence
         recognitionEffects.onClassificationCompleted(requireNotNull(pendingEncounter).id, breed)
         return true
     }

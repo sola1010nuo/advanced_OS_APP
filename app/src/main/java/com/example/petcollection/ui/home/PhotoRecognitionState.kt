@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.util.Log
+import com.example.petcollection.CatColorClassifier
 import androidx.compose.runtime.*
 import com.example.petcollection.BreedClassifier
 import com.example.petcollection.AnimalClassifier
@@ -45,7 +47,10 @@ class PhotoRecognitionState {
             bitmap = photo
             val classification = withContext(Dispatchers.Default) {
                 val animal = AnimalClassifier(context).use { it.classify(photo) }
-                RecognitionPolicy.route(animal, catalog) { species ->
+                Log.d("PetRecognition", "animal top=${animal.category} confidence=${animal.confidence}")
+                RecognitionPolicy.route(animal, catalog,
+                    classifyColor = { CatColorClassifier(context).use { it.classify(photo) } },
+                    trace = { Log.d("PetRecognition", it) }) { species ->
                     val type = if (species == Species.CAT) BreedClassifier.AnimalType.CAT else BreedClassifier.AnimalType.DOG
                     BreedClassifier(context, type).use { classifier ->
                         val result = classifier.classify(photo)
@@ -54,7 +59,7 @@ class PhotoRecognitionState {
                 }
             }
             unlockState.collection.first { it.loaded }
-            check(unlockState.onClassificationResult(classification.breedId, catalog, uri.toString())) { "Another encounter is pending" }
+            check(unlockState.onClassificationResult(classification.breedId, catalog, uri.toString(), classification.confidence)) { "Another encounter is pending" }
             breedId = classification.breedId
             confidence = classification.confidence
         } catch (cancelled: CancellationException) {

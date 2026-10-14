@@ -19,8 +19,10 @@ data class Breed(
     val coverPhoto: BreedPhoto? = null,
     val collectedPhotos: List<BreedPhoto> = emptyList(),
     val isCollectible: Boolean = true,
-    val isHiddenUntilDiscovered: Boolean = false
+    val isHiddenUntilDiscovered: Boolean = false,
+    val isCoatCategory: Boolean = false
 ) {
+    val showsDiscoveryState: Boolean get() = isCollectible || isCoatCategory
     /** Visibility is independent of membership in the collectible catalog. */
     val isVisibleInCollection: Boolean get() = !isHiddenUntilDiscovered || isDiscovered
     val isSecretMonkey: Boolean get() = id == MockBreedRepository.MONKEY_ID

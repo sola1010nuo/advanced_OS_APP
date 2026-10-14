@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="coat_categories">毛色分類</string>
+    <string name="unclassified_cat_photos">未分類貓咪照片</string>
+    <string name="coat_orange_tabby">橘貓</string>
+    <string name="coat_calico">三花貓</string>
+    <string name="coat_tortoiseshell">玳瑁貓</string>
+    <string name="coat_tabby">虎斑貓</string>
+    <string name="coat_tuxedo">賓士貓</string>
+    <string name="coat_black">黑貓</string>
+    <string name="coat_orange_tabby_description">以橘色毛髮為主，常帶有虎斑紋路。這是毛色分類，不代表特定品種。可手動加入對應照片。</string>
+    <string name="coat_calico_description">白色、橘色與黑色等三色毛髮形成塊狀花色。這是毛色分類，不代表特定品種。可手動加入對應照片。</string>
+    <string name="coat_tortoiseshell_description">黑色與橘色等毛髮交錯，呈現玳瑁般的斑駁花色。這是毛色分類，不代表特定品種。可手動加入對應照片。</string>
+    <string name="coat_tabby_description">毛髮帶有條紋、斑點或渦旋等虎斑紋路。這是毛色分類，不代表特定品種。可手動加入對應照片。</string>
+    <string name="coat_tuxedo_description">以黑白配色為主，常見白色胸口與腹部，如同穿著燕尾服。這是毛色分類，不代表特定品種。可手動加入對應照片。</string>
+    <string name="coat_black_description">全身毛髮以黑色為主。這是毛色分類，不代表特定品種。可手動加入對應照片。</string>
+    <string name="coat_other_description">收錄未包含在六種毛色中，或無法有把握分類的貓咪，例如白貓、灰藍色貓咪。這是毛色相簿，不代表特定品種。</string>
+</resources>

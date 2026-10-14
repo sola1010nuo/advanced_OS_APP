@@ -91,6 +91,25 @@ class CollectionCrudUiTest {
         compose.waitUntil(10000) { !state.isWorking && state.encounters.none { it.petName == name } }
     }
 
+    @Test fun coatAlbumsSupportIndependentPhotosAndPreserveBreedProgress() {
+        mount()
+        compose.onNode(hasScrollAction()).performScrollToNode(hasText(text(R.string.coat_categories)))
+        compose.onNodeWithText(text(R.string.coat_categories)).assertIsDisplayed()
+        for (id in MockBreedRepository.coatCategoryIds) {
+            openAlbum(id, R.string.filter_cats)
+            compose.onNodeWithText(catalog.getBreed(id)!!.name).assertExists()
+            add(id, "Coat $id")
+            compose.waitUntil(10000) { state.collection.value.forBreed(id).size == 1 }
+            assertTrue(state.applyTo(catalog.getBreed(id)!!).isDiscovered)
+            assertEquals(0, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).discovered)
+            assertEquals(22, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).totalBreeds)
+            openPhoto("Coat $id")
+            deleteConfirmed("Coat $id")
+            assertFalse(state.applyTo(catalog.getBreed(id)!!).isDiscovered)
+            click(R.string.breed_back)
+        }
+    }
+
     @Test fun corgiAlbumDetailEditDeleteAndCoverUseRoomRecords() {
         mount()
         openAlbum("corgi", R.string.filter_dogs)
