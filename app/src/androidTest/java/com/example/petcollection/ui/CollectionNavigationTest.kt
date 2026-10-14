@@ -58,6 +58,26 @@ class CollectionNavigationTest {
         assertRoot()
     }
 
+    @Test fun existingCoatRecordsCountOnceOnHomeAndCollectionWithoutRecognition() {
+        runBlocking {
+            for (id in MockBreedRepository.coatCategoryIds) {
+                db.encounters().create(EncounterRecord(id, null, id = "saved-$id"))
+            }
+            db.encounters().create(EncounterRecord("coat_orange_tabby", null, id = "repeat-orange"))
+        }
+        mount()
+        compose.waitUntil(10000) { state.collection.value.statistics(catalog.getCollectionEntries()).discovered == 9 }
+        compose.onNodeWithText(resources.getString(R.string.collection_discovered_count, 7, 28)).assertExists()
+        compose.onNodeWithTag("navigation-HOME").performClick()
+        compose.onNodeWithText(resources.getString(R.string.collection_count, 9, 63)).assertExists()
+        compose.onNodeWithText(resources.getString(R.string.category_count, 7, 28)).assertExists()
+        compose.onNodeWithText(resources.getString(R.string.category_count, 1, 34)).assertExists()
+        compose.onNodeWithTag("navigation-COLLECTION").performClick()
+        compose.onNodeWithText(resources.getString(R.string.collection_discovered_count, 7, 28)).assertExists()
+        compose.onNodeWithText(resources.getString(R.string.filter_dogs)).performClick()
+        compose.onNodeWithText(resources.getString(R.string.collection_discovered_count, 1, 34)).assertExists()
+    }
+
     private fun assertRoot() {
         compose.onNodeWithText(resources.getString(R.string.filter_cats)).assertIsSelected()
         compose.onNodeWithText(resources.getString(R.string.breed_back)).assertDoesNotExist()

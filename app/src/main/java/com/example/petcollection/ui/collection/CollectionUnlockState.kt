@@ -46,7 +46,7 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         pendingEncounter = EncounterRecord(breedId = breed.id, photoUri = photoUri,
             encounteredAt = photoTime ?: LocalDateTime.now())
         editingExisting = false
-        isFirstDiscovery = breed.id in MockBreedRepository.normalBreedIds && collection.value.forBreed(breed.id).isEmpty()
+        isFirstDiscovery = breed.showsDiscoveryState && collection.value.forBreed(breed.id).isEmpty()
         showRecognitionResult = true
         operationError = false
         return true

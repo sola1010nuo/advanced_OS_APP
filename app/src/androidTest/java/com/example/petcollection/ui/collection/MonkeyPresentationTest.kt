@@ -46,7 +46,7 @@ class MonkeyPresentationTest {
                 compose.runOnIdle { language = lang; dark = night }
                 val resources = localized(lang).resources
                 val catalog = MockBreedRepository(resources).getCollectionEntries()
-                val total = catalog.count { it.isCollectible }
+                val total = CollectionData().statistics(catalog).totalBreeds
                 compose.onNodeWithText(resources.getString(R.string.collection_count, 0, total)).assertExists()
                 compose.runOnIdle {
                     assertTrue(state.onClassificationResult(MockBreedRepository.MONKEY_ID, catalog, "file:///preview-only"))

@@ -75,7 +75,7 @@ fun BreedDetailScreen(
         }
         item(span = { GridItemSpan(2) }) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (breed.isCollectible) DetailHeading(stringResource(R.string.breed_about))
+                if (breed.showsDiscoveryState) DetailHeading(stringResource(R.string.breed_about))
                 Text(breed.description, style = MaterialTheme.typography.bodyLarge)
                 if (breed.isSecretMonkey) Text(stringResource(R.string.monkey_model_note),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

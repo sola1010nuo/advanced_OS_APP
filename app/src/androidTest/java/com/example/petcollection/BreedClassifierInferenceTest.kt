@@ -83,7 +83,7 @@ class BreedClassifierInferenceTest {
             val breed = catalog.first { it.id == recognition.breedId }
             assertFalse(state.applyTo(breed).isDiscovered)
             assertTrue(state.showRecognitionResult)
-            assertEquals(breed.isCollectible, state.isFirstDiscovery)
+            assertEquals(breed.showsDiscoveryState, state.isFirstDiscovery)
             assertEquals(uri.toString(), state.pendingEncounter!!.photoUri)
             withContext(Dispatchers.Main) {
                 state.editEncounter()
@@ -112,7 +112,7 @@ class BreedClassifierInferenceTest {
                     .use { it.readBytes() }
                 assertArrayEquals(originalBytes, savedBytes)
             }
-            assertEquals(if (breed.isCollectible) 1 else 0, state.collection.value.statistics(catalog).discovered)
+            assertEquals(if (breed.showsDiscoveryState) 1 else 0, state.collection.value.statistics(catalog).discovered)
             val repository = com.example.petcollection.data.EncounterRepository(database.encounters(), context)
             val store = androidx.lifecycle.ViewModelStore()
             withContext(Dispatchers.Main) {
