@@ -98,16 +98,59 @@ class CollectionCrudUiTest {
         for (id in MockBreedRepository.coatCategoryIds) {
             openAlbum(id, R.string.filter_cats)
             compose.onNodeWithText(catalog.getBreed(id)!!.name).assertExists()
-            add(id, "Coat $id")
+            compose.runOnIdle {
+                assertTrue(state.onClassificationResult(id, catalog.getCollectionEntries(), Uri.fromFile(fixture).toString()))
+                assertTrue(state.isFirstDiscovery)
+                assertFalse(state.applyTo(catalog.getBreed(id)!!).isDiscovered)
+                assertTrue(state.collection.value.forBreed(id).isEmpty())
+            }
+            compose.onNodeWithText(text(R.string.recognition_first)).assertExists()
+            click(R.string.encounter_cancel)
+            assertTrue(state.collection.value.forBreed(id).isEmpty())
+            add(id, "Coat $id", normalFirst = true)
             compose.waitUntil(10000) { state.collection.value.forBreed(id).size == 1 }
             assertTrue(state.applyTo(catalog.getBreed(id)!!).isDiscovered)
-            assertEquals(0, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).discovered)
-            assertEquals(22, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).totalBreeds)
+            add(id, "Second $id")
+            assertEquals(1, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).discovered)
+            assertEquals(28, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).totalBreeds)
+            openPhoto("Second $id")
+            click(R.string.encounter_set_cover)
+            compose.waitUntil(10000) {
+                state.applyTo(catalog.getBreed(id)!!).coverPhoto?.id == state.encounters.first { it.petName == "Second $id" }.id
+            }
+            compose.onNodeWithText(text(R.string.encounter_current_cover)).assertExists()
+            deleteConfirmed("Second $id")
+            assertTrue(state.applyTo(catalog.getBreed(id)!!).isDiscovered)
             openPhoto("Coat $id")
             deleteConfirmed("Coat $id")
             assertFalse(state.applyTo(catalog.getBreed(id)!!).isDiscovered)
             click(R.string.breed_back)
         }
+    }
+
+    @Test fun otherCatsRemainPhotoAlbumWithoutDiscoveryState() {
+        mount()
+        val other = catalog.getBreed("other_cat")!!
+        assertFalse(other.isCoatCategory)
+        assertFalse(other.showsDiscoveryState)
+        openAlbum(other.id, R.string.filter_cats)
+        compose.onAllNodesWithText(text(R.string.breed_undiscovered)).assertCountEquals(0)
+        compose.onAllNodesWithText(text(R.string.breed_discovered)).assertCountEquals(0)
+        compose.runOnIdle {
+            assertTrue(state.onClassificationResult(other.id, catalog.getCollectionEntries(), Uri.fromFile(fixture).toString()))
+            assertFalse(state.isFirstDiscovery)
+        }
+        compose.onNodeWithText(text(R.string.recognition_other_cat)).assertExists()
+        click(R.string.encounter_cancel)
+        add(other.id, "Other cat")
+        assertEquals(1, state.collection.value.forBreed(other.id).size)
+        add(other.id, "Second other cat")
+        openPhoto("Second other cat")
+        click(R.string.encounter_set_cover)
+        compose.waitUntil(10000) {
+            state.applyTo(other).coverPhoto?.id == state.encounters.first { it.petName == "Second other cat" }.id
+        }
+        compose.onNodeWithText(text(R.string.encounter_current_cover)).assertExists()
     }
 
     @Test fun corgiAlbumDetailEditDeleteAndCoverUseRoomRecords() {
@@ -304,7 +347,7 @@ class CollectionCrudUiTest {
         compose.onNodeWithText(text(R.string.other_photos)).assertIsDisplayed()
         compose.onNodeWithText(text(R.string.other_cats)).assertDoesNotExist()
         compose.onNodeWithText(text(R.string.other_dogs)).assertDoesNotExist()
-        compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 22)).assertDoesNotExist()
+        compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 28)).assertDoesNotExist()
         compose.onNodeWithText(context.getString(R.string.collection_discovered_count, 0, 34)).assertDoesNotExist()
         for ((id, filter) in listOf("other_cat" to R.string.filter_cats, "other_dog" to R.string.filter_dogs,
             "unregistered" to R.string.filter_other)) {
@@ -349,7 +392,7 @@ class CollectionCrudUiTest {
         val breed = catalog.getBreed(id)!!
         val total = state.collection.value.statistics(catalog.getCollectionEntries()).totalBreeds
         assertEquals(catalog.getBreeds().size, total)
-        assertEquals(Species.entries.sumOf { MockBreedRepository.total(it) } + 1, total)
+        assertEquals(Species.entries.sumOf { MockBreedRepository.total(it) } + MockBreedRepository.coatCategoryIds.size + 1, total)
         click(R.string.filter_other)
         compose.onNodeWithText(breed.name).assertDoesNotExist()
         compose.onNodeWithText(text(R.string.monkey_rarity)).assertDoesNotExist()

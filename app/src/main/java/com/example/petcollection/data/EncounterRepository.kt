@@ -33,12 +33,12 @@ data class CollectionData(
     }
     fun discoveredCount(ids: Set<String>) = encounters.map { it.breedId }.filter { it in ids }.toSet().size
 
-    /** Catalog defines official breeds; only persisted rows contribute to discovery or totals. */
+    /** Breeds, coat entries and the secret monkey share discovery totals from persisted rows. */
     fun statistics(catalog: List<Breed>, species: Species? = null): CollectionStatistics {
-        val officialIds = catalog.filter { it.isCollectible && (species == null || it.species == species) }
+        val catalogIds = catalog.filter { it.showsDiscoveryState && (species == null || it.species == species) }
             .map { it.id }.toSet()
         val encounterIds = catalog.filter { species == null || it.species == species }.map { it.id }.toSet()
-        return CollectionStatistics(discoveredCount(officialIds), officialIds.size,
+        return CollectionStatistics(discoveredCount(catalogIds), catalogIds.size,
             encounters.count { it.breedId in encounterIds })
     }
 }

@@ -2,7 +2,8 @@ package com.example.petcollection.ui.home
 
 import androidx.annotation.StringRes
 import com.example.petcollection.R
-import com.example.petcollection.data.MockBreedRepository
+import com.example.petcollection.data.Breed
+import com.example.petcollection.data.CollectionData
 import com.example.petcollection.data.Species
 
 // Screen input; production values come from CollectionData, not preview fixtures.
@@ -11,12 +12,12 @@ data class CollectionCategory(val id: String, @param:StringRes val nameRes: Int,
 data class AchievementPreview(@param:StringRes val nameRes: Int, val breedThreshold: Int? = null)
 
 object HomePreviewData {
-    val categories: List<CollectionCategory> = listOf(
-        CollectionCategory("cat", R.string.cat_collection, MockBreedRepository.total(Species.CAT)),
-        CollectionCategory("dog", R.string.dog_collection, MockBreedRepository.total(Species.DOG))
-    )
-    val total: Int get() = MockBreedRepository.normalBreedIds.size
-    val collected: Int get() = categories.sumOf { it.collected }
+    fun categories(catalog: List<Breed>): List<CollectionCategory> = Species.entries.map { species ->
+        val statistics = CollectionData().statistics(catalog, species)
+        CollectionCategory(if (species == Species.CAT) "cat" else "dog",
+            if (species == Species.CAT) R.string.cat_collection else R.string.dog_collection,
+            statistics.totalBreeds)
+    }
     val achievements = listOf(
         AchievementPreview(R.string.first_discovery, 1),
         AchievementPreview(R.string.beginner_collector, 5),

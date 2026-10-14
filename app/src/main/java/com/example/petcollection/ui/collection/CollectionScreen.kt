@@ -161,6 +161,11 @@ fun CollectionScreen(
                 items(breeds.filter { it.isCoatCategory && it.isVisibleInCollection }, key = { it.id }) { breed ->
                     BreedCard(breed, onClick = { selectedBreedId = breed.id })
                 }
+                if (breeds.any { it.id == "other_cat" }) item(span = { GridItemSpan(maxLineSpan) }, key = "other-cat-album") {
+                    TextButton(onClick = { selectedBreedId = "other_cat" }) {
+                        Text(stringResource(R.string.other_cats))
+                    }
+                }
             }
         }
     }

@@ -6,7 +6,7 @@ import org.junit.Test
 class MockBreedRepositoryTest {
     @Test fun coatAlbumsHaveIndependentDiscoveryAndKeepBreedProgress() {
         assertEquals(setOf("coat_orange_tabby", "coat_calico", "coat_tortoiseshell", "coat_tabby",
-            "coat_tuxedo", "coat_black", "other_cat"), MockBreedRepository.coatCategoryIds)
+            "coat_tuxedo", "coat_black"), MockBreedRepository.coatCategoryIds)
         assertTrue(MockBreedRepository.collectionIds.containsAll(MockBreedRepository.coatCategoryIds))
         assertFalse("blue" in MockBreedRepository.collectionIds)
         assertTrue("russian_blue" in MockBreedRepository.normalBreedIds)
@@ -26,7 +26,12 @@ class MockBreedRepositoryTest {
             assertEquals(records.first { it.breedId == coat.id }.photoUri, saved.coverPhoto!!.uri)
             assertEquals(1, data.forBreed(coat.id).size)
         }
-        assertEquals(CollectionStatistics(0, 1, 7), data.statistics(coats + official, Species.CAT))
+        assertEquals(CollectionStatistics(6, 7, 6), data.statistics(coats + official, Species.CAT))
+        val duplicate = data.copy(encounters = records + records.first().copy(id = "repeat"))
+        assertEquals(CollectionStatistics(6, 7, 7), duplicate.statistics(coats + official, Species.CAT))
+        val other = official.copy(id = "other_cat", isCollectible = false)
+        val withOther = duplicate.copy(encounters = duplicate.encounters + EncounterRecord(other.id, null))
+        assertEquals(CollectionStatistics(6, 7, 8), withOther.statistics(coats + official + other, Species.CAT))
         assertFalse(data.applyTo(official).isDiscovered)
     }
 

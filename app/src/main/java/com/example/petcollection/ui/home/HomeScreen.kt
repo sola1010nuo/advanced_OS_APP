@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    categories: List<CollectionCategory> = HomePreviewData.categories,
+    categories: List<CollectionCategory>? = null,
     encounterCount: Int = 0,
     selectedPhotoUri: Uri? = null,
     onAddPhoto: () -> Unit = {},
@@ -45,8 +45,11 @@ fun HomeScreen(
     onRetryRecognition: () -> Unit = {},
     collectionStatistics: com.example.petcollection.data.CollectionStatistics? = null
 ) {
-    val progress = collectionStatistics ?: com.example.petcollection.data.CollectionData().statistics(
-        com.example.petcollection.data.MockBreedRepository(androidx.compose.ui.platform.LocalContext.current.resources).getCollectionEntries()).copy(encounterCount = encounterCount)
+    val catalog = com.example.petcollection.data.MockBreedRepository(
+        androidx.compose.ui.platform.LocalContext.current.resources).getCollectionEntries()
+    val progress = collectionStatistics ?: com.example.petcollection.data.CollectionData().statistics(catalog)
+        .copy(encounterCount = encounterCount)
+    val displayedCategories = categories ?: HomePreviewData.categories(catalog)
     val photoPreview = remember { BringIntoViewRequester() }
     LaunchedEffect(selectedPhotoUri, recognitionState.processing) {
         if (selectedPhotoUri != null) {
@@ -62,7 +65,7 @@ fun HomeScreen(
         CollectionProgressCard(progress.discovered, progress.totalBreeds, progress.encounterCount)
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionTitle(stringResource(R.string.your_collections))
-            categories.forEach { category ->
+            displayedCategories.forEach { category ->
                 CollectionCategoryCard(category, onClick = {
                     onOpenCollection(if (category.id == "cat") Species.CAT else Species.DOG)
                 })
