@@ -71,7 +71,7 @@ internal fun MonkeyRecognitionPolaroid(
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                RecognitionEffectAnchor(effects, draft.id, Modifier.fillMaxWidth().aspectRatio(1f)) {
+                RecognitionEffectAnchor(effects, draft.id, Modifier.fillMaxWidth().aspectRatio(EncounterPhotoLayout.aspectRatio)) {
                     BreedImageArea(breed, BreedPhoto(draft.id, draft.photoUri), locked = false, modifier = Modifier.fillMaxSize())
                 }
                 Column(Modifier.padding(horizontal = 8.dp, vertical = 12.dp),

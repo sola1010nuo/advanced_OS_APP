@@ -54,12 +54,8 @@ fun CollectionScreen(
     var selectedSpecies by rememberSaveable(initialSpecies) { mutableStateOf(initialSpecies.name) }
     var selectedBreedId by rememberSaveable { mutableStateOf<String?>(null) }
     var selectedEncounterId by rememberSaveable { mutableStateOf<String?>(null) }
-    var pickerTargetId by rememberSaveable { mutableStateOf<String?>(null) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        if (uri != null) breeds.firstOrNull { it.id == pickerTargetId }?.let {
-            unlockState.onBreedRecognized(it, uri.toString())
-        }
-        pickerTargetId = null
+        if (uri != null) unlockState.photoInput.begin(uri)
     }
     val catGridState = rememberLazyGridState()
     val dogGridState = rememberLazyGridState()
@@ -96,7 +92,7 @@ fun CollectionScreen(
             onBack = { selectedEncounterId = null },
             onEdit = { unlockState.startEdit(selectedEncounter) },
             onDelete = { unlockState.deleteEncounter(selectedEncounter.id) { selectedEncounterId = null } },
-            onSetCover = { unlockState.selectCover(selectedBreed.id, selectedEncounter.id) },
+            onSetCover = { unlockState.photoInput.beginCover(selectedBreed.id, selectedEncounter) },
             busy = unlockState.isWorking, modifier = modifier)
     } else if (selectedBreed != null) {
         BreedDetailScreen(selectedBreed, onBack = { selectedBreedId = null }, modifier = modifier,
@@ -107,7 +103,6 @@ fun CollectionScreen(
             onOpenEncounter = { selectedEncounterId = it },
             onAddEncounter = {
                 if (!unlockState.isWorking) {
-                    pickerTargetId = selectedBreed.id
                     picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 }
             })
@@ -203,7 +198,7 @@ private fun BreedCard(breed: Breed, onClick: () -> Unit) {
             else CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
         BreedImageArea(
             breed = breed, photo = breed.coverPhoto,
-            locked = breed.showsDiscoveryState && !breed.isDiscovered, modifier = Modifier.fillMaxWidth().aspectRatio(1.15f)
+            locked = breed.showsDiscoveryState && !breed.isDiscovered, modifier = Modifier.fillMaxWidth().aspectRatio(EncounterPhotoLayout.aspectRatio)
         )
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (breed.isSecretMonkey) MonkeyLegendaryBadge()

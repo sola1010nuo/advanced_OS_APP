@@ -14,6 +14,7 @@ import com.example.petcollection.AnimalClassifier
 import com.example.petcollection.data.RecognitionPolicy
 import com.example.petcollection.data.Breed
 import com.example.petcollection.data.Species
+import com.example.petcollection.data.PhotoMetadata
 import com.example.petcollection.ui.collection.CollectionUnlockState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +35,17 @@ class PhotoRecognitionState {
     var failed by mutableStateOf(false)
         private set
 
-    suspend fun recognize(context: Context, uri: Uri, catalog: List<Breed>, unlockState: CollectionUnlockState) {
+    fun reset() {
+        request++
+        bitmap = null
+        breedId = null
+        confidence = null
+        processing = false
+        failed = false
+    }
+
+    suspend fun recognize(context: Context, uri: Uri, catalog: List<Breed>, unlockState: CollectionUnlockState,
+        metadata: PhotoMetadata? = null) {
         val currentRequest = ++request
         unlockState.recognitionEffects.clear()
         bitmap = null
@@ -59,7 +70,7 @@ class PhotoRecognitionState {
                 }
             }
             unlockState.collection.first { it.loaded }
-            check(unlockState.onClassificationResult(classification.breedId, catalog, uri.toString(), classification.confidence)) { "Another encounter is pending" }
+            check(unlockState.onClassificationResult(classification.breedId, catalog, uri.toString(), classification.confidence, metadata)) { "Another encounter is pending" }
             breedId = classification.breedId
             confidence = classification.confidence
         } catch (cancelled: CancellationException) {

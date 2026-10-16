@@ -62,7 +62,7 @@ fun BreedDetailScreen(
             Card(shape = RoundedCornerShape(24.dp)) {
                 BreedImageArea(breed, breed.coverPhoto,
                     locked = breed.showsDiscoveryState && !breed.isDiscovered,
-                    modifier = Modifier.fillMaxWidth().height(220.dp))
+                    modifier = Modifier.fillMaxWidth().aspectRatio(EncounterPhotoLayout.aspectRatio))
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (breed.showsDiscoveryState) {
                         Text(stringResource(if (breed.isDiscovered) R.string.breed_discovered else R.string.breed_undiscovered),
@@ -123,7 +123,7 @@ fun BreedDetailScreen(
                     .then(drag.itemModifier(encounter.id)),
                 shape = RoundedCornerShape(18.dp)) {
                 BreedImageArea(breed, BreedPhoto(encounter.id, encounter.photoUri), locked = false,
-                    modifier = Modifier.fillMaxWidth().aspectRatio(1f))
+                    modifier = Modifier.fillMaxWidth().aspectRatio(EncounterPhotoLayout.aspectRatio))
                 Text(encounter.petName ?: encounter.encounteredAt?.toLocalDate()?.toString() ?: stringResource(R.string.photo_date_missing),
                     modifier = Modifier.padding(12.dp), style = MaterialTheme.typography.labelLarge)
             }

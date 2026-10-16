@@ -139,21 +139,38 @@ class AchievementsUiTest {
         try {
             compose.setContent { PetCollectionTheme(darkTheme = false) { AchievementNotifications(state, Modifier.fillMaxWidth()) } }
             compose.waitUntil(10000) { state.achievements.value.loaded }
+            // Freeze auto-advancement so a semantics assertion cannot skip a short-lived queued banner.
+            compose.mainClock.autoAdvance = false
             runBlocking { repo.create(EncounterRecord("bombay", Uri.fromFile(source).toString())) }
             val firstNotice = context.getString(R.string.achievement_notice, context.getString(R.string.ach_first))
             val rareNotice = context.getString(R.string.achievement_notice, context.getString(R.string.ach_rare))
-            compose.waitUntil(10000) { compose.onAllNodesWithText(firstNotice).fetchSemanticsNodes().isNotEmpty() }
+            compose.waitUntil(10000) {
+                compose.mainClock.advanceTimeByFrame()
+                state.achievements.value.unlock(Achievement.FIRST)?.announced == true
+            }
+            compose.mainClock.advanceTimeBy(400)
+            compose.onNodeWithText(firstNotice).assertExists()
             compose.onAllNodesWithTag("achievement-notification").assertCountEquals(1)
-            compose.waitUntil(10000) { compose.onAllNodesWithText(rareNotice).fetchSemanticsNodes().isNotEmpty() }
+            compose.waitUntil(10000) {
+                compose.mainClock.advanceTimeByFrame()
+                state.achievements.value.unlock(Achievement.RARE)?.announced == true
+            }
+            compose.mainClock.advanceTimeBy(400)
+            compose.onNodeWithText(rareNotice).assertExists()
             compose.onNodeWithText(firstNotice).assertDoesNotExist()
             compose.onAllNodesWithTag("achievement-notification").assertCountEquals(1)
-            compose.waitUntil(10000) { compose.onAllNodesWithTag("achievement-notification").fetchSemanticsNodes().isEmpty() }
+            compose.mainClock.advanceTimeBy(3000)
+            compose.waitUntil(10000) {
+                compose.mainClock.advanceTimeByFrame()
+                compose.onAllNodesWithTag("achievement-notification").fetchSemanticsNodes().isEmpty()
+            }
             runBlocking {
                 assertFalse(repo.claimAchievementAnnouncement(Achievement.FIRST.name))
                 assertFalse(repo.claimAchievementAnnouncement(Achievement.RARE.name))
                 repo.collection.first().encounters.forEach { repo.delete(it.id) }
             }
         } finally {
+            compose.mainClock.autoAdvance = true
             val store = ViewModelStore(); store.put("achievements", state); store.clear()
             db.close(); source.delete()
         }

@@ -16,7 +16,7 @@ import org.junit.Test
 class AchievementPersistenceTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private fun open(name: String) = Room.databaseBuilder(context, CollectionDatabase::class.java, name)
-        .addMigrations(CollectionDatabase.MIGRATION_1_2, CollectionDatabase.MIGRATION_2_3, CollectionDatabase.MIGRATION_3_4).build()
+        .addMigrations(CollectionDatabase.MIGRATION_1_2, CollectionDatabase.MIGRATION_2_3, CollectionDatabase.MIGRATION_3_4, CollectionDatabase.MIGRATION_4_5, CollectionDatabase.MIGRATION_5_6).build()
 
     @Test fun versionThreeMigrationPreservesPhotosCoversAlbumsAndSortOrdersAndBackfillsWithoutDates() = runBlocking {
         val name = "ach-migration-${UUID.randomUUID()}.db"
@@ -40,6 +40,17 @@ class AchievementPersistenceTest {
                 raw.execSQL("DROP TABLE achievement_unlocks")
                 raw.execSQL("DROP TABLE achievement_photos")
                 raw.execSQL("UPDATE room_master_table SET identity_hash = 'b642b4bb8b0851bd69adcb8a2fc8aae9' WHERE id = 42")
+                raw.setForeignKeyConstraintsEnabled(false)
+                raw.execSQL("CREATE TABLE encounters_v3 (breedId TEXT NOT NULL, photoUri TEXT, encounteredAt TEXT, timeZoneId TEXT NOT NULL, id TEXT NOT NULL PRIMARY KEY, petName TEXT, location TEXT, note TEXT, createdAt INTEGER NOT NULL)")
+                raw.execSQL("INSERT INTO encounters_v3 SELECT breedId, photoUri, encounteredAt, timeZoneId, id, petName, location, note, createdAt FROM encounters")
+                raw.execSQL("DROP TABLE encounters")
+                raw.execSQL("ALTER TABLE encounters_v3 RENAME TO encounters")
+                raw.execSQL("CREATE INDEX index_encounters_breedId ON encounters(breedId)")
+                raw.execSQL("CREATE TABLE breed_covers_v3 (breedId TEXT NOT NULL PRIMARY KEY, encounterId TEXT NOT NULL, FOREIGN KEY(encounterId) REFERENCES encounters(id) ON DELETE CASCADE)")
+                raw.execSQL("INSERT INTO breed_covers_v3 SELECT breedId, encounterId FROM breed_covers")
+                raw.execSQL("DROP TABLE breed_covers")
+                raw.execSQL("ALTER TABLE breed_covers_v3 RENAME TO breed_covers")
+                raw.execSQL("CREATE INDEX index_breed_covers_encounterId ON breed_covers(encounterId)")
                 raw.version = 3
             }
             db = open(name)

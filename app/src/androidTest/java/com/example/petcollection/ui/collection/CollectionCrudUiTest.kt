@@ -54,6 +54,15 @@ class CollectionCrudUiTest {
         val node = compose.onNodeWithText(text(id))
         try { node.assertIsDisplayed() } catch (_: AssertionError) { node.performScrollTo() }
         node.performClick()
+        if (id == R.string.encounter_set_cover &&
+            (state.photoInput.opening || state.photoInput.source != null || state.photoInput.error)) {
+            compose.waitUntil(10000) { state.photoInput.source != null || state.photoInput.error }
+            assertFalse(state.photoInput.error)
+            assertEquals(CropMode.COVER, state.photoInput.mode)
+            compose.onNodeWithText(text(R.string.crop_cover_ratio)).assertIsDisplayed()
+            compose.onNodeWithTag("photo-crop-confirm").performClick()
+            compose.waitUntil(10000) { !state.photoInput.exporting && state.photoInput.source == null }
+        }
     }
     private fun add(id: String, name: String, normalFirst: Boolean = false) {
         compose.runOnIdle { assertTrue(state.onBreedRecognized(catalog.getBreed(id)!!, Uri.fromFile(fixture).toString())) }
@@ -112,7 +121,8 @@ class CollectionCrudUiTest {
             assertTrue(state.applyTo(catalog.getBreed(id)!!).isDiscovered)
             add(id, "Second $id")
             assertEquals(1, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).discovered)
-            assertEquals(29, state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).totalBreeds)
+            assertEquals(MockBreedRepository.total(Species.CAT) + MockBreedRepository.coatCategoryIds.size + 1,
+                state.collection.value.statistics(catalog.getCollectionEntries(), Species.CAT).totalBreeds)
             openPhoto("Second $id")
             click(R.string.encounter_set_cover)
             compose.waitUntil(10000) {
@@ -391,8 +401,8 @@ class CollectionCrudUiTest {
         val id = MockBreedRepository.MONKEY_ID
         val breed = catalog.getBreed(id)!!
         val total = state.collection.value.statistics(catalog.getCollectionEntries()).totalBreeds
-        assertEquals(catalog.getBreeds().size, total)
-        assertEquals(Species.entries.sumOf { MockBreedRepository.total(it) } + MockBreedRepository.coatCategoryIds.size + 1, total)
+        assertEquals(catalog.getBreeds().size + MockBreedRepository.coatCategoryIds.size + 1, total)
+        assertEquals(Species.entries.sumOf { MockBreedRepository.total(it) } + MockBreedRepository.coatCategoryIds.size + 2, total)
         click(R.string.filter_other)
         compose.onNodeWithText(breed.name).assertDoesNotExist()
         compose.onNodeWithText(text(R.string.monkey_rarity)).assertDoesNotExist()

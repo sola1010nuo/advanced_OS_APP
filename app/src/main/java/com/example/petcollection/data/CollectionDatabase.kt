@@ -21,11 +21,19 @@ data class OtherAlbumMember(@PrimaryKey val encounterId: String, val albumId: St
     entity = EncounterRecord::class, parentColumns = ["id"], childColumns = ["encounterId"],
     onDelete = ForeignKey.CASCADE
 )], indices = [Index("encounterId")])
-data class BreedCover(@PrimaryKey val breedId: String, val encounterId: String)
+data class BreedCover(@PrimaryKey val breedId: String, val encounterId: String,
+    @ColumnInfo(defaultValue = "NULL") val cropRegion: CropRegion? = null)
 
 data class EncounterCount(val breedId: String, val count: Int)
 
 class EncounterConverters {
+    @TypeConverter fun encodeRegion(value: CropRegion?): String? = value?.let {
+        listOf(it.left, it.top, it.width, it.height).joinToString(",")
+    }
+    @TypeConverter fun decodeRegion(value: String?): CropRegion? = value?.let {
+        val parts = it.split(',').map(String::toFloat)
+        CropRegion(parts[0], parts[1], parts[2], parts[3])
+    }
     @TypeConverter fun encode(value: LocalDateTime?): String? = value?.toString()
     @TypeConverter fun decode(value: String?): LocalDateTime? = value?.let(LocalDateTime::parse)
 }
@@ -278,10 +286,10 @@ abstract class EncounterDao {
     }
 
     @Transaction
-    open suspend fun selectCover(breedId: String, encounterId: String) {
+    open suspend fun selectCover(breedId: String, encounterId: String, region: CropRegion? = null) {
         val encounter = requireNotNull(get(encounterId))
         require(encounter.breedId == breedId && encounter.photoUri != null)
-        putCover(BreedCover(breedId, encounterId))
+        putCover(BreedCover(breedId, encounterId, region))
     }
 
     @Transaction
@@ -296,11 +304,22 @@ abstract class EncounterDao {
 }
 
 @Database(entities = [EncounterRecord::class, BreedCover::class, OtherAlbum::class, OtherAlbumMember::class,
-    PhotoSortSetting::class, PhotoOrder::class, AchievementUnlock::class, AchievementPhoto::class], version = 4, exportSchema = true)
+    PhotoSortSetting::class, PhotoOrder::class, AchievementUnlock::class, AchievementPhoto::class], version = 6, exportSchema = true)
 @TypeConverters(EncounterConverters::class)
 abstract class CollectionDatabase : RoomDatabase() {
     abstract fun encounters(): EncounterDao
     companion object {
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE breed_covers ADD COLUMN cropRegion TEXT DEFAULT NULL")
+            }
+        }
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE encounters ADD COLUMN latitude REAL")
+                db.execSQL("ALTER TABLE encounters ADD COLUMN longitude REAL")
+            }
+        }
         val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("CREATE TABLE achievement_unlocks (id TEXT NOT NULL PRIMARY KEY, unlockedAt INTEGER, announced INTEGER NOT NULL)")
@@ -362,7 +381,7 @@ abstract class CollectionDatabase : RoomDatabase() {
         @Volatile private var instance: CollectionDatabase? = null
         fun getInstance(context: Context): CollectionDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(context.applicationContext, CollectionDatabase::class.java,
-                "collection.db").addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build().also { instance = it }
+                "collection.db").addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6).build().also { instance = it }
         }
     }
 }

@@ -82,7 +82,7 @@ internal fun OtherAlbumsScreen(data: CollectionData, breeds: List<Breed>, state:
         EncounterDetailScreen(detailBreed, detail, onBack = { detailId = null },
             onEdit = { state.startEdit(detail) },
             onDelete = { state.deleteEncounter(detail.id) { detailId = null } },
-            onSetCover = { if (album != null) state.albumCover(album.id, detail.id) else state.selectCover(other.id, detail.id) },
+            onSetCover = { if (album != null) state.albumCover(album.id, detail.id) else state.photoInput.beginCover(other.id, detail) },
             busy = state.isWorking, modifier = modifier)
     } else LazyVerticalGrid(columns = GridCells.Fixed(2), state = grid,
         userScrollEnabled = photoDrag.draggingId == null,
@@ -136,7 +136,7 @@ internal fun OtherAlbumsScreen(data: CollectionData, breeds: List<Breed>, state:
             breeds.firstOrNull { it.isSecretMonkey && it.isVisibleInCollection }?.let { monkey ->
                 item(key = "monkey") {
                     Card(onClick = { onMonkey(monkey.id) }, shape = RoundedCornerShape(22.dp), colors = monkeyCardColors()) {
-                        BreedImageArea(monkey, monkey.coverPhoto, false, Modifier.fillMaxWidth().aspectRatio(1f))
+                        BreedImageArea(monkey, monkey.coverPhoto, false, Modifier.fillMaxWidth().aspectRatio(EncounterPhotoLayout.aspectRatio))
                         MonkeyLegendaryBadge()
                         Text(monkey.name, Modifier.padding(12.dp))
                     }
@@ -162,7 +162,7 @@ internal fun OtherAlbumsScreen(data: CollectionData, breeds: List<Breed>, state:
                     shape = RoundedCornerShape(22.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
                         Column {
-                            BreedImageArea(other, cover?.let { BreedPhoto(it.id, it.photoUri) }, false, Modifier.fillMaxWidth().aspectRatio(1f))
+                            BreedImageArea(other, cover?.let { BreedPhoto(it.id, it.photoUri) }, false, Modifier.fillMaxWidth().aspectRatio(EncounterPhotoLayout.aspectRatio))
                             Text(entry.name, style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth().padding(14.dp))
                             Text(pluralStringResource(R.plurals.breed_encounters, records.size, records.size),
@@ -221,7 +221,7 @@ internal fun OtherAlbumsScreen(data: CollectionData, breeds: List<Breed>, state:
                         placementSpec = if (dragging) null else androidx.compose.animation.core.spring())
                     .then(photoDrag.itemModifier(photo.id))
                     .then(if (checked) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)) else Modifier)) {
-                BreedImageArea(other, BreedPhoto(photo.id, photo.photoUri), false, Modifier.fillMaxWidth().aspectRatio(1f))
+                BreedImageArea(other, BreedPhoto(photo.id, photo.photoUri), false, Modifier.fillMaxWidth().aspectRatio(EncounterPhotoLayout.aspectRatio))
                 Row {
                     if (selectionMode) Checkbox(checked = checked, enabled = !state.isWorking, onCheckedChange = { toggle() })
                     Text(photo.petName ?: photo.encounteredAt?.toLocalDate()?.toString() ?: stringResource(R.string.photo_date_missing), Modifier.padding(top = 12.dp))

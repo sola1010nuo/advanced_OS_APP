@@ -24,10 +24,14 @@ import com.example.petcollection.R
 import com.example.petcollection.data.Breed
 import com.example.petcollection.data.BreedPhoto
 import com.example.petcollection.data.Species
+import com.example.petcollection.data.PhotoCropIO
+import com.example.petcollection.data.SquareCrop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/** Shared cover/gallery area. Locked entries never load or display a collected photo. */
+/** Shared cover/gallery area. Always preserve the complete confirmed crop, including legacy aspect ratios.
+ * Locked entries never load or display a collected photo.
+ */
 @Composable
 internal fun BreedImageArea(
     breed: Breed,
@@ -37,7 +41,8 @@ internal fun BreedImageArea(
 ) {
     val context = LocalContext.current
     val photoUri = if (locked) null else photo?.uri
-    val bitmap by produceState<ImageBitmap?>(null, photoUri, context) {
+    val cropRegion = photo?.cropRegion
+    val bitmap by produceState<ImageBitmap?>(null, photoUri, cropRegion, context) {
         value = null
         value = withContext(Dispatchers.IO) {
             val uri = photoUri?.let(Uri::parse)
@@ -46,6 +51,13 @@ internal fun BreedImageArea(
             } else {
                 // Use two streams for bounds and decoding; sample large camera images.
                 runCatching {
+                    if (cropRegion != null) {
+                        // Use the identical EXIF-oriented source and renderer as the cover editor.
+                        val source = PhotoCropIO.prepare(context, uri).bitmap
+                        return@runCatching try {
+                            PhotoCropIO.render(source, SquareCrop.fromRegion(cropRegion, source.width, source.height)).asImageBitmap()
+                        } finally { source.recycle() }
+                    }
                     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
                     context.contentResolver.openInputStream(uri)?.use {
                         BitmapFactory.decodeStream(it, null, bounds)
@@ -70,7 +82,7 @@ internal fun BreedImageArea(
         val image = bitmap
         if (!locked && image != null) {
             Image(image, contentDescription = stringResource(R.string.breed_photo_description, breed.name),
-                modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
         } else if (breed.species == null) {
             Text(stringResource(R.string.breed_photo_placeholder), color = colors.onSurfaceVariant)
         } else {

@@ -1,7 +1,7 @@
 package com.example.petcollection.data
 
 /** Photo references can later come from app storage or a Room encounter record. */
-data class BreedPhoto(val id: String, val uri: String? = null)
+data class BreedPhoto(val id: String, val uri: String? = null, val cropRegion: CropRegion? = null)
 enum class Species { CAT, DOG }
 
 data class Breed(
