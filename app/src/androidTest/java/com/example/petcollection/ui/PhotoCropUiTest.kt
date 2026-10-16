@@ -48,7 +48,7 @@ class PhotoCropUiTest {
     @get:Rule val compose = createComposeRule()
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context = instrumentation.targetContext
-    private val expectedRatio = 4f / 3f
+    private val expectedRatio = 2f
 
     @Test fun sharedPhotosKeepAllFourEdgesInThumbnailsAndMismatchedLegacyContainers() {
         val directory = PhotoCropIO.sessionDirectory(context)
@@ -103,7 +103,7 @@ class PhotoCropUiTest {
         } finally { PhotoCropIO.deleteSession(directory) }
     }
 
-    @Test fun collectedDetailShowsTheSameAreaAsTheFourByThreeCropAtDifferentWidths() {
+    @Test fun collectedDetailShowsTheSameAreaAsTheFreeCropAtDifferentWidths() {
         // A gradient in both axes makes any second crop visible in the pixel comparison.
         val bitmap = Bitmap.createBitmap(640, 640, Bitmap.Config.ARGB_8888)
         bitmap.setPixels(IntArray(640 * 640) { index ->
@@ -131,7 +131,7 @@ class PhotoCropUiTest {
             val preview = compose.onNodeWithTag("photo-crop-frame").captureToImage().asAndroidBitmap()
             compose.onNodeWithTag("photo-crop-confirm").performClick()
             val crop = requireNotNull(chosen)
-            assertEquals(4f / 3f, crop.aspectRatio, 0f)
+            assertEquals(1f, crop.aspectRatio, .001f)
             val exported = PhotoCropIO.export(source, crop, directory)
             val saved = runBlocking { repo.create(EncounterRecord(breed.id, exported.uri.toString())).first }
             savedFile = File(requireNotNull(Uri.parse(saved.photoUri).path))
@@ -149,7 +149,10 @@ class PhotoCropUiTest {
                 val shown = detail.captureToImage().asAndroidBitmap()
                 for (x in listOf(.1f, .5f, .9f)) for (y in listOf(.1f, .5f, .9f)) {
                     val expected = preview.getPixel((preview.width * x).toInt(), (preview.height * y).toInt())
-                    val actual = shown.getPixel((shown.width * x).toInt(), (shown.height * y).toInt())
+                    val fitWidth = minOf(shown.width.toFloat(), shown.height * crop.aspectRatio)
+                    val fitHeight = fitWidth / crop.aspectRatio
+                    val actual = shown.getPixel(((shown.width - fitWidth) / 2 + fitWidth * x).toInt(),
+                        ((shown.height - fitHeight) / 2 + fitHeight * y).toInt())
                     assertEquals(Color.red(expected).toFloat(), Color.red(actual).toFloat(), 3f)
                     assertEquals(Color.green(expected).toFloat(), Color.green(actual).toFloat(), 3f)
                     assertEquals(Color.blue(expected).toFloat(), Color.blue(actual).toFloat(), 3f)

@@ -46,7 +46,7 @@ fun EncounterDetailScreen(breed: Breed, record: EncounterRecord, onBack: () -> U
         record.note?.let { EncounterField(R.string.encounter_note, it) }
         if (record.photoUri != null) {
             if (breed.coverPhoto?.id == record.id) Text(stringResource(R.string.encounter_current_cover))
-            else OutlinedButton(enabled = !busy, onClick = onSetCover) { Text(stringResource(R.string.encounter_set_cover)) }
+            OutlinedButton(enabled = !busy, onClick = onSetCover) { Text(stringResource(R.string.encounter_set_cover)) }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Button(enabled = !busy, onClick = onEdit) { Text(stringResource(R.string.encounter_edit)) }

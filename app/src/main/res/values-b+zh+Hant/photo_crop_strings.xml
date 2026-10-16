@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="crop_title">裁切照片</string>
-    <string name="crop_hint">拖曳移動、雙指縮放。辨識與收藏都會使用框內的照片，比例與圖鑑照片詳細頁一致。</string>
+    <string name="crop_drag_hint">拖曳照片以調整位置</string>
+    <string name="crop_pinch_hint">雙指縮放照片</string>
+    <string name="crop_hint">辨識與收藏都會使用框內的照片，比例與圖鑑照片詳細頁一致。</string>
+    <string name="crop_loading">正在處理照片…</string>
     <string name="crop_zoom">縮放</string>
     <string name="crop_cancel">取消</string>
-    <string name="crop_confirm">確認裁切</string>
+    <string name="crop_confirm">確認</string>
     <string name="crop_retry">重新載入照片</string>
     <string name="crop_error">照片處理失敗，請重新載入或取消。尚未收藏的裁切檔案將會清理。</string>
     <string name="photo_gps">原始照片 GPS</string>
+    <string name="crop_reset">重設</string>
+    <string name="crop_cover_ratio">封面比例</string>
 </resources>

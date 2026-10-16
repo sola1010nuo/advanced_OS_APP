@@ -24,6 +24,8 @@ import com.example.petcollection.R
 import com.example.petcollection.data.Breed
 import com.example.petcollection.data.BreedPhoto
 import com.example.petcollection.data.Species
+import com.example.petcollection.data.PhotoCropIO
+import com.example.petcollection.data.SquareCrop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -39,7 +41,8 @@ internal fun BreedImageArea(
 ) {
     val context = LocalContext.current
     val photoUri = if (locked) null else photo?.uri
-    val bitmap by produceState<ImageBitmap?>(null, photoUri, context) {
+    val cropRegion = photo?.cropRegion
+    val bitmap by produceState<ImageBitmap?>(null, photoUri, cropRegion, context) {
         value = null
         value = withContext(Dispatchers.IO) {
             val uri = photoUri?.let(Uri::parse)
@@ -48,6 +51,13 @@ internal fun BreedImageArea(
             } else {
                 // Use two streams for bounds and decoding; sample large camera images.
                 runCatching {
+                    if (cropRegion != null) {
+                        // Use the identical EXIF-oriented source and renderer as the cover editor.
+                        val source = PhotoCropIO.prepare(context, uri).bitmap
+                        return@runCatching try {
+                            PhotoCropIO.render(source, SquareCrop.fromRegion(cropRegion, source.width, source.height)).asImageBitmap()
+                        } finally { source.recycle() }
+                    }
                     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
                     context.contentResolver.openInputStream(uri)?.use {
                         BitmapFactory.decodeStream(it, null, bounds)

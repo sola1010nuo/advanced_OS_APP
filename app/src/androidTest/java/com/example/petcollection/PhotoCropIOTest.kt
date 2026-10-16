@@ -98,21 +98,24 @@ class PhotoCropIOTest {
         val original = PhotoCropTestFixtures.original(context)
         val directory = PhotoCropIO.sessionDirectory(context)
         try {
-            val output = PhotoCropIO.export(PhotoCropIO.prepare(context, Uri.fromFile(original)), SquareCrop(.75f, .5f, 2f, 4f / 3f), directory)
-            val crop = BitmapFactory.decodeFile(output.file.path)
-            val input = BreedClassifier.rgbInput(crop)
-            assertEquals(224 * 224 * 3 * 4, input.remaining())
-            repeat(224 * 224) {
-                assertTrue(input.float < 20f)
-                assertTrue(input.float < 20f)
-                assertTrue(input.float > 240f) // RGB [0,255]; original has red pixels outside the selected crop.
+            val source = PhotoCropIO.prepare(context, Uri.fromFile(original))
+            for (region in listOf(CropRegion(.55f, .1f, .25f, .8f), CropRegion(.55f, .2f, .4f, .4f))) {
+                val output = PhotoCropIO.export(source, SquareCrop.fromRegion(region, source.bitmap.width, source.bitmap.height), directory)
+                val crop = BitmapFactory.decodeFile(output.file.path)
+                val input = BreedClassifier.rgbInput(crop)
+                assertEquals(224 * 224 * 3 * 4, input.remaining())
+                repeat(224 * 224) {
+                    assertTrue(input.float < 20f)
+                    assertTrue(input.float < 20f)
+                    assertTrue(input.float > 240f) // RGB [0,255]; original has red pixels outside the selected crop.
+                }
+                AnimalClassifier(context).use { assertTrue(it.classify(crop).confidence in 0f..1f) }
+                for (type in BreedClassifier.AnimalType.entries) BreedClassifier(context, type).use {
+                    assertTrue(it.classify(crop).confidence in 0f..1f)
+                }
+                CatColorClassifier(context).use { assertTrue(it.classify(crop).second in 0f..1f) }
+                crop.recycle()
             }
-            AnimalClassifier(context).use { assertTrue(it.classify(crop).confidence in 0f..1f) }
-            for (type in BreedClassifier.AnimalType.entries) BreedClassifier(context, type).use {
-                assertTrue(it.classify(crop).confidence in 0f..1f)
-            }
-            CatColorClassifier(context).use { assertTrue(it.classify(crop).second in 0f..1f) }
-            crop.recycle()
         } finally { PhotoCropIO.deleteSession(directory); original.delete() }
     }
 }

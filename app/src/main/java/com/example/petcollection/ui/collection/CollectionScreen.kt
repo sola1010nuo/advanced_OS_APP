@@ -92,7 +92,7 @@ fun CollectionScreen(
             onBack = { selectedEncounterId = null },
             onEdit = { unlockState.startEdit(selectedEncounter) },
             onDelete = { unlockState.deleteEncounter(selectedEncounter.id) { selectedEncounterId = null } },
-            onSetCover = { unlockState.selectCover(selectedBreed.id, selectedEncounter.id) },
+            onSetCover = { unlockState.photoInput.beginCover(selectedBreed.id, selectedEncounter) },
             busy = unlockState.isWorking, modifier = modifier)
     } else if (selectedBreed != null) {
         BreedDetailScreen(selectedBreed, onBack = { selectedBreedId = null }, modifier = modifier,

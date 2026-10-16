@@ -34,9 +34,10 @@ data class CollectionData(
     fun applyTo(breed: Breed): Breed {
         val records = forBreed(breed.id)
         val photos = records.mapNotNull { record -> record.photoUri?.let { BreedPhoto(record.id, it) } }
-        val selected = covers.firstOrNull { it.breedId == breed.id }?.encounterId
+        val selected = covers.firstOrNull { it.breedId == breed.id }
         return breed.copy(isDiscovered = records.isNotEmpty(), encounterCount = records.size,
-            collectedPhotos = photos, coverPhoto = photos.firstOrNull { it.id == selected } ?: photos.lastOrNull())
+            collectedPhotos = photos, coverPhoto = photos.firstOrNull { it.id == selected?.encounterId }
+                ?.copy(cropRegion = selected?.cropRegion) ?: photos.lastOrNull())
     }
     fun discoveredCount(ids: Set<String>) = encounters.map { it.breedId }.filter { it in ids }.toSet().size
 
@@ -149,7 +150,7 @@ class EncounterRepository(private val dao: EncounterDao, private val context: Co
         require(record.breedId in MockBreedRepository.collectionIds)
         dao.updateTracked(record.copy(photoUri = old.photoUri, createdAt = old.createdAt), achievementCatalog, System.currentTimeMillis())
     }
-    suspend fun selectCover(breedId: String, encounterId: String) = dao.selectCover(breedId, encounterId)
+    suspend fun selectCover(breedId: String, encounterId: String, region: CropRegion? = null) = dao.selectCover(breedId, encounterId, region)
     suspend fun delete(id: String) {
         val deleted = dao.deleteAndRepairCover(id) ?: return
         deleted.photoUri?.let { if (dao.photoReferences(it) == 0) deletePrivatePhoto(it) }

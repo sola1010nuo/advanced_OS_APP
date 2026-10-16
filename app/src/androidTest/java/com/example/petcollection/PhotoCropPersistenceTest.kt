@@ -20,6 +20,43 @@ class PhotoCropPersistenceTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private suspend fun await(condition: () -> Boolean) = withTimeout(30000) { while (!condition()) delay(20) }
 
+    @Test fun freePortraitAndLandscapeUseTheConfirmedPixelsForRealModelsAndCollection() = runBlocking {
+        val db = Room.inMemoryDatabaseBuilder(context, CollectionDatabase::class.java).build()
+        val state = CollectionUnlockState(EncounterRepository(db.encounters(), context))
+        val original = PhotoCropTestFixtures.original(context)
+        val originalBytes = original.readBytes()
+        val files = mutableListOf<File>()
+        try {
+            state.collection.first { it.loaded }
+            for (region in listOf(CropRegion(.55f, .1f, .25f, .8f), CropRegion(.55f, .2f, .4f, .4f))) {
+                withContext(Dispatchers.Main) { state.photoInput.begin(Uri.fromFile(original)) }
+                await { state.photoInput.source != null }
+                assertEquals(CropMode.FREE, state.photoInput.mode)
+                val source = requireNotNull(state.photoInput.source)
+                val crop = SquareCrop.fromRegion(region, source.bitmap.width, source.bitmap.height)
+                val expected = PhotoCropIO.render(source.bitmap, crop)
+                withContext(Dispatchers.Main) { state.photoInput.confirm(crop) }
+                await { state.pendingEncounter != null || state.photoInput.error }
+                assertFalse(state.photoInput.error)
+                assertTrue(expected.sameAs(state.photoInput.recognition.bitmap))
+                val draft = requireNotNull(state.pendingEncounter)
+                withContext(Dispatchers.Main) { state.editEncounter(); state.saveEncounter(draft) }
+                await { !state.isWorking && state.pendingEncounter == null }
+                val saved = state.collection.first { it.encounters.any { row -> row.id == draft.id } }.encounters.first { it.id == draft.id }
+                val file = File(requireNotNull(Uri.parse(saved.photoUri).path)).also(files::add)
+                val decoded = BitmapFactory.decodeFile(file.path)
+                assertTrue(expected.sameAs(decoded))
+                assertEquals(draft.encounteredAt, saved.encounteredAt)
+                assertEquals(draft.latitude, saved.latitude)
+                decoded.recycle(); expected.recycle()
+            }
+            assertArrayEquals(originalBytes, original.readBytes())
+        } finally {
+            withContext(Dispatchers.Main) { ViewModelStore().apply { put("free", state); clear() } }
+            db.close(); original.delete(); files.forEach { it.delete() }
+        }
+    }
+
     @Test fun realRecognitionAndEveryAlbumKeepOnlyTheCropWithOriginalMetadataAfterRestart() = runBlocking {
         val name = "crop-persistence-${UUID.randomUUID()}.db"
         fun open() = Room.databaseBuilder(context, CollectionDatabase::class.java, name).build()

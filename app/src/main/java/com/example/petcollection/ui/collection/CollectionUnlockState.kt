@@ -118,6 +118,10 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         super.onCleared()
     }
     fun selectCover(breedId: String, encounterId: String) = perform { repository.selectCover(breedId, encounterId) }
+    suspend fun saveCroppedCover(breedId: String, encounterId: String, region: CropRegion) {
+        repository.selectCover(breedId, encounterId, region)
+        collection.first { data -> data.covers.any { it.breedId == breedId && it.encounterId == encounterId && it.cropRegion == region } }
+    }
     fun createAlbum(name: String, onCreated: (String) -> Unit = {}) = perform { onCreated(repository.createAlbum(name)) }
     fun renameAlbum(id: String, name: String, onRenamed: () -> Unit = {}) = perform { repository.renameAlbum(id, name); onRenamed() }
     fun reorderAlbum(id: String, offset: Int) = perform { repository.reorderAlbum(id, offset) }

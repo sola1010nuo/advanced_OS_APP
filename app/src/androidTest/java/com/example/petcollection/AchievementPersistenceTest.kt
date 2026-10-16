@@ -16,7 +16,7 @@ import org.junit.Test
 class AchievementPersistenceTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private fun open(name: String) = Room.databaseBuilder(context, CollectionDatabase::class.java, name)
-        .addMigrations(CollectionDatabase.MIGRATION_1_2, CollectionDatabase.MIGRATION_2_3, CollectionDatabase.MIGRATION_3_4, CollectionDatabase.MIGRATION_4_5).build()
+        .addMigrations(CollectionDatabase.MIGRATION_1_2, CollectionDatabase.MIGRATION_2_3, CollectionDatabase.MIGRATION_3_4, CollectionDatabase.MIGRATION_4_5, CollectionDatabase.MIGRATION_5_6).build()
 
     @Test fun versionThreeMigrationPreservesPhotosCoversAlbumsAndSortOrdersAndBackfillsWithoutDates() = runBlocking {
         val name = "ach-migration-${UUID.randomUUID()}.db"
@@ -46,6 +46,11 @@ class AchievementPersistenceTest {
                 raw.execSQL("DROP TABLE encounters")
                 raw.execSQL("ALTER TABLE encounters_v3 RENAME TO encounters")
                 raw.execSQL("CREATE INDEX index_encounters_breedId ON encounters(breedId)")
+                raw.execSQL("CREATE TABLE breed_covers_v3 (breedId TEXT NOT NULL PRIMARY KEY, encounterId TEXT NOT NULL, FOREIGN KEY(encounterId) REFERENCES encounters(id) ON DELETE CASCADE)")
+                raw.execSQL("INSERT INTO breed_covers_v3 SELECT breedId, encounterId FROM breed_covers")
+                raw.execSQL("DROP TABLE breed_covers")
+                raw.execSQL("ALTER TABLE breed_covers_v3 RENAME TO breed_covers")
+                raw.execSQL("CREATE INDEX index_breed_covers_encounterId ON breed_covers(encounterId)")
                 raw.version = 3
             }
             db = open(name)

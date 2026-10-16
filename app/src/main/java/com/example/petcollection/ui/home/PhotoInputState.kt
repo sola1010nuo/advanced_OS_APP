@@ -15,6 +15,9 @@ class PhotoInputState(private val context: Context, private val scope: Coroutine
     private var generation = 0
     private var original: Uri? = null
     private var temporary: CroppedPhoto? = null
+    private var coverTarget: Pair<String, String>? = null
+    var mode by mutableStateOf(CropMode.FREE)
+        private set
     var source by mutableStateOf<CropSource?>(null)
         private set
     var opening by mutableStateOf(false)
@@ -28,7 +31,19 @@ class PhotoInputState(private val context: Context, private val scope: Coroutine
 
     fun begin(uri: Uri) {
         if (owner.pendingEncounter != null || owner.isWorking) return
-        discard()
+        open(uri, null)
+    }
+
+    fun beginCover(breedId: String, record: EncounterRecord) {
+        if (owner.pendingEncounter != null || owner.isWorking || record.photoUri == null) return
+        require(record.breedId == breedId)
+        open(Uri.parse(record.photoUri), breedId to record.id)
+    }
+
+    private fun open(uri: Uri, target: Pair<String, String>?) {
+        clear(keepRecognition = target != null)
+        coverTarget = target
+        mode = if (target == null) CropMode.FREE else CropMode.COVER
         original = uri
         opening = true
         val current = generation
@@ -48,10 +63,21 @@ class PhotoInputState(private val context: Context, private val scope: Coroutine
         exporting = true
         error = false
         val current = generation
+        val target = coverTarget
         job = scope.launch {
             // Assign inside IO too, so cancellation during dispatch cannot orphan an exported file.
             var output: CroppedPhoto? = null
             try {
+                if (target != null) {
+                    val bounds = crop.bounds(loaded.bitmap.width, loaded.bitmap.height)
+                    val region = CropRegion(bounds.left / loaded.bitmap.width, bounds.top / loaded.bitmap.height,
+                        bounds.side / loaded.bitmap.width, bounds.height / loaded.bitmap.height)
+                    owner.saveCroppedCover(target.first, target.second, region)
+                    source = null
+                    original = null
+                    coverTarget = null
+                    return@launch
+                }
                 withContext(Dispatchers.IO) { output = PhotoCropIO.export(loaded, crop, directory) }
                 ensureActive()
                 val photo = requireNotNull(output)
@@ -75,14 +101,14 @@ class PhotoInputState(private val context: Context, private val scope: Coroutine
                 output?.file?.delete()
                 if (generation == current) {
                     temporary = null
-                    displayedUri = null
+                    if (target == null) displayedUri = null
                     error = true
                 }
             } finally { if (generation == current) exporting = false }
         }
     }
 
-    fun retry() { original?.let(::begin) }
+    fun retry() { original?.let { open(it, coverTarget) } }
 
     /** Saving copies the confirmed crop into encounter_photos before its cache file is removed. */
     fun saved(record: EncounterRecord) {
@@ -93,6 +119,10 @@ class PhotoInputState(private val context: Context, private val scope: Coroutine
     }
 
     fun discard() {
+        clear(keepRecognition = mode == CropMode.COVER)
+    }
+
+    private fun clear(keepRecognition: Boolean) {
         generation++
         job?.cancel()
         job = null
@@ -103,8 +133,11 @@ class PhotoInputState(private val context: Context, private val scope: Coroutine
         exporting = false
         error = false
         original = null
-        displayedUri = null
-        recognition.reset()
+        coverTarget = null
+        if (!keepRecognition) {
+            displayedUri = null
+            recognition.reset()
+        }
     }
 
     fun close() { discard(); PhotoCropIO.deleteSession(directory) }

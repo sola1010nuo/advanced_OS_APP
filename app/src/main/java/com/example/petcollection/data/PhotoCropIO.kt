@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.ResolverStyle
 import java.util.UUID
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 data class PhotoMetadata(val capturedAt: LocalDateTime? = null, val timeZoneId: String? = null,
     val latitude: Double? = null, val longitude: Double? = null)
@@ -73,25 +74,32 @@ object PhotoCropIO {
     fun draw(canvas: Canvas, bitmap: Bitmap, crop: SquareCrop, edge: Float) {
         val bounds = crop.bounds(bitmap.width, bitmap.height)
         val scale = edge / bounds.side
+        // Cover the entire floating-point selection even when integer output dimensions round differently.
+        val scaleY = canvas.height / bounds.height
         canvas.drawColor(Color.WHITE)
         canvas.drawBitmap(bitmap, Matrix().apply {
-            setScale(scale, scale)
-            postTranslate(-bounds.left * scale, -bounds.top * scale)
+            setScale(scale, scaleY)
+            postTranslate(-bounds.left * scale, -bounds.top * scaleY)
         }, Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG))
     }
 
-    fun export(source: CropSource, crop: SquareCrop, directory: File): CroppedPhoto {
-        val bounds = crop.bounds(source.bitmap.width, source.bitmap.height)
+    fun render(bitmap: Bitmap, crop: SquareCrop): Bitmap {
+        val bounds = crop.bounds(bitmap.width, bitmap.height)
         val scale = min(1f, 1024f / maxOf(bounds.side, bounds.height))
         // Keep the collection's 4:3 output exact even when the source crop has fractional dimensions.
         val isFourByThree = crop.aspectRatio == 4f / 3f
         val width = if (isFourByThree) ((bounds.side * scale).toInt() / 4).coerceAtLeast(1) * 4
             else (bounds.side * scale).toInt().coerceAtLeast(1)
-        val height = if (isFourByThree) width / 4 * 3 else (width / crop.aspectRatio).toInt().coerceAtLeast(1)
+        val height = if (isFourByThree) width / 4 * 3 else (width / crop.aspectRatio).roundToInt().coerceIn(1, 1024)
         val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        draw(Canvas(result), bitmap, crop, width.toFloat())
+        return result
+    }
+
+    fun export(source: CropSource, crop: SquareCrop, directory: File): CroppedPhoto {
+        val result = render(source.bitmap, crop)
         val file = File(directory, "${UUID.randomUUID()}.png")
         try {
-            draw(Canvas(result), source.bitmap, crop, width.toFloat())
             file.outputStream().use { check(result.compress(Bitmap.CompressFormat.PNG, 100, it)) }
             return CroppedPhoto(file, source.metadata)
         } catch (error: Throwable) { file.delete(); throw error }

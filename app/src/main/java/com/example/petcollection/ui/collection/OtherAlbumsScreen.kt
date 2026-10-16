@@ -82,7 +82,7 @@ internal fun OtherAlbumsScreen(data: CollectionData, breeds: List<Breed>, state:
         EncounterDetailScreen(detailBreed, detail, onBack = { detailId = null },
             onEdit = { state.startEdit(detail) },
             onDelete = { state.deleteEncounter(detail.id) { detailId = null } },
-            onSetCover = { if (album != null) state.albumCover(album.id, detail.id) else state.selectCover(other.id, detail.id) },
+            onSetCover = { if (album != null) state.albumCover(album.id, detail.id) else state.photoInput.beginCover(other.id, detail) },
             busy = state.isWorking, modifier = modifier)
     } else LazyVerticalGrid(columns = GridCells.Fixed(2), state = grid,
         userScrollEnabled = photoDrag.draggingId == null,
