@@ -22,5 +22,7 @@ data class EncounterRecord(
     val petName: String? = null,
     val location: String? = null,
     val note: String? = null,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )

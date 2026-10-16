@@ -3,7 +3,6 @@ package com.example.petcollection.ui
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivityResultRegistryOwner
-import android.content.Intent
 import android.content.Context
 import android.content.ContextWrapper
 import android.net.Uri
@@ -56,7 +55,6 @@ import com.example.petcollection.ui.home.CollectionCategory
 import com.example.petcollection.ui.home.HomeScreen
 import com.example.petcollection.ui.home.AchievementsScreen
 import com.example.petcollection.ui.home.AchievementNotifications
-import com.example.petcollection.ui.home.PhotoRecognitionState
 import com.example.petcollection.ui.theme.PetCollectionTheme
 import com.example.petcollection.ui.settings.EffectsSettingRow
 import com.example.petcollection.ui.settings.EffectsSettingsUiState
@@ -88,10 +86,8 @@ fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberColl
     var collectionSpecies by rememberSaveable { mutableStateOf(Species.CAT.name) }
     // Reselecting Collection discards only its local detail/album routes, not stored photos.
     var collectionRootRequest by rememberSaveable { mutableIntStateOf(0) }
-    // Each picker selection starts one automatic recognition, including selecting the same URI again.
-    var selectedPhotoUri by rememberSaveable { mutableStateOf<String?>(null) }
-    var photoRequest by rememberSaveable { mutableIntStateOf(0) }
-    val recognitionState = remember { PhotoRecognitionState() }
+    val photoInput = collectionUnlockState.photoInput
+    val recognitionState = photoInput.recognition
     val baseContext = LocalContext.current
     val view = LocalView.current
     val settingsBackEnabled = destination == Destination.SETTINGS.name && collectionUnlockState.pendingEncounter == null
@@ -104,13 +100,7 @@ fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberColl
     val activityResultOwner = LocalActivityResultRegistryOwner.current
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
-            try {
-                baseContext.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            } catch (_: SecurityException) {
-                // Some providers grant read access for the current session only.
-            }
-            selectedPhotoUri = uri.toString()
-            photoRequest++
+            photoInput.begin(uri)
         }
     }
     val systemConfiguration = LocalConfiguration.current
@@ -124,9 +114,6 @@ fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberColl
     }
     val entries = remember(localizedContext) { MockBreedRepository(localizedContext.resources).getCollectionEntries() }
     val breeds = entries.map { collectionData.applyTo(it) }
-    LaunchedEffect(selectedPhotoUri, photoRequest) {
-        selectedPhotoUri?.let { recognitionState.recognize(baseContext.applicationContext, Uri.parse(it), entries, collectionUnlockState) }
-    }
     val dark = when (Appearance.valueOf(appearance)) {
         Appearance.SYSTEM -> isSystemInDarkTheme()
         Appearance.LIGHT -> false
@@ -175,7 +162,7 @@ fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberColl
                                 stats.totalBreeds, stats.discovered, stats.encounterCount)
                         },
                         encounterCount = collectionData.statistics(entries).encounterCount,
-                        selectedPhotoUri = selectedPhotoUri?.let(Uri::parse),
+                        selectedPhotoUri = photoInput.displayedUri?.let(Uri::parse),
                         onAddPhoto = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                         onOpenCollection = { species ->
                             collectionSpecies = species.name
@@ -183,7 +170,7 @@ fun PetCollectionApp(collectionUnlockState: CollectionUnlockState = rememberColl
                         },
                         recognitionState = recognitionState,
                         recognizedBreedName = breeds.firstOrNull { it.id == recognitionState.breedId }?.name,
-                        onRetryRecognition = { photoRequest++ },
+                        onRetryRecognition = photoInput::retry,
                         collectionStatistics = collectionData.statistics(entries),
                         onOpenSettings = { destination = Destination.SETTINGS.name }
                     )

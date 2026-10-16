@@ -27,7 +27,9 @@ import com.example.petcollection.data.Species
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/** Shared cover/gallery area. Locked entries never load or display a collected photo. */
+/** Shared cover/gallery area. Always preserve the complete confirmed crop, including legacy aspect ratios.
+ * Locked entries never load or display a collected photo.
+ */
 @Composable
 internal fun BreedImageArea(
     breed: Breed,
@@ -70,7 +72,7 @@ internal fun BreedImageArea(
         val image = bitmap
         if (!locked && image != null) {
             Image(image, contentDescription = stringResource(R.string.breed_photo_description, breed.name),
-                modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
         } else if (breed.species == null) {
             Text(stringResource(R.string.breed_photo_placeholder), color = colors.onSurfaceVariant)
         } else {

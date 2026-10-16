@@ -296,11 +296,17 @@ abstract class EncounterDao {
 }
 
 @Database(entities = [EncounterRecord::class, BreedCover::class, OtherAlbum::class, OtherAlbumMember::class,
-    PhotoSortSetting::class, PhotoOrder::class, AchievementUnlock::class, AchievementPhoto::class], version = 4, exportSchema = true)
+    PhotoSortSetting::class, PhotoOrder::class, AchievementUnlock::class, AchievementPhoto::class], version = 5, exportSchema = true)
 @TypeConverters(EncounterConverters::class)
 abstract class CollectionDatabase : RoomDatabase() {
     abstract fun encounters(): EncounterDao
     companion object {
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE encounters ADD COLUMN latitude REAL")
+                db.execSQL("ALTER TABLE encounters ADD COLUMN longitude REAL")
+            }
+        }
         val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("CREATE TABLE achievement_unlocks (id TEXT NOT NULL PRIMARY KEY, unlockedAt INTEGER, announced INTEGER NOT NULL)")
@@ -362,7 +368,7 @@ abstract class CollectionDatabase : RoomDatabase() {
         @Volatile private var instance: CollectionDatabase? = null
         fun getInstance(context: Context): CollectionDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(context.applicationContext, CollectionDatabase::class.java,
-                "collection.db").addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build().also { instance = it }
+                "collection.db").addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5).build().also { instance = it }
         }
     }
 }

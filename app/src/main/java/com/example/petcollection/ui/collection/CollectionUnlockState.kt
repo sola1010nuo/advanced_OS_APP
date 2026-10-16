@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.petcollection.data.*
 import com.example.petcollection.ui.effects.RecognitionEffectsState
+import com.example.petcollection.ui.home.PhotoInputState
 import java.time.LocalDateTime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.*
@@ -39,17 +40,20 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
     var recognitionConfidence by mutableStateOf<Float?>(null)
         private set
     private var editingExisting = false
+    val photoInput = PhotoInputState(repository.photoContext, viewModelScope, this)
 
     fun applyTo(breed: Breed, data: CollectionData = collection.value): Breed = data.applyTo(breed)
 
     /** Future callers supply a canonical entry; a draft never unlocks a breed before INSERT. */
-    fun onBreedRecognized(breed: Breed, photoUri: String?, photoTime: LocalDateTime? = null): Boolean {
+    fun onBreedRecognized(breed: Breed, photoUri: String?, photoTime: LocalDateTime? = null, metadata: PhotoMetadata? = null): Boolean {
         if (pendingEncounter != null || isWorking || !collection.value.loaded) return false
         require(breed.id in MockBreedRepository.collectionIds)
         recognitionEffects.clear()
         recognitionConfidence = null
         pendingEncounter = EncounterRecord(breedId = breed.id, photoUri = photoUri,
-            encounteredAt = photoTime ?: LocalDateTime.now())
+            encounteredAt = if (metadata != null) metadata.capturedAt else photoTime ?: LocalDateTime.now(),
+            timeZoneId = metadata?.timeZoneId ?: java.time.ZoneId.systemDefault().id,
+            latitude = metadata?.latitude, longitude = metadata?.longitude)
         editingExisting = false
         isFirstDiscovery = breed.showsDiscoveryState && collection.value.forBreed(breed.id).isEmpty()
         showRecognitionResult = true
@@ -60,9 +64,10 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
     /** Future three-class classifier: pass canonical "monkey" here, with the selected URI.
      * This only creates a preview draft; the editor remains the sole save entry point.
      */
-    fun onClassificationResult(canonicalId: String, catalog: List<Breed>, photoUri: String, confidence: Float? = null): Boolean {
+    fun onClassificationResult(canonicalId: String, catalog: List<Breed>, photoUri: String, confidence: Float? = null,
+        metadata: PhotoMetadata? = null): Boolean {
         val breed = catalog.firstOrNull { it.id == canonicalId } ?: return false
-        if (!onBreedRecognized(breed, photoUri)) return false
+        if (!onBreedRecognized(breed, photoUri, metadata = metadata)) return false
         recognitionConfidence = confidence
         recognitionEffects.onClassificationCompleted(requireNotNull(pendingEncounter).id, breed)
         return true
@@ -85,6 +90,7 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
         pendingEncounter = null
         showRecognitionResult = false
         operationError = false
+        if (!editingExisting) photoInput.discard()
     }
     fun clearError() { operationError = false }
 
@@ -101,10 +107,15 @@ class CollectionUnlockState(private val repository: EncounterRepository) : ViewM
                 onSaved(record)
             } else {
                 val (stored, _) = repository.create(record, recognized = true)
+                photoInput.saved(stored)
                 pendingEncounter = null
                 onSaved(stored)
             }
         }
+    }
+    override fun onCleared() {
+        photoInput.close()
+        super.onCleared()
     }
     fun selectCover(breedId: String, encounterId: String) = perform { repository.selectCover(breedId, encounterId) }
     fun createAlbum(name: String, onCreated: (String) -> Unit = {}) = perform { onCreated(repository.createAlbum(name)) }

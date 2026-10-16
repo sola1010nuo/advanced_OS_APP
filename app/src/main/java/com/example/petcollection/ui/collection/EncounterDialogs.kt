@@ -61,7 +61,7 @@ fun RecognitionResultDialog(
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                 ) {
                     Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                        RecognitionEffectAnchor(effects, draft.id, Modifier.fillMaxWidth().aspectRatio(1f)) {
+                        RecognitionEffectAnchor(effects, draft.id, Modifier.fillMaxWidth().aspectRatio(EncounterPhotoLayout.aspectRatio)) {
                             BreedImageArea(breed, BreedPhoto(draft.id, draft.photoUri), locked = false,
                                 modifier = Modifier.fillMaxSize())
                         }
@@ -106,7 +106,7 @@ fun EncounterEditorDialog(
                 if (hasError) Text(stringResource(R.string.collection_storage_error), color = MaterialTheme.colorScheme.error)
                 Card(shape = RoundedCornerShape(20.dp)) {
                     BreedImageArea(breed, BreedPhoto(initialEncounter.id, initialEncounter.photoUri),
-                        locked = false, modifier = Modifier.fillMaxWidth().height(160.dp))
+                        locked = false, modifier = Modifier.fillMaxWidth().aspectRatio(EncounterPhotoLayout.aspectRatio))
                 }
                 OutlinedTextField(value = name, onValueChange = { name = it }, modifier = Modifier.fillMaxWidth(),
                     label = { Text(stringResource(R.string.encounter_name)) }, singleLine = true)

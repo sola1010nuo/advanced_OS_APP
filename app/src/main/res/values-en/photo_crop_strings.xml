@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crop_title">Crop photo</string>
+    <string name="crop_hint">Drag to move and pinch to zoom. Recognition and collection use the photo shown here, with the same aspect ratio as the collection photo detail page.</string>
+    <string name="crop_zoom">Zoom</string>
+    <string name="crop_cancel">Cancel</string>
+    <string name="crop_confirm">Confirm crop</string>
+    <string name="crop_retry">Reload photo</string>
+    <string name="crop_error">Photo processing failed. Reload or cancel. Uncollected crop files will be cleaned up.</string>
+    <string name="photo_gps">Original photo GPS</string>
+</resources>

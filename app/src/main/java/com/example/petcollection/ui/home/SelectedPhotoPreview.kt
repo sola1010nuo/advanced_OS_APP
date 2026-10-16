@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.petcollection.ui.collection.EncounterPhotoLayout
 import com.example.petcollection.R
 
 /** The photo develops inside a Material 3 Polaroid frame; results use catalog names. */
@@ -33,7 +34,7 @@ fun SelectedPhotoPreview(state: PhotoRecognitionState, breedName: String?, onRet
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Box(Modifier.fillMaxWidth().aspectRatio(1f).background(MaterialTheme.colorScheme.surfaceVariant),
+            Box(Modifier.fillMaxWidth().aspectRatio(EncounterPhotoLayout.aspectRatio).background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center) {
                 if (photo != null) {
                     Image(photo.asImageBitmap(), contentDescription = stringResource(R.string.selected_photo),

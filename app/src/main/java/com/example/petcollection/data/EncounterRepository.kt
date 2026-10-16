@@ -54,6 +54,7 @@ data class CollectionStatistics(val discovered: Int, val totalBreeds: Int, val e
 
 /** One persistent encounter store shared by all normal breeds and special albums. */
 class EncounterRepository(private val dao: EncounterDao, private val context: Context) {
+    internal val photoContext: Context get() = context.applicationContext
     private val achievementCatalog by lazy { MockBreedRepository(context.resources).getCollectionEntries() }
     private val initialization = Mutex()
     private var achievementsInitialized = false
